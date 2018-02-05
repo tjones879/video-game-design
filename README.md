@@ -1,4 +1,4 @@
-# video-game-design
+# video-game
 
 This project uses CMake and a compiler that is at least compatible with C++14.
 
