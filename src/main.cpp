@@ -16,9 +16,9 @@ enum KeyPressSurfaces {
 };
 
 SDL_Surface *gScreenSurface = NULL;
-SDL_Surface *gHelloWorld = NULL;
 SDL_Surface *gKeyPressSurfaces[KEY_PRESS_SURFACE_TOTAL];
 SDL_Surface *gCurrentSurface = NULL;
+SDL_Renderer *gRenderer = NULL;
 
 SDL_Surface *loadSurface(const std::string &path)
 {
@@ -34,17 +34,6 @@ SDL_Surface *loadSurface(const std::string &path)
 bool loadMedia()
 {
     bool success = true;
-
-    /*
-    gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT] = loadSurface("press.bmp");
-    if (!gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT])
-        std::cout << "Failed to load default image" << std::endl;
-    */
-    gHelloWorld = SDL_LoadBMP("assets/hello_world.bmp");
-    if (!gHelloWorld) {
-        std::cout << "Unable to load image: " << SDL_GetError() << std::endl;
-        success = false;
-    }
 
     return success;
 }
@@ -63,24 +52,31 @@ int main(int argc, char **args)
         return 1;
     }
 
+    gRenderer = SDL_CreateRenderer(window(), -1, SDL_RENDERER_ACCELERATED);
+    if (!gRenderer) {
+        std::cout << "Renderer could not be created!" << SDL_GetError() << std::endl;
+        return 1;
+    }
 
     gScreenSurface = SDL_GetWindowSurface(window());
     bool quit = false;
     SDL_Event e;
 
-    if (loadMedia()) {
-        while (!quit) {
-            SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-            SDL_UpdateWindowSurface(window());
-            SDL_Delay(16);
-
-            while (SDL_PollEvent(&e) != 0) {
-                if (e.type == SDL_QUIT)
-                    quit = true;
-            }
+    while (!quit) {
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT)
+                quit = true;
         }
+        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        SDL_RenderClear(gRenderer);
+        SDL_Rect fillRect = { SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
+        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0x00, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(gRenderer, &fillRect);
+        SDL_RenderPresent(gRenderer);
 
+        SDL_Delay(16);
     }
 
+    SDL_DestroyRenderer(gRenderer);
     return 0;
 }
