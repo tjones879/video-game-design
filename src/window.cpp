@@ -7,11 +7,8 @@ Window::Window(const std::string &title, int width, int height, Uint32 flags)
     window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED, width,
                               height, flags);
-    if (!window) {
+    if (!window)
         std::cout << "SDL Window Error: " << SDL_GetError() << std::endl;
-    } else {
-        std::cout << "SDL Window Succeeded" << std::endl;
-    }
 }
 
 Window::~Window()

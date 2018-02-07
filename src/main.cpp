@@ -40,7 +40,7 @@ bool loadMedia()
     if (!gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT])
         std::cout << "Failed to load default image" << std::endl;
     */
-    gHelloWorld = SDL_LoadBMP("hello_world.bmp");
+    gHelloWorld = SDL_LoadBMP("assets/hello_world.bmp");
     if (!gHelloWorld) {
         std::cout << "Unable to load image: " << SDL_GetError() << std::endl;
         success = false;
