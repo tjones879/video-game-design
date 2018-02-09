@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "inc/initialize.hpp"
 #include "inc/window.hpp"
+#include "inc/dot.hpp"
 #include <iostream>
 
 const int SCREEN_WIDTH = 640;
