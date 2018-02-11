@@ -10,6 +10,11 @@ add_executable(VGD
     src/main.cpp
     src/window.cpp
     src/initialize.cpp
-    src/dot.cpp)
+    src/physics/world.cpp
+    src/physics/body.cpp
+    src/physics/shape.cpp
+    src/physics/circle.cpp
+    src/physics/edge.cpp
+    src/physics/polygon.cpp)
 target_link_libraries(VGD ${SDL2_LIBRARIES})
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})

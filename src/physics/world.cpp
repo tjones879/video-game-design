@@ -1,18 +1,25 @@
-#pragma once
-
-#include <inc/physics/common.hpp>
+#include "inc/physics/world.hpp"
+#include "inc/physics/body.hpp"
 
 namespace phy {
 
-class Body;
-class Contact;
-class Joint;
+World::World(const Vec2 &gravity_)
+    : gravity(gravity_)
+{
 
+}
+
+World::~World() {}
+
+Body *World::createBody()
+{
+
+}
+
+
+
+/*
 class World {
-public:
-    World(const Vec2 &gravity_);
-    ~World();
-
     Body *createBody();
     void destroyBody();
     const Body *getBodies() const;
@@ -37,4 +44,6 @@ private:
     uint8_t velocityIterations;
     uint8_t positionIterations;
 };
+ */
+
 } /* namespace phy */
