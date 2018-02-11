@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "inc/initialize.hpp"
 #include "inc/window.hpp"
+#include "inc/eventhandler.hpp"
 #include <iostream>
 
 const int SCREEN_WIDTH = 640;
@@ -40,7 +41,7 @@ bool loadMedia()
     if (!gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT])
         std::cout << "Failed to load default image" << std::endl;
     */
-    gHelloWorld = SDL_LoadBMP("assets/hello_world.bmp");
+    gHelloWorld = SDL_LoadBMP("../assets/hello_world.bmp");
     if (!gHelloWorld) {
         std::cout << "Unable to load image: " << SDL_GetError() << std::endl;
         success = false;
@@ -62,7 +63,12 @@ int main(int argc, char **args)
         std::cout << "Window failed" << std::endl;
         return 1;
     }
-
+    
+    EventHandler eventhandler();
+    if (!eventhandler.isInitialized()) {
+        std::cout << "EventHandler failed" << std::endl;
+        return 1;
+    }
 
     gScreenSurface = SDL_GetWindowSurface(window());
     bool quit = false;
@@ -70,14 +76,11 @@ int main(int argc, char **args)
 
     if (loadMedia()) {
         while (!quit) {
+			eventhandler.InputHandler(e);
             SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
             SDL_UpdateWindowSurface(window());
             SDL_Delay(16);
 
-            while (SDL_PollEvent(&e) != 0) {
-                if (e.type == SDL_QUIT)
-                    quit = true;
-            }
         }
 
     }
