@@ -1,6 +1,10 @@
 #pragma once
 
-#include <inc/physics/common.hpp>
+#include "inc/physics/common.hpp"
+#include "inc/physics/joint.hpp"
+#include "inc/physics/body.hpp"
+#include <memory>
+#include <vector>
 
 namespace phy {
 
@@ -13,15 +17,15 @@ public:
     World(const Vec2 &gravity_);
     ~World();
 
-    Body *createBody();
+    std::weak_ptr<Body> createBody();
     void destroyBody();
-    const Body *getBodies() const;
+    std::vector<std::weak_ptr<const Body>> getBodies() const;
 
-    Joint *createJoint();
+    std::weak_ptr<Joint> createJoint();
     void destroyJoint();
-    const Joint *getJoints() const;
+    std::vector<std::weak_ptr<const Joint>> getJoints() const;
 
-    const Contact *getContacts() const;
+    std::vector<std::weak_ptr<const Contact>> getContacts() const;
 
     void step(float deltaTime);
 
@@ -32,8 +36,8 @@ public:
     void setPositionIterations(uint8_t iterations);
 private:
     Vec2 gravity;
-    Body *bodyList;
-    Joint *jointList;
+    std::vector<Body> bodyList;
+    std::vector<Joint> jointList;
     uint8_t velocityIterations;
     uint8_t positionIterations;
 };

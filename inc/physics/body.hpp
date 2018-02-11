@@ -1,4 +1,5 @@
-#include <inc/physics/common.hpp>
+#pragma once
+#include "inc/physics/common.hpp"
 
 namespace phy {
 
