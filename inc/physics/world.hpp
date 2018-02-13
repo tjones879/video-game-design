@@ -17,14 +17,48 @@ public:
     World(const Vec2 &gravity_);
     ~World();
 
-    std::weak_ptr<Body> createBody();
-    void destroyBody();
+    /**
+     * Create a body using the given BodySpec.
+     *
+     * The given reference can be safely destroyed or reused after this function.
+     * @return A pointer to the created body.
+     */
+    std::weak_ptr<Body> createBody(const BodySpec &spec);
+
+    /**
+     * Destroy the given body. Nothing occurs if the body can't be found.
+     *
+     * @param body A reference to the body that should be deleted.
+     * @warning All associated shapes and joints are automatically destroyed.
+     */
+    void destroyBody(std::weak_ptr<Body> body);
+
+    /**
+     * Get all current bodies in the world.
+     */
     std::vector<std::weak_ptr<const Body>> getBodies() const;
 
-    std::weak_ptr<Joint> createJoint();
-    void destroyJoint();
+    /**
+     * Create a joint using the given joint specification.
+     *
+     * The given JointSpec can be safely deleted or reused after this function.
+     * @return A pointer to the created joint.
+     */
+    std::weak_ptr<Joint> createJoint(const JointSpec &joint);
+
+    /**
+     * Destroy the given joint. Nothing occurs if the joint could not be found.
+     */
+    void destroyJoint(std::weak_ptr<Joint> joint);
+
+    /**
+     * Obtain an array of all known joints.
+     */
     std::vector<std::weak_ptr<const Joint>> getJoints() const;
 
+    /**
+     * Obtain all current contacts created by the world.
+     */
     std::vector<std::weak_ptr<const Contact>> getContacts() const;
 
     void step(float deltaTime);
@@ -36,8 +70,8 @@ public:
     void setPositionIterations(uint8_t iterations);
 private:
     Vec2 gravity;
-    std::vector<Body> bodyList;
-    std::vector<Joint> jointList;
+    std::vector<std::shared_ptr<Body>> bodyList;
+    std::vector<std::shared_ptr<Joint>> jointList;
     uint8_t velocityIterations;
     uint8_t positionIterations;
 };

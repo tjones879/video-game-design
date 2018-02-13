@@ -1,42 +1,61 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/body.hpp"
 
+#include <algorithm>
+
 namespace phy {
 
 World::World(const Vec2 &gravity_)
     : gravity(gravity_)
 {
-
 }
 
 World::~World()
 {
-
+    std::for_each(bodyList.begin(), bodyList.end(),
+        [](auto &body) {
+            // Destroy all of the body's shapes
+        });
 }
 
-std::weak_ptr<Body> World::createBody()
+std::weak_ptr<Body> World::createBody(const BodySpec &spec)
 {
-    return std::make_shared<Body>(Body());
+    // TODO: Provide custom allocator to improve cache locality in vector and improve performance.
+    // TODO: Synchronize to avoid data race.
+    auto bodyPtr = std::make_shared<Body>(spec);
+    bodyList.push_back(bodyPtr);
+    return bodyPtr;
 }
 
-void World::destroyBody()
+void World::destroyBody(std::weak_ptr<Body> body)
 {
-
+    // TODO: Synchronize to avoid data race
+    auto result = std::find(std::begin(bodyList), std::end(bodyList), body.lock());
+    if (result != std::end(bodyList))
+        bodyList.erase(result);
 }
 
 std::vector<std::weak_ptr<const Body>> World::getBodies() const
 {
-    return std::vector<std::weak_ptr<const Body>>();
+    return std::vector<std::weak_ptr<const Body>>(bodyList.begin(), bodyList.end());
 }
 
-std::weak_ptr<Joint> createJoint()
+std::weak_ptr<Joint> World::createJoint(const JointSpec &spec)
 {
-    return std::make_shared<Joint>(Joint());
+    // TODO: Provide custom allocator to improve cache locality in vector and improve performance.
+    // TODO: Synchronize to avoid data race.
+    auto jointPtr = std::make_shared<Joint>(spec);
+    jointList.push_back(jointPtr);
+    return jointPtr;
 }
 
-void World::destroyJoint()
+void World::destroyJoint(std::weak_ptr<Joint> joint)
 {
-
+    // TODO: Synhcronize to avoid data race
+    // TODO: Wake up connected bodies before destruction
+    auto result = std::find(std::begin(jointList), std::end(jointList), joint.lock());
+    if (result != std::end(jointList))
+        jointList.erase(result);
 }
 
 std::vector<std::weak_ptr<const Joint>> World::getJoints() const
@@ -53,27 +72,24 @@ void World::step(float deltaTime)
 {
 
 }
-/*
-class World {
-public:
-    void setGravity(const Vec2 &gravity_);
-    Vec2 getGravity() const;
 
-    void setVelocityIterations(uint8_t iterations);
-    void setPositionIterations(uint8_t iterations);
-private:
-    Vec2 gravity;
-    std::vector<Body> bodyList;
-    std::vector<Joint> jointList;
-    uint8_t velocityIterations;
-    uint8_t positionIterations;
-private:
-    Vec2 gravity;
-    std::vector<Body> bodyList;
-    std::vector<Joint> jointList;
-    uint8_t velocityIterations;
-    uint8_t positionIterations;
-};
- */
+void World::setGravity(const Vec2 &gravity_)
+{
+    gravity = gravity_;
+}
 
+Vec2 World::getGravity() const
+{
+    return gravity;
+}
+
+void World::setVelocityIterations(uint8_t iterations)
+{
+    velocityIterations = iterations;
+}
+
+void World::setPositionIterations(uint8_t iterations)
+{
+    positionIterations = iterations;
+}
 } /* namespace phy */
