@@ -40,29 +40,6 @@ std::vector<std::weak_ptr<const Body>> World::getBodies() const
     return std::vector<std::weak_ptr<const Body>>(bodyList.begin(), bodyList.end());
 }
 
-std::weak_ptr<Joint> World::createJoint(const JointSpec &spec)
-{
-    // TODO: Provide custom allocator to improve cache locality in vector and improve performance.
-    // TODO: Synchronize to avoid data race.
-    auto jointPtr = std::make_shared<Joint>(spec);
-    jointList.push_back(jointPtr);
-    return jointPtr;
-}
-
-void World::destroyJoint(std::weak_ptr<Joint> joint)
-{
-    // TODO: Synhcronize to avoid data race
-    // TODO: Wake up connected bodies before destruction
-    auto result = std::find(std::begin(jointList), std::end(jointList), joint.lock());
-    if (result != std::end(jointList))
-        jointList.erase(result);
-}
-
-std::vector<std::weak_ptr<const Joint>> World::getJoints() const
-{
-    return std::vector<std::weak_ptr<const Joint>>();
-}
-
 std::vector<std::weak_ptr<const Contact>> World::getContacts() const
 {
     return std::vector<std::weak_ptr<const Contact>>();

@@ -1,7 +1,8 @@
 #include "inc/physics/body.hpp"
+#include "inc/physics/circle.hpp"
 
 namespace phy {
-Body::Body(BodySpec &spec)
+Body::Body(const BodySpec &spec)
 {
 
 }
@@ -13,7 +14,7 @@ Body::~Body()
 
 std::weak_ptr<Shape> Body::createShape(const ShapeSpec &spec)
 {
-    return std::make_shared<Shape>();
+    return std::make_shared<CircleShape>();
 }
 
 void Body::destroyShape(std::weak_ptr<Shape> shape)
@@ -28,7 +29,7 @@ const Vec2& Body::getPosition() const
 
 float Body::getRotation() const
 {
-
+    return 0.0f;
 }
 
 void Body::setLinearVelocity(const Vec2 &velocity)
@@ -104,16 +105,6 @@ std::vector<std::weak_ptr<Shape>> Body::getShapes()
 std::vector<std::weak_ptr<const Shape>> Body::getShapes() const
 {
     return std::vector<std::weak_ptr<const Shape>>(shapeList.begin(), shapeList.end());
-}
-
-std::vector<std::weak_ptr<Joint>> Body::getJoints()
-{
-    return std::vector<std::weak_ptr<Joint>>(jointList.begin(), jointList.end());
-}
-
-std::vector<std::weak_ptr<const Joint>> Body::getJoints() const
-{
-    return std::vector<std::weak_ptr<const Joint>>(jointList.begin(), jointList.end());
 }
 
 std::weak_ptr<World> Body::getParentWorld()

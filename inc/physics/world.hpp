@@ -1,7 +1,6 @@
 #pragma once
 
 #include "inc/physics/common.hpp"
-#include "inc/physics/joint.hpp"
 #include "inc/physics/body.hpp"
 #include <memory>
 #include <vector>
@@ -10,7 +9,6 @@ namespace phy {
 
 class Body;
 class Contact;
-class Joint;
 
 class World {
 public:
@@ -39,24 +37,6 @@ public:
     std::vector<std::weak_ptr<const Body>> getBodies() const;
 
     /**
-     * Create a joint using the given joint specification.
-     *
-     * The given JointSpec can be safely deleted or reused after this function.
-     * @return A pointer to the created joint.
-     */
-    std::weak_ptr<Joint> createJoint(const JointSpec &joint);
-
-    /**
-     * Destroy the given joint. Nothing occurs if the joint could not be found.
-     */
-    void destroyJoint(std::weak_ptr<Joint> joint);
-
-    /**
-     * Obtain an array of all known joints.
-     */
-    std::vector<std::weak_ptr<const Joint>> getJoints() const;
-
-    /**
      * Obtain all current contacts created by the world.
      */
     std::vector<std::weak_ptr<const Contact>> getContacts() const;
@@ -71,7 +51,6 @@ public:
 private:
     Vec2 gravity;
     std::vector<std::shared_ptr<Body>> bodyList;
-    std::vector<std::shared_ptr<Joint>> jointList;
     uint8_t velocityIterations;
     uint8_t positionIterations;
 };

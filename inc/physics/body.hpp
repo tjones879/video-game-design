@@ -1,5 +1,6 @@
 #pragma once
 #include "inc/physics/common.hpp"
+#include "inc/physics/shape.hpp"
 #include <memory>
 #include <vector>
 
@@ -7,7 +8,6 @@ namespace phy {
 
 class Shape;
 class ShapeSpec;
-class Joint;
 class Contact;
 class World;
 
@@ -32,9 +32,8 @@ private:
     std::shared_ptr<World> parentWorld;
     Vec2 position, linearVelocity, angularVelocity, centroid;
     std::vector<std::shared_ptr<Shape>> shapeList;
-    std::vector<std::shared_ptr<Joint>> jointList;
 public:
-    Body(BodySpec &spec);
+    Body(const BodySpec &spec);
     ~Body();
 
     std::weak_ptr<Shape> createShape(const ShapeSpec &spec);
@@ -63,9 +62,6 @@ public:
 
     std::vector<std::weak_ptr<Shape>> getShapes();
     std::vector<std::weak_ptr<const Shape>> getShapes() const;
-
-    std::vector<std::weak_ptr<Joint>> getJoints();
-    std::vector<std::weak_ptr<const Joint>> getJoints() const;
 
     std::weak_ptr<World> getParentWorld();
     std::weak_ptr<const World> getParentWorld() const;
