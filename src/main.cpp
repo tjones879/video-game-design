@@ -1,8 +1,10 @@
 #include <SDL2/SDL.h>
+#include <iostream>
+
 #include "inc/initialize.hpp"
 #include "inc/window.hpp"
 #include "inc/eventhandler.hpp"
-#include <iostream>
+
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -64,7 +66,7 @@ int main(int argc, char **args)
         return 1;
     }
     
-    EventHandler eventhandler();
+    EventHandler eventhandler;
     if (!eventhandler.isInitialized()) {
         std::cout << "EventHandler failed" << std::endl;
         return 1;
@@ -76,7 +78,7 @@ int main(int argc, char **args)
 
     if (loadMedia()) {
         while (!quit) {
-			eventhandler.InputHandler(e);
+			if(eventhandler.InputHandler(e) == 1) return 1; 
             SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
             SDL_UpdateWindowSurface(window());
             SDL_Delay(16);
