@@ -17,21 +17,36 @@ enum class BodyType {
 };
 
 struct BodySpec {
-    BodySpec();
+    BodySpec()
+    {
+        bodyType = BodyType::staticBody;
+        angle = 0.0f;
+        angVelocity = 0.0f;
+        gravityFactor = 1.0f;
+    }
 
     BodyType bodyType;
     Vec2 position;
     float angle;
     Vec2 linVelocity;
-    Vec2 angVelocity;
+    float angVelocity;
     float gravityFactor;
 };
 
 class Body {
 private:
     std::shared_ptr<World> parentWorld;
-    Vec2 position, linearVelocity, angularVelocity, centroid;
+    float mass, invMass;
+    float inertia, invInertia;
+    BodyType bodyType;
+    Vec2 position, centroid;
+    Vec2 linearVelocity;
+    float angularVelocity;
+    Vec2 force;
+    float torque;
     std::vector<std::shared_ptr<Shape>> shapeList;
+    Sweep bodySweep;
+    float gravityFactor; ///< Factor in the range [0, 1]
 public:
     Body(const BodySpec &spec);
     ~Body();
@@ -39,13 +54,17 @@ public:
     std::weak_ptr<Shape> createShape(const ShapeSpec &spec);
     void destroyShape(std::weak_ptr<Shape> shape);
     const Vec2 &getPosition() const;
+
+    /**
+     * Get the angle of the body in radians.
+     */
     float getRotation() const;
 
     void setLinearVelocity(const Vec2 &velocity);
     const Vec2 &getLinearVelocity() const;
 
-    void setAngularVelocity(const Vec2 &velocity);
-    const Vec2 &getAngularVelocity();
+    void setAngularVelocity(float velocity);
+    float getAngularVelocity();
 
     void applyForce(const Vec2 &force, const Vec2 &point);
     void applyTorque(float torque);

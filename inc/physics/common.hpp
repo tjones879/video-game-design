@@ -5,9 +5,13 @@
 namespace phy {
 
 class Vec2 {
-    float x, y;
 public:
-    Vec2() {}
+    float x, y;
+    Vec2()
+    {
+        x = 0.f;
+        y = 0.f;
+    }
     Vec2(float x, float y) : x(x), y(y) {}
 
     void zeroOut()
@@ -48,6 +52,21 @@ public:
         y *= scalar;
     }
 
+    Vec2 operator-(const Vec2& b) const
+    {
+        return Vec2(x - b.x, y - b.y);
+    }
+
+    float cross(const Vec2 &b)
+    {
+        return x * b.y - y * b.x;
+    }
+
+    Vec2 cross(float s)
+    {
+        return Vec2(s * y, -s * x);
+    }
+
     float length() const
     {
         return x * x + y * y;
@@ -66,6 +85,15 @@ public:
 
         return length;
     }
+};
+
+struct Sweep {
+    void Step();
+
+    Vec2 localCenter; ///< Local center of mass position
+    Vec2 center0, center;
+    float angle0, angle;
+    float currentTime; ///< Current time step in range [0, 1]
 };
 
 } /* namespace phy */
