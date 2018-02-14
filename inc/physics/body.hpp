@@ -1,5 +1,7 @@
 #pragma once
 #include "inc/physics/common.hpp"
+#include <memory>
+#include <vector>
 
 namespace phy {
 
@@ -26,13 +28,22 @@ struct BodySpec {
 };
 
 class Body {
-    Shape createShape(const ShapeSpec &spec);
-    void DestroyShape(Shape *shape);
-    const Vec2 getPosition() const;
-    float getRoation() const;
+private:
+    std::shared_ptr<World> parentWorld;
+    Vec2 position, linearVelocity, angularVelocity, centroid;
+    std::vector<std::shared_ptr<Shape>> shapeList;
+    std::vector<std::shared_ptr<Joint>> jointList;
+public:
+    Body(BodySpec &spec);
+    ~Body();
+
+    std::weak_ptr<Shape> createShape(const ShapeSpec &spec);
+    void destroyShape(std::weak_ptr<Shape> shape);
+    const Vec2 &getPosition() const;
+    float getRotation() const;
 
     void setLinearVelocity(const Vec2 &velocity);
-    const Vec2 &getLinearVelocity();
+    const Vec2 &getLinearVelocity() const;
 
     void setAngularVelocity(const Vec2 &velocity);
     const Vec2 &getAngularVelocity();
@@ -50,16 +61,13 @@ class Body {
     void setSleep();
     bool isAsleep();
 
-    Shape *getShapes();
-    const Shape *getShapes() const;
+    std::vector<std::weak_ptr<Shape>> getShapes();
+    std::vector<std::weak_ptr<const Shape>> getShapes() const;
 
-    Joint *getJoints();
-    const Joint *getJoints() const;
+    std::vector<std::weak_ptr<Joint>> getJoints();
+    std::vector<std::weak_ptr<const Joint>> getJoints() const;
 
-    Body *getNextBody();
-    const Body *getNextBody() const;
-
-    World *getParentWorld();
-    const World *getParentWorld() const;
+    std::weak_ptr<World> getParentWorld();
+    std::weak_ptr<const World> getParentWorld() const;
 };
 } /* namespace phy */
