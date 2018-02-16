@@ -34,7 +34,10 @@ Body::~Body()
 
 std::weak_ptr<Shape> Body::createShape(const ShapeSpec &spec)
 {
-    return std::make_shared<CircleShape>();
+    auto ptr = std::make_shared<CircleShape>();
+    shapeList.push_back(ptr);
+    updateMassProperties();
+    return ptr;
 }
 
 void Body::destroyShape(std::weak_ptr<Shape> shape)
@@ -142,5 +145,20 @@ std::weak_ptr<World> Body::getParentWorld()
 std::weak_ptr<const World> Body::getParentWorld() const
 {
     return parentWorld;
+}
+
+void Body::updateMassProperties()
+{
+    mass = 0.0f;
+    invMass = 0.0f;
+    inertia = 0.0f;
+    invInertia = 0.0f;
+    bodySweep.center.zeroOut();
+
+    Vec2 localCenter;
+    // Sum the mass of all shapes
+    // Calculate the center of mass
+    // Center the inertia
+    // Update velocity
 }
 } /* namespace phy */

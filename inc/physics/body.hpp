@@ -84,5 +84,7 @@ public:
 
     std::weak_ptr<World> getParentWorld();
     std::weak_ptr<const World> getParentWorld() const;
+private:
+    void updateMassProperties();
 };
 } /* namespace phy */

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <math.h>
 
 namespace phy {
 
@@ -37,6 +38,11 @@ public:
         y += vec.y;
     }
 
+    Vec2 operator+ (const Vec2 &vec) const
+    {
+        return Vec2(x + vec.x, y + vec.y);
+    }
+
     void operator-= (const Vec2 &vec)
     {
         x -= vec.x;
@@ -67,6 +73,14 @@ public:
         return Vec2(s * y, -s * x);
     }
 
+    /**
+     * Calculate the dot product with another vector.
+     */
+    float dot(const Vec2 &vec)
+    {
+        return x * vec.x + y * vec.y;
+    }
+
     float length() const
     {
         return x * x + y * y;
@@ -85,6 +99,26 @@ public:
 
         return length;
     }
+};
+
+struct Rotation {
+    Rotation() {}
+    Rotation(float angle)
+    {
+        sine = sinf(angle);
+        cosine = cosf(angle);
+    }
+    inline Vec2 rotate(const Vec2 &point) const
+    {
+        return Vec2(cosine * point.x - sine * point.y,
+                    sine * point.x + cosine * point.y);
+    }
+    float sine, cosine;
+};
+
+struct Transform {
+    Vec2 position;
+    Rotation rotation;
 };
 
 struct Sweep {

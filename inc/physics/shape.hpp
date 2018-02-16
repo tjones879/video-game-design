@@ -23,9 +23,14 @@ struct ShapeSpec {
 };
 
 class Shape {
+protected:
     ShapeType shapeType;
 public:
-    virtual bool testPoint() const = 0;
+    /**
+     * Test a point to see if it is inside this shape.
+     * @param point The location in world coordinates
+     */
+    virtual bool testPoint(const Transform &transform, const Vec2 &pos) const = 0;
     virtual void getAABB() const = 0;
     ShapeType getShapeType() const;
     virtual MassProperties getMassProps() const = 0;

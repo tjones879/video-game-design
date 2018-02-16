@@ -10,7 +10,7 @@ public:
     CircleShape();
     CircleShape(const Vec2& pos, float radius);
 
-    bool testPoint() const override;
+    bool testPoint(const Transform &transform, const Vec2 &pos) const override;
     void getAABB() const override;
     MassProperties getMassProps() const override;
 };
