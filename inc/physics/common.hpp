@@ -58,17 +58,22 @@ public:
         y *= scalar;
     }
 
+    Vec2 operator* (float scalar) const
+    {
+        return Vec2(x * scalar, y * scalar);
+    }
+
     Vec2 operator-(const Vec2& b) const
     {
         return Vec2(x - b.x, y - b.y);
     }
 
-    float cross(const Vec2 &b)
+    float cross(const Vec2 &b) const
     {
         return x * b.y - y * b.x;
     }
 
-    Vec2 cross(float s)
+    Vec2 cross(float s) const
     {
         return Vec2(s * y, -s * x);
     }
@@ -112,6 +117,11 @@ struct Rotation {
     {
         return Vec2(cosine * point.x - sine * point.y,
                     sine * point.x + cosine * point.y);
+    }
+    inline Vec2 invRotate(const Vec2 &point) const
+    {
+        return Vec2(cosine * point.x + sine * point.y,
+                    -sine * point.x + cosine * point.y);
     }
     float sine, cosine;
 };
