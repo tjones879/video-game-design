@@ -76,7 +76,7 @@ public:
     /**
      * Calculate the dot product with another vector.
      */
-    float dot(const Vec2 &vec)
+    float dot(const Vec2 &vec) const
     {
         return x * vec.x + y * vec.y;
     }
@@ -117,6 +117,15 @@ struct Rotation {
 };
 
 struct Transform {
+    Transform(Vec2 p, Rotation r)
+        : position(p), rotation(r) {}
+    Vec2 translate(const Vec2 &point) const
+    {
+        auto translated = rotation.rotate(point);
+        translated.x += position.x;
+        translated.y += position.y;
+        return translated;
+    }
     Vec2 position;
     Rotation rotation;
 };

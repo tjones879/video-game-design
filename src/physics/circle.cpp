@@ -21,6 +21,10 @@ void CircleShape::getAABB() const
 
 MassProperties CircleShape::getMassProps() const
 {
-    return MassProperties();
+    MassProperties data;
+    data.centroid = pos;
+    data.mass = density * M_PI * radius * radius;
+    data.inertia = data.mass * (0.5f * radius * radius + pos.dot(pos));
+    return data;
 }
 } /* namespace phy */
