@@ -10,6 +10,7 @@ class PolygonShape : public Shape {
     Vec2 centroid;
     std::vector<Vec2> vertices;
     std::vector<Vec2> normals;
+    float density;
 public:
     PolygonShape();
     /**
@@ -38,5 +39,6 @@ public:
     virtual MassProperties getMassProps() const override;
 private:
     Vec2 calculateCentroid() const;
+    float calculateArea() const;
 };
 } /* namespace phy */

@@ -35,6 +35,21 @@ Vec2 PolygonShape::calculateCentroid() const
 }
 
 /**
+ * Use the sum of cross products to calculate the area of the polygon.
+ */
+float PolygonShape::calculateArea() const
+{
+    int n = vertices.size();
+    float area = 0.0f;
+    for (int i = 0; i < n; i++) {
+        int j = (i + 1) % n;
+        area += vertices[j].cross(vertices[i]);
+    }
+
+    return area / 2.0f;
+}
+
+/**
  * Use Graham Scan to find the convex hull of the given points.
  *
  * @param vertices Vector of points with at least 3 elements.
@@ -152,6 +167,11 @@ void PolygonShape::getAABB() const
 
 MassProperties PolygonShape::getMassProps() const
 {
-    return MassProperties();
+    MassProperties props;
+    props.centroid = calculateCentroid();
+    props.mass = density * calculateArea();
+    // Sum the moment of inertia for each triangle in the polygon
+    props.inertia = 0;
+    return props;
 }
 } /* namespace phy */
