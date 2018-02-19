@@ -1,6 +1,5 @@
 #include <SDL2/SDL.h>
 #include <iostream>
-
 #include "inc/initialize.hpp"
 #include "inc/window.hpp"
 #include "inc/eventhandler.hpp"
@@ -8,20 +7,10 @@
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-
-enum KeyPressSurfaces {
-    KEY_PRESS_SURFACE_DEFAULT,
-    KEY_PRESS_SURFACE_UP,
-    KEY_PRESS_SURFACE_DOWN,
-    KEY_PRESS_SURFACE_LEFT,
-    KEY_PRESS_SURFACE_RIGHT,
-    KEY_PRESS_SURFACE_TOTAL
-};
+constexpr int MIN_MILLISECONDS_PER_FRAME = 16;
 
 SDL_Surface *gScreenSurface = NULL;
 SDL_Surface *gHelloWorld = NULL;
-SDL_Surface *gKeyPressSurfaces[KEY_PRESS_SURFACE_TOTAL];
-SDL_Surface *gCurrentSurface = NULL;
 
 SDL_Surface *loadSurface(const std::string &path)
 {
@@ -37,12 +26,6 @@ SDL_Surface *loadSurface(const std::string &path)
 bool loadMedia()
 {
     bool success = true;
-
-    /*
-    gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT] = loadSurface("press.bmp");
-    if (!gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT])
-        std::cout << "Failed to load default image" << std::endl;
-    */
     gHelloWorld = SDL_LoadBMP("../assets/hello_world.bmp");
     if (!gHelloWorld) {
         std::cout << "Unable to load image: " << SDL_GetError() << std::endl;
@@ -66,8 +49,8 @@ int main(int argc, char **args)
         return 1;
     }
     
-    EventHandler eventhandler;
-    if (!eventhandler.isInitialized()) {
+    EventHandler eventHandler;
+    if (!eventHandler.isInitialized()) {
         std::cout << "EventHandler failed" << std::endl;
         return 1;
     }
@@ -78,10 +61,18 @@ int main(int argc, char **args)
 
     if (loadMedia()) {
         while (!quit) {
-			if(eventhandler.InputHandler(e) == 1) return 1; 
+			const int start = (int)SDL_GetTicks();
+			if(eventHandler.inputHandler(e) == 1) return 0;
+			eventHandler.executeEvents();
             SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
             SDL_UpdateWindowSurface(window());
-            SDL_Delay(16);
+            const int end = (int)SDL_GetTicks();
+			const int millisecondsThisFrame = end - start;
+			if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME)
+			{
+				// If rendering faster than 60FPS, delay
+				SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
+			}
 
         }
 

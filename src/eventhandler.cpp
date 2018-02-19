@@ -15,6 +15,11 @@ EventHandler::EventHandler(){
 	keysToCommands[SDLK_f]=ACTION;
 	keysToCommands[SDLK_d]=SPECIAL;
 	keysToCommands[SDLK_ESCAPE]=QUIT;
+	duckCommand = new DuckCommand;
+	specialCommand = new SpecialCommand;
+	actionCommand = new ActionCommand;
+	moveCommand = new MoveCommand;
+	jumpCommand = new JumpCommand;
 }
 
 EventHandler::~EventHandler(){
@@ -33,32 +38,32 @@ int EventHandler::inputHandler(SDL_Event &event){
 					case JUMP:
 						DEBUG("Jump");
 						keyState[event.key.keysym.scancode]=true;
-						eventStack.push_back(jumpCommand);
+						eventStack.push(jumpCommand);
 						return 0;
 					case DUCK:
 						keyState[event.key.keysym.scancode]=true;
-						eventStack.push_back(duckCommand);
+						eventStack.push(duckCommand);
 						DEBUG("Duck");
 						return 0;
 					case BACK:
 						keyState[event.key.keysym.scancode]=true;
-						eventStack.push_back(moveCommand);
+						eventStack.push(moveCommand);
 						DEBUG("Back");
 						return 0;
 					case FORWARD:
 						keyState[event.key.keysym.scancode]=true;
-						eventStack.push_back(moveCommand);
+						eventStack.push(moveCommand);
 						DEBUG("Forward");
 						return 0;
 					case ACTION:
 						DEBUG("Action");
 						keyState[event.key.keysym.scancode]=true;
-						eventStack.push_back(actionCommand);
+						eventStack.push(actionCommand);
 						return 0;
 					case SPECIAL:
 						DEBUG("Special");
 						keyState[event.key.keysym.scancode]=true;
-						eventStack.push_back(specialCommand);
+						eventStack.push(specialCommand);
 						return 0;
 					case QUIT:
 						DEBUG("Quit");
@@ -92,4 +97,33 @@ int EventHandler::inputHandler(SDL_Event &event){
 bool EventHandler::isInitialized() const
 {
     return initialized;
+}
+
+void EventHandler::addEvent(Command &newCommand){
+	eventStack.push(&newCommand);
+	return;
+}
+
+void EventHandler::executeEvents(){
+	while (!eventStack.empty()){
+		eventStack.front()->execute();
+		eventStack.pop();
+	}
+}
+
+auto EventHandler::getCommandPtr(int cmd) -> Command*{
+	switch (cmd){
+		case JUMP://0
+			return jumpCommand;
+		case DUCK://1
+			return duckCommand;
+		case BACK://2
+			return moveCommand;
+		case FORWARD://3
+			return moveCommand;
+		case ACTION://4
+			return actionCommand;
+		case SPECIAL://5
+			return actionCommand;
+	}
 }

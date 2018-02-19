@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <array>
 #include <map>
-#include <vector>
+#include <queue>
 #include <iostream>
 
 #define DEBUG(e) std::cerr << e << std::endl;
@@ -27,11 +27,11 @@ private:
 	class Command {
 		public:
 		  virtual ~Command() {};
-		  virtual void execute() = 0;
+		  virtual void execute() const = 0;
 	};
 	class JumpCommand : public Command {
 		public:
-		  virtual void execute() { 
+		  virtual void execute() const { 
 			  DEBUG("Execute Jump");	
 			  //jump(); 
 			  return;
@@ -39,39 +39,41 @@ private:
 	};
 	class DuckCommand : public Command {
 		public:
-		  virtual void execute() { 
+		  virtual void execute() const { 
 			  //duck(); 
 		  }
 	};
 	class MoveCommand : public Command {
 		public:
-		  virtual void execute() { 
+		  virtual void execute() const { 
 			  //Need to have object pointer
 			  //Update object position 
 		  }
 	};
 	class ActionCommand : public Command {
 		public:
-		  virtual void execute() { 
+		  virtual void execute() const { 
 			  //action(); 
 		  }
 	};
 	class SpecialCommand : public Command {
 		public:
-		  virtual void execute() { 
+		  virtual void execute() const { 
 			  //special(); 
 		  }
 	};
-	std::vector<Command*> eventStack;
-	JumpCommand* jumpCommand = new JumpCommand;
-	MoveCommand* moveCommand = new MoveCommand;
-	ActionCommand* actionCommand = new ActionCommand;
-	SpecialCommand* specialCommand = new SpecialCommand;
-	DuckCommand* duckCommand = new DuckCommand;
+	std::queue<Command*> eventStack;
+	JumpCommand* jumpCommand;
+	MoveCommand* moveCommand;
+	ActionCommand* actionCommand;
+	SpecialCommand* specialCommand;
+	DuckCommand* duckCommand;
 public:
     EventHandler();
     ~EventHandler();
     bool isInitialized() const;
     int inputHandler(SDL_Event &event);
-    void addEvent();
+    void addEvent(Command &newEvent);
+    void executeEvents();
+    Command* getCommandPtr(int);
 };
