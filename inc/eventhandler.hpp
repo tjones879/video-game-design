@@ -46,7 +46,6 @@ private:
 	class MoveCommand : public Command {
 		public:
 		  virtual void execute() const { 
-			  //Need to have object pointer
 			  //Update object position 
 		  }
 	};

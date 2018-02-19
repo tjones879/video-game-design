@@ -3,6 +3,7 @@
 #include "inc/initialize.hpp"
 #include "inc/window.hpp"
 #include "inc/eventhandler.hpp"
+#include "inc/displaymanager.hpp"
 
 
 const int SCREEN_WIDTH = 640;
