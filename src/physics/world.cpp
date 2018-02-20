@@ -47,6 +47,15 @@ std::vector<std::weak_ptr<const Contact>> World::getContacts() const
 
 void World::step(float deltaTime)
 {
+    // If new bodies or shapes were added, find them
+    // Lock the world
+    float invDeltaTime = 0.0f;
+    if (deltaTime > 0)
+        invDeltaTime = 1.0f / deltaTime;
+
+    // Update all contacts
+    // Integrate velocities, solve velocity constraints, integrate positions
+    // Handle TOI
 
 }
 
