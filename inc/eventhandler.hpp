@@ -1,5 +1,7 @@
 #pragma once
 
+#include "inc/controller.hpp"
+
 #include <SDL2/SDL.h>
 #include <array>
 #include <map>
@@ -24,6 +26,7 @@ private:
         NUM_OF_COMMANDS
     };
     std::map<int,SDL_Keycode> keysToCommands; 
+    Controller ctrl;
     class Command {
         public:
           virtual ~Command() {};

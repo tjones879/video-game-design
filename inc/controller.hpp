@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <stdint.h>
 
 #include <SDL2/SDL_gamecontroller.h>
+#include <SDL2/SDL_events.h>
 
 class Controller {
     SDL_GameController *controller;
@@ -13,6 +15,7 @@ class Controller {
     std::string mapping;
     std::vector<bool> buttons;
     std::vector<int16_t> axis;
+    int deadzone;
 public:
     /**
      * Initialize a game controller with the given joystick id.
@@ -31,7 +34,13 @@ public:
      * @return Whether or not opening the controller was successful.
      */
     bool setJoystick(int joystick);
+    /**
+     *
+     */
+    float getAnalog(SDL_ControllerAxisEvent event) const;
     ~Controller();
+    operator const SDL_GameController*() const;
+    operator SDL_JoystickID() const;
     friend std::ostream &operator<<(std::ostream &out, const Controller &controller);
 };
 

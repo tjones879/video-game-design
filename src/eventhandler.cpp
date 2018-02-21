@@ -28,6 +28,10 @@ EventHandler::EventHandler(){
     actionCommand = new ActionCommand;
     moveCommand = new MoveCommand;
     jumpCommand = new JumpCommand;
+
+    // Temporarily open the first joystick to the controller if it exists
+    if (SDL_NumJoysticks() > 0)
+        ctrl.setJoystick(0);
 }
 
 EventHandler::~EventHandler(){
@@ -108,6 +112,12 @@ int EventHandler::inputHandler(SDL_Event &event){
                 return 0;
             }
         case SDL_CONTROLLERAXISMOTION:
+            if (event.caxis.which == ctrl && ctrl.getAnalog(event.caxis) != 0) {
+                /* Too damn many events right now
+                printf("Axis: %d    ", event.caxis.axis);
+                std::cout << "Value: " << ctrl.getAnalog(event.caxis) << std::endl;
+                */
+            }
             return 0;
         case SDL_CONTROLLERBUTTONDOWN:
             if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()) {
@@ -191,14 +201,14 @@ void EventHandler::addEvent(Command &newCommand){
 }
 
 void EventHandler::executeEvents(){
-    while (!eventStack.empty()){
+    while (!eventStack.empty()) {
         eventStack.front()->execute();
         eventStack.pop();
     }
 }
 
 auto EventHandler::getCommandPtr(int cmd) -> Command*{
-    switch (cmd){
+    switch (cmd) {
         case JUMP://0
             return jumpCommand;
         case DUCK://1

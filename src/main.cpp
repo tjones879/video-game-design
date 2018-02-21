@@ -65,11 +65,6 @@ int main(int argc, char **args)
     SDL_Event e;
 
     if (loadMedia()) {
-        Controller ctrl;
-        // Temporarily open the first joystick to the controller if it exists
-        if (SDL_NumJoysticks() > 0)
-            ctrl.setJoystick(0);
-
         while (!quit) {
             const int start = (int)SDL_GetTicks();
             if (eventHandler.inputHandler(e) == 1)
