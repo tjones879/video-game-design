@@ -4,14 +4,18 @@
 #include "inc/window.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
+#include "inc/controller.hpp"
 
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+const int JOYSTICK_DEAD_ZONE = 8000;
 constexpr int MIN_MILLISECONDS_PER_FRAME = 16;
 
 SDL_Surface *gScreenSurface = NULL;
 SDL_Surface *gHelloWorld = NULL;
+SDL_Joystick *gGameController = NULL;
+
 
 SDL_Surface *loadSurface(const std::string &path)
 {
@@ -38,7 +42,7 @@ bool loadMedia()
 
 int main(int argc, char **args)
 {
-    Initialize init(SDL_INIT_VIDEO);
+    Initialize init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
     if (!init.isInitialized()) {
         std::cout << "Initialization failed" << std::endl;
         return 1;
@@ -49,7 +53,7 @@ int main(int argc, char **args)
         std::cout << "Window failed" << std::endl;
         return 1;
     }
-    
+
     EventHandler eventHandler;
     if (!eventHandler.isInitialized()) {
         std::cout << "EventHandler failed" << std::endl;
@@ -61,23 +65,25 @@ int main(int argc, char **args)
     SDL_Event e;
 
     if (loadMedia()) {
+        Controller ctrl;
+        // Temporarily open the first joystick to the controller if it exists
+        if (SDL_NumJoysticks() > 0)
+            ctrl.setJoystick(0);
+
         while (!quit) {
-			const int start = (int)SDL_GetTicks();
-			if(eventHandler.inputHandler(e) == 1) return 0;
-			eventHandler.executeEvents();
+            const int start = (int)SDL_GetTicks();
+            if (eventHandler.inputHandler(e) == 1)
+                return 0;
+            eventHandler.executeEvents();
             SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
             SDL_UpdateWindowSurface(window());
-            const int end = (int)SDL_GetTicks();
-			const int millisecondsThisFrame = end - start;
-			if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME)
-			{
-				// If rendering faster than 60FPS, delay
-				SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
-			}
-
+            const int end = (int) SDL_GetTicks();
+            const int millisecondsThisFrame = end - start;
+            if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
+                // If rendering faster than 60FPS, delay
+                SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
+            }
         }
-
     }
-
     return 0;
 }
