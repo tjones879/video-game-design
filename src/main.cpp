@@ -4,6 +4,7 @@
 #include "inc/window.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
+#include "inc/controller.hpp"
 
 
 const int SCREEN_WIDTH = 640;
@@ -64,38 +65,25 @@ int main(int argc, char **args)
     SDL_Event e;
 
     if (loadMedia()) {
-        auto numJoysticks = SDL_NumJoysticks();
-        if (numJoysticks < 1) {
-            std::cout << "No joysticks" << std::endl;
-        } else {
-            std::cout << numJoysticks << " joysticks found:" << std::endl;
-            for (int i = 0; i < numJoysticks; i++) {
-                SDL_Joystick *js = SDL_JoystickOpen(i);
-                std::cout << "Name: " << SDL_JoystickName(js) << std::endl
-                          << "    NumAxes: " << SDL_JoystickNumAxes(js) << std::endl
-                          << "    NumBalls: " << SDL_JoystickNumBalls(js) << std::endl
-                          << "    NumButtons: " << SDL_JoystickNumButtons(js) << std::endl
-                          << "    NumHats: " << SDL_JoystickNumHats(js) << std::endl;
-            }
-        }
+        Controller ctrl;
+        // Temporarily open the first joystick to the controller if it exists
+        if (SDL_NumJoysticks() > 0)
+            ctrl.setJoystick(0);
+
         while (!quit) {
             const int start = (int)SDL_GetTicks();
-            if(eventHandler.inputHandler(e) == 1)
+            if (eventHandler.inputHandler(e) == 1)
                 return 0;
             eventHandler.executeEvents();
             SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
             SDL_UpdateWindowSurface(window());
-            const int end = (int)SDL_GetTicks();
+            const int end = (int) SDL_GetTicks();
             const int millisecondsThisFrame = end - start;
-            if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME)
-            {
+            if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
                 // If rendering faster than 60FPS, delay
                 SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
             }
-
         }
-
     }
-
     return 0;
 }
