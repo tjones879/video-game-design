@@ -1,5 +1,6 @@
 #include <inc/eventhandler.hpp>
 #include <iostream>
+#include <stdio.h>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -27,7 +28,8 @@ EventHandler::~EventHandler(){
 
 int EventHandler::inputHandler(SDL_Event &event){
 	while(SDL_PollEvent(&event) != 0){
-		if (event.type == SDL_QUIT) return 1;
+		if (event.type == SDL_QUIT)
+            return 1;
 		switch(event.type){
 			case SDL_KEYDOWN: 
 				DEBUG("Keypress detected. Scancode: "<<event.key.keysym.scancode<<" & array value: "<<keyState[event.key.keysym.scancode]);
@@ -90,6 +92,14 @@ int EventHandler::inputHandler(SDL_Event &event){
 						keyState[event.key.keysym.scancode]=false;
 						return 0;
 				}
+            case SDL_JOYAXISMOTION:
+                if (event.jaxis.which == 0) {
+                    std::cout << "AXIS: ";
+                    printf("%d\n", event.jaxis.axis);
+                }
+                return 0;
+            default:
+                return 0;
 		}
 	}
 }
