@@ -35,7 +35,6 @@ int EventHandler::inputHandler(SDL_Event &event){
 					return 0;
 				 }
 				if (keysToCommands.find(event.key.keysym.sym)==keysToCommands.end()){
-					DEBUG(keysToCommands.find(event.key.keysym.sym)==keysToCommands.end());
 					return 0;
 				}
 				switch (keysToCommands[event.key.keysym.sym]){
@@ -76,36 +75,27 @@ int EventHandler::inputHandler(SDL_Event &event){
 						return 0;
 				}
 			case SDL_KEYUP: 
+			if (keysToCommands.find(event.key.keysym.sym)==keysToCommands.end()){
+				return 0;
+			}
 				switch (keysToCommands[event.key.keysym.sym]){
 					case JUMP:
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						keyState[event.key.keysym.scancode]=false;
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						return 0;
 					case DUCK:
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						keyState[event.key.keysym.scancode]=false;
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						return 0;
 					case BACK:
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						keyState[event.key.keysym.scancode]=false;
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						return 0;
 					case FORWARD:
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						keyState[event.key.keysym.scancode]=false;
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						return 0;
 					case ACTION:
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						keyState[event.key.keysym.scancode]=false;
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						return 0;
 					case SPECIAL:
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						keyState[event.key.keysym.scancode]=false;
-						DEBUG("Keyup: "<<keyState[event.key.keysym.scancode]<<std::endl);
 						return 0;
 				}
 		}
