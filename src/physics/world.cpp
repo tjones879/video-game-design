@@ -45,18 +45,36 @@ std::vector<std::weak_ptr<const Contact>> World::getContacts() const
     return std::vector<std::weak_ptr<const Contact>>();
 }
 
-void World::step(float deltaTime)
+void World::step(float dt)
 {
     // If new bodies or shapes were added, find them
     // Lock the world
-    float invDeltaTime = 0.0f;
-    if (deltaTime > 0)
-        invDeltaTime = 1.0f / deltaTime;
+    float inv_dt = 0.0f;
+    if (dt > 0)
+        inv_dt = 1.0f / dt;
 
-    // Update all contacts
-    // Integrate velocities, solve velocity constraints, integrate positions
-    // Handle TOI
+    // TODO: Update all contacts
+    // Integrate velocities
+    std::for_each(std::begin(bodyList), std::end(bodyList),
+        [&](auto body) {
+            body->updateVelocity(dt, gravity);
+        });
+    // TODO: Resolve velocity constraints
+    // Integrate positions
+    std::for_each(std::begin(bodyList), std::end(bodyList),
+        [&](auto body) {
+           body->updatePosition(dt);
+        });
+    // TODO: Resolve position constraints
 
+    // TODO: Synchronize shapes for broad-phase
+    // TODO: Handle TOI
+
+    // Clear forces
+    std::for_each(std::begin(bodyList), std::end(bodyList),
+        [&](auto body) {
+           body->clearForces();
+        });
 }
 
 void World::setGravity(const Vec2 &gravity_)

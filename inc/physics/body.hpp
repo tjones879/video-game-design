@@ -41,12 +41,14 @@ private:
     BodyType bodyType;
     Vec2 position, centroid;
     Vec2 linearVelocity;
+    float angle;
     float angularVelocity;
     Vec2 force;
     float torque;
     std::vector<std::shared_ptr<Shape>> shapeList;
     Sweep bodySweep;
     float gravityFactor; ///< Factor in the range [0, 1]
+    friend class World;
 public:
     Body(const BodySpec &spec);
     ~Body();
@@ -84,6 +86,24 @@ public:
 
     std::weak_ptr<World> getParentWorld();
     std::weak_ptr<const World> getParentWorld() const;
+
+    /**
+     * Update this body's velocity due to gravity and other forces.
+     *
+     * @param dt The amount of time in seconds since the last update
+     * @param gravity A vector of the world's gravity effect
+     */
+    void updateVelocity(float dt, Vec2 gravity);
+    /**
+     * Update this body's position due to accumulated velocity.
+     *
+     * @param dt The amount of time in seconds since the last update
+     */
+    void updatePosition(float dt);
+    /**
+     * Remove all forces that are currently effecting the body.
+     */
+    void clearForces();
 private:
     void updateMassProperties();
 };

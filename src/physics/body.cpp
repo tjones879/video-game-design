@@ -147,6 +147,29 @@ std::weak_ptr<const World> Body::getParentWorld() const
     return parentWorld;
 }
 
+void Body::updateVelocity(float dt, Vec2 gravity)
+{
+    if (bodyType == BodyType::dynamicBody) {
+        linearVelocity = (gravity * gravityFactor + force * invMass) * dt;
+        angularVelocity = invInertia * torque * dt;
+        // TODO: Apply damping
+    }
+}
+
+void Body::updatePosition(float dt)
+{
+    Vec2 translation = linearVelocity * dt;
+    float rotation = angularVelocity * dt;
+    position += translation;
+    angle += rotation;
+}
+
+void Body::clearForces()
+{
+    force.zeroOut();
+    torque = 0.0f;
+}
+
 void Body::updateMassProperties()
 {
     mass = 0.0f;
