@@ -4,6 +4,7 @@
 
 namespace phy {
 Body::Body(const BodySpec &spec)
+    : extraData(nullptr)
 {
     bodySweep.center0 = spec.position;
     bodySweep.center = spec.position;
@@ -183,5 +184,15 @@ void Body::updateMassProperties()
     // Calculate the center of mass
     // Center the inertia
     // Update velocity
+}
+
+void *Body::getExtraData() const
+{
+    return extraData;
+}
+
+void Body::setExtraData(void *data)
+{
+    extraData = data;
 }
 } /* namespace phy */
