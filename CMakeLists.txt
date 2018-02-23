@@ -8,6 +8,7 @@ include_directories(${CMAKE_SOURCE_DIR}/)
 
 add_executable(VGD
     src/main.cpp
+    src/displaymanager.cpp
     src/window.cpp
     src/initialize.cpp
     src/eventhandler.cpp)
