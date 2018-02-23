@@ -87,7 +87,7 @@ int EventHandler::inputHandler(SDL_Event &event){
                 DEBUG("Quit");
                 return 1;
             }
-        case SDL_KEYUP: 
+        case SDL_KEYUP:
             if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()) {
                 return 0;
             }
@@ -112,12 +112,6 @@ int EventHandler::inputHandler(SDL_Event &event){
                 return 0;
             }
         case SDL_CONTROLLERAXISMOTION:
-            if (event.caxis.which == ctrl && ctrl.getAnalog(event.caxis) != 0) {
-                /* Too damn many events right now
-                printf("Axis: %d    ", event.caxis.axis);
-                std::cout << "Value: " << ctrl.getAnalog(event.caxis) << std::endl;
-                */
-            }
             return 0;
         case SDL_CONTROLLERBUTTONDOWN:
             if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()) {

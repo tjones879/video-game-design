@@ -53,6 +53,20 @@ Controller::operator SDL_JoystickID() const
     return SDL_JoystickInstanceID(js);
 }
 
+std::pair<Axis, Axis> Controller::queryThumbstick()
+{
+    return thumbstick;
+}
+
+void Controller::updateAxis(SDL_ControllerAxisEvent event)
+{
+    if (event.axis == SDL_CONTROLLER_AXIS_LEFTX) {
+        thumbstick.first.value = getAnalog(event);
+    } else if (event.axis == SDL_CONTROLLER_AXIS_LEFTY) {
+        thumbstick.second.value = getAnalog(event);
+    }
+}
+
 std::ostream &operator<<(std::ostream &out, const Controller &ctrl)
 {
     if (!ctrl.initialized) {
