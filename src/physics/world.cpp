@@ -12,10 +12,9 @@ World::World(const Vec2 &gravity_)
 
 World::~World()
 {
-    std::for_each(bodyList.begin(), bodyList.end(),
-        [](auto &body) {
-            // Destroy all of the body's shapes
-        });
+    /* All objects referenced by the world are ref counted, so
+     * they should be automatically destroyed when any other
+     * strong references are removed. */
 }
 
 std::weak_ptr<Body> World::createBody(const BodySpec &spec)

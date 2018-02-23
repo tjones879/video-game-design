@@ -8,11 +8,7 @@ namespace phy {
 class Vec2 {
 public:
     float x, y;
-    Vec2()
-    {
-        x = 0.f;
-        y = 0.f;
-    }
+    Vec2() : x(0.0f), y(0.0f) {}
     Vec2(float x, float y) : x(x), y(y) {}
 
     void zeroOut()
@@ -27,6 +23,10 @@ public:
         y = y1;
     }
 
+    /**
+     * Access a value by 0-based index.
+     * @param i Index of the value that is wanted, must be 0 or 1.
+     */
     float operator() (int i) const
     {
         return (&x)[i];
@@ -49,9 +49,6 @@ public:
         y -= vec.y;
     }
 
-    /**
-     * Scalar multiplication.
-     */
     void operator*= (float scalar)
     {
         x *= scalar;
@@ -68,11 +65,17 @@ public:
         return Vec2(x - b.x, y - b.y);
     }
 
+    /**
+     * Cross product of two vectors.
+     */
     float cross(const Vec2 &b) const
     {
         return x * b.y - y * b.x;
     }
 
+    /**
+     * Cross product with a scalar. This returns a Vec2 in 2 dimensions.
+     */
     Vec2 cross(float s) const
     {
         return Vec2(s * y, -s * x);
@@ -86,6 +89,10 @@ public:
         return x * vec.x + y * vec.y;
     }
 
+    /**
+     * Calculate the absolute magnitude of the vector with
+     * the sum of squares.
+     */
     float length() const
     {
         return x * x + y * y;
@@ -107,28 +114,31 @@ public:
 };
 
 struct Rotation {
-    Rotation() {}
-    Rotation(float angle)
-    {
-        sine = sinf(angle);
-        cosine = cosf(angle);
-    }
+    float sine, cosine;
+    Rotation() : sine(sinf(0)), cosine(cosf(0)) {}
+    Rotation(float angle) : sine(sinf(angle)), cosine(cosf(angle)) {}
     inline Vec2 rotate(const Vec2 &point) const
     {
         return Vec2(cosine * point.x - sine * point.y,
                     sine * point.x + cosine * point.y);
     }
+
     inline Vec2 invRotate(const Vec2 &point) const
     {
         return Vec2(cosine * point.x + sine * point.y,
                     -sine * point.x + cosine * point.y);
     }
-    float sine, cosine;
 };
 
+/**
+ * Represent the transformation of a Vec2 with a
+ *   linear translation,
+ *   rotation around a local origin.
+ */
 struct Transform {
-    Transform(Vec2 p, Rotation r)
-        : position(p), rotation(r) {}
+    Vec2 position;
+    Rotation rotation;
+    Transform(Vec2 p, Rotation r) : position(p), rotation(r) {}
     Vec2 translate(const Vec2 &point) const
     {
         auto translated = rotation.rotate(point);
@@ -136,10 +146,12 @@ struct Transform {
         translated.y += position.y;
         return translated;
     }
-    Vec2 position;
-    Rotation rotation;
 };
 
+/**
+ * Store the position information for a body for iterative resolution
+ * of position and velocity.
+ */
 struct Sweep {
     void Step();
 

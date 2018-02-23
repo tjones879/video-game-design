@@ -24,10 +24,14 @@ public:
     std::weak_ptr<Body> createBody(const BodySpec &spec);
 
     /**
-     * Destroy the given body. Nothing occurs if the body can't be found.
+     * Remove the reference to the given body.
+     *
+     * Nothing occurs if the body can't be found.
+     *
+     * Note that the body will not be destroyed until all other strong
+     * references are also destroyed.
      *
      * @param body A reference to the body that should be deleted.
-     * @warning All associated shapes and joints are automatically destroyed.
      */
     void destroyBody(std::weak_ptr<Body> body);
 
@@ -41,12 +45,27 @@ public:
      */
     std::vector<std::weak_ptr<const Contact>> getContacts() const;
 
-    void step(float deltaTime);
+    void step(float dt);
 
     void setGravity(const Vec2 &gravity_);
     Vec2 getGravity() const;
 
+    /**
+     * Set the number of iterations the world should use to resolve
+     * the velocity of bodies.
+     *
+     * More iterations will reduce performance but increase accuracy
+     * and prevent impossible conditions.
+     */
     void setVelocityIterations(uint8_t iterations);
+
+    /**
+     * Set the number of iterations the world should use to resolve
+     * the global position of bodies.
+     *
+     * More iterations will reduce performance but increase accuracy
+     * and prevent impossible conditions.
+     */
     void setPositionIterations(uint8_t iterations);
 private:
     Vec2 gravity;
