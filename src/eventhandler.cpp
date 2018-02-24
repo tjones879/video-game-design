@@ -4,12 +4,6 @@
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
-template<typename E>
-constexpr auto underType(E e) -> typename std::underlying_type<E>::type
-{
-    return static_cast<typename std::underlying_type<E>::type>(e);
-}
-
 void EventHandler::initButtonMapping()
 {
     buttonsToCommands[SDL_CONTROLLER_BUTTON_A]=Commands::JUMP;
@@ -58,7 +52,7 @@ EventHandler::~EventHandler(){
 
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
-    if (pressed && !commandState[underType(command)]) {
+    if (pressed && !commandState[static_cast<char>(command)]) {
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
