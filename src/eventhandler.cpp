@@ -4,11 +4,9 @@
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
-//.cbutton for joystick
-
 EventHandler::EventHandler(){
     initialized = true;
-    keyState.fill(false);
+    commandState.fill(false);
     keysToCommands[SDLK_UP]=JUMP;
     keysToCommands[SDL_CONTROLLER_BUTTON_A]=JUMP;
     keysToCommands[SDL_CONTROLLER_BUTTON_DPAD_UP]=JUMP;
@@ -35,150 +33,88 @@ EventHandler::EventHandler(){
 }
 
 EventHandler::~EventHandler(){
+	delete jumpCommand;
+    delete moveCommand;
+    delete actionCommand;
+    delete specialCommand;
+    delete duckCommand;
+}
+
+void EventHandler::actionHandler(const int command, const int flag=0, const float move=0){
+	switch (command) {
+            case JUMP:
+                DEBUG("Jump");
+                if(flag==(KEYDOWN||JOYDOWN)) commandState[JUMP] = true;
+                if(flag==KEYUP||JOYUP) commandState[JUMP] = false;
+                eventStack.push(jumpCommand);
+                return;
+            case DUCK:
+                DEBUG("Duck");
+                if(flag==(KEYDOWN||JOYDOWN)) commandState[DUCK] = true;
+                if(flag==KEYUP||JOYUP) commandState[DUCK] = false;
+                eventStack.push(duckCommand);
+                return;
+            case BACK:
+                DEBUG("Back");
+                if(flag==(KEYDOWN||JOYDOWN)) commandState[BACK] = true;
+                if(flag==KEYUP||JOYUP) commandState[BACK] = false;
+                eventStack.push(moveCommand);
+                return;
+            case FORWARD:
+                DEBUG("Forward");
+                if(flag==(KEYDOWN||JOYDOWN)) commandState[FORWARD] = true;
+                if(flag==KEYUP||JOYUP) commandState[FORWARD] = false;
+                eventStack.push(moveCommand);
+                return;
+            case ACTION:
+                DEBUG("Action");
+                if(flag==(KEYDOWN||JOYDOWN)) commandState[ACTION] = true;
+                if(flag==KEYUP||JOYUP) commandState[ACTION] = false;
+                eventStack.push(actionCommand);
+                return;
+            case SPECIAL:
+                DEBUG("Special");
+                if(flag==(KEYDOWN||JOYDOWN)) commandState[SPECIAL] = true;
+                if(flag==KEYUP||JOYUP) commandState[SPECIAL] = false;
+                eventStack.push(specialCommand);
+                return;
+            }
 }
 
 int EventHandler::inputHandler(SDL_Event &event){
     while (SDL_PollEvent(&event) != 0) {
         if (event.type == SDL_QUIT)
             return 1;
-
+		if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()||
+			keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()) 
+            return 0;
+		DEBUG("Keypress detected. Key: "<<event.key.keysym.scancode<<" & command: "<<keysToCommands[event.key.keysym.sym]
+				<<" & command state: "<<commandState[keysToCommands[event.key.keysym.sym]]);
         switch (event.type) {
-        case SDL_KEYDOWN: 
-            DEBUG("Keypress detected. Scancode: "<<event.key.keysym.scancode<<" & array value: "<<keyState[event.key.keysym.scancode]);
-            if (keyState[event.key.keysym.scancode] == true) {
-                return 0;
-            }
-
-            if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()) {
-                return 0;
-            }
-            switch (keysToCommands[event.key.keysym.sym]) {
-            case JUMP:
-                DEBUG("Jump");
-                keyState[event.key.keysym.scancode] = true;
-                eventStack.push(jumpCommand);
-                return 0;
-            case DUCK:
-                keyState[event.key.keysym.scancode] = true;
-                eventStack.push(duckCommand);
-                DEBUG("Duck");
-                return 0;
-            case BACK:
-                keyState[event.key.keysym.scancode] = true;
-                eventStack.push(moveCommand);
-                DEBUG("Back");
-                return 0;
-            case FORWARD:
-                keyState[event.key.keysym.scancode] = true;
-                eventStack.push(moveCommand);
-                DEBUG("Forward");
-                return 0;
-            case ACTION:
-                DEBUG("Action");
-                keyState[event.key.keysym.scancode] = true;
-                eventStack.push(actionCommand);
-                return 0;
-            case SPECIAL:
-                DEBUG("Special");
-                keyState[event.key.keysym.scancode] = true;
-                eventStack.push(specialCommand);
-                return 0;
-            case QUIT:
-                DEBUG("Quit");
-                return 1;
-            }
-        case SDL_KEYUP:
-            if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()) {
-                return 0;
-            }
-            switch (keysToCommands[event.key.keysym.sym]) {
-            case JUMP:
-                keyState[event.key.keysym.scancode] = false;
-                return 0;
-            case DUCK:
-                keyState[event.key.keysym.scancode] = false;
-                return 0;
-            case BACK:
-                keyState[event.key.keysym.scancode] = false;
-                return 0;
-            case FORWARD:
-                keyState[event.key.keysym.scancode] = false;
-                return 0;
-            case ACTION:
-                keyState[event.key.keysym.scancode] = false;
-                return 0;
-            case SPECIAL:
-                keyState[event.key.keysym.scancode] = false;
-                return 0;
-            }
-        case SDL_CONTROLLERAXISMOTION:
-            return 0;
-        case SDL_CONTROLLERBUTTONDOWN:
-            if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()) {
-                return 0;
-            }
-            switch (keysToCommands[event.cbutton.button]) {
-            case JUMP:
-                DEBUG("Jump");
-                keyState[event.cbutton.button] = true;
-                eventStack.push(jumpCommand);
-                return 0;
-            case DUCK:
-                keyState[event.cbutton.button] = true;
-                eventStack.push(duckCommand);
-                DEBUG("Duck");
-                return 0;
-            case BACK:
-                keyState[event.cbutton.button] = true;
-                eventStack.push(moveCommand);
-                DEBUG("Back");
-                return 0;
-            case FORWARD:
-                keyState[event.cbutton.button] = true;
-                eventStack.push(moveCommand);
-                DEBUG("Forward");
-                return 0;
-            case ACTION:
-                DEBUG("Action");
-                keyState[event.cbutton.button] = true;
-                eventStack.push(actionCommand);
-                return 0;
-            case SPECIAL:
-                DEBUG("Special");
-                keyState[event.cbutton.button] = true;
-                eventStack.push(specialCommand);
-                return 0;
-            case QUIT:
-                DEBUG("Quit");
-                return 1;
-            }
-            return 0;
-        case SDL_CONTROLLERBUTTONUP:
-            if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()) {
-                return 0;
-            }
-            switch (keysToCommands[event.cbutton.button]) {
-            case JUMP:
-                keyState[event.cbutton.button] = false;
-                return 0;
-            case DUCK:
-                keyState[event.cbutton.button] = false;
-                return 0;
-            case BACK:
-                keyState[event.cbutton.button] = false;
-                return 0;
-            case FORWARD:
-                keyState[event.cbutton.button] = false;
-                return 0;
-            case ACTION:
-                keyState[event.cbutton.button] = false;
-                return 0;
-            case SPECIAL:
-                keyState[event.cbutton.button] = false;
-                return 0;
-            }
-        default:
-            return 0;
+			case SDL_KEYDOWN: 
+				if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()||
+					commandState[keysToCommands[event.key.keysym.sym]]==true)
+					return 0;
+				if (keysToCommands[event.key.keysym.sym]==QUIT)
+					return 1;
+				actionHandler(keysToCommands[event.key.keysym.sym],KEYDOWN);
+			case SDL_KEYUP:
+				if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()||
+					commandState[keysToCommands[event.key.keysym.sym]]==false)
+					return 0;
+				actionHandler(keysToCommands[event.key.keysym.sym],KEYUP);
+			case SDL_CONTROLLERAXISMOTION:
+				return 0;
+			case SDL_CONTROLLERBUTTONDOWN:
+				if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()||
+					commandState[keysToCommands[event.cbutton.button]]==true)
+					return 0;
+				actionHandler(keysToCommands[event.cbutton.button],JOYDOWN);
+			case SDL_CONTROLLERBUTTONUP:
+				if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()||
+					commandState[keysToCommands[event.cbutton.button]]==false)
+					return 0;
+				actionHandler(keysToCommands[event.cbutton.button],JOYUP);
         }
     }
     return 0;

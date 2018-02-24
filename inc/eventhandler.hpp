@@ -14,7 +14,9 @@ class EventHandler
 {
 private:
     bool initialized;
-    std::array<bool,285> keyState{};
+    std::array<bool,25> commandState{};
+    std::map<int,SDL_Keycode> keysToCommands; 
+    Controller ctrl;
     enum commands{
         JUMP,
         DUCK,
@@ -25,8 +27,15 @@ private:
         QUIT,
         NUM_OF_COMMANDS
     };
-    std::map<int,SDL_Keycode> keysToCommands; 
-    Controller ctrl;
+    enum flags{
+		DEFAULT,
+        KEYDOWN,
+        KEYUP,
+        JOYDOWN,
+        JOYUP,
+        STICK,
+        NUM_OF_FLAGS
+    };
     class Command {
         public:
           virtual ~Command() {};
@@ -64,6 +73,7 @@ private:
               //special(); 
           }
     };
+    void actionHandler(const int command, const int flag, const float move);
     std::queue<Command*> eventStack;
     JumpCommand* jumpCommand;
     MoveCommand* moveCommand;
