@@ -4,23 +4,39 @@
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
+template<typename E>
+constexpr auto underType(E e) -> typename std::underlying_type<E>::type
+{
+    return static_cast<typename std::underlying_type<E>::type>(e);
+}
+
+void EventHandler::initButtonMapping()
+{
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_A]=Commands::JUMP;
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_DPAD_UP]=Commands::JUMP;
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_DPAD_DOWN]=Commands::DUCK;
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_DPAD_LEFT]=Commands::BACK;
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]=Commands::FORWARD;
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_B]=Commands::ACTION;
+    buttonsToCommands[SDL_CONTROLLER_BUTTON_X]=Commands::SPECIAL;
+}
+
+void EventHandler::initKeyMapping()
+{
+    keysToCommands[SDLK_UP]=Commands::JUMP;
+    keysToCommands[SDLK_DOWN]=Commands::DUCK;
+    keysToCommands[SDLK_LEFT]=Commands::BACK;
+    keysToCommands[SDLK_RIGHT]=Commands::FORWARD;
+    keysToCommands[SDLK_f]=Commands::ACTION;
+    keysToCommands[SDLK_d]=Commands::SPECIAL;
+    keysToCommands[SDLK_ESCAPE]=Commands::QUIT;
+}
+
 EventHandler::EventHandler(){
     initialized = true;
     commandState.fill(false);
-    keysToCommands[SDLK_UP]=JUMP;
-    keysToCommands[SDL_CONTROLLER_BUTTON_A]=JUMP;
-    keysToCommands[SDL_CONTROLLER_BUTTON_DPAD_UP]=JUMP;
-    keysToCommands[SDLK_DOWN]=DUCK;
-    keysToCommands[SDL_CONTROLLER_BUTTON_DPAD_DOWN]=DUCK;
-    keysToCommands[SDLK_LEFT]=BACK;
-    keysToCommands[SDL_CONTROLLER_BUTTON_DPAD_LEFT]=BACK;
-    keysToCommands[SDLK_RIGHT]=FORWARD;
-    keysToCommands[SDL_CONTROLLER_BUTTON_DPAD_RIGHT]=FORWARD;
-    keysToCommands[SDLK_f]=ACTION;
-    keysToCommands[SDL_CONTROLLER_BUTTON_B]=ACTION;
-    keysToCommands[SDLK_d]=SPECIAL;
-    keysToCommands[SDL_CONTROLLER_BUTTON_X]=SPECIAL;
-    keysToCommands[SDLK_ESCAPE]=QUIT;
+    initKeyMapping();
+    initButtonMapping();
     duckCommand = new DuckCommand;
     specialCommand = new SpecialCommand;
     actionCommand = new ActionCommand;
@@ -29,92 +45,86 @@ EventHandler::EventHandler(){
 
     // Temporarily open the first joystick to the controller if it exists
     if (SDL_NumJoysticks() > 0)
-        ctrl.setJoystick(0);
+        controller.setJoystick(0);
 }
 
 EventHandler::~EventHandler(){
-	delete jumpCommand;
+    delete jumpCommand;
     delete moveCommand;
     delete actionCommand;
     delete specialCommand;
     delete duckCommand;
 }
 
-void EventHandler::actionHandler(const int command, const int flag=0, const float move=0){
-	switch (command) {
-            case JUMP:
-                DEBUG("Jump");
-                if(flag==(KEYDOWN||JOYDOWN)) commandState[JUMP] = true;
-                if(flag==KEYUP||JOYUP) commandState[JUMP] = false;
-                eventStack.push(jumpCommand);
-                return;
-            case DUCK:
-                DEBUG("Duck");
-                if(flag==(KEYDOWN||JOYDOWN)) commandState[DUCK] = true;
-                if(flag==KEYUP||JOYUP) commandState[DUCK] = false;
-                eventStack.push(duckCommand);
-                return;
-            case BACK:
-                DEBUG("Back");
-                if(flag==(KEYDOWN||JOYDOWN)) commandState[BACK] = true;
-                if(flag==KEYUP||JOYUP) commandState[BACK] = false;
-                eventStack.push(moveCommand);
-                return;
-            case FORWARD:
-                DEBUG("Forward");
-                if(flag==(KEYDOWN||JOYDOWN)) commandState[FORWARD] = true;
-                if(flag==KEYUP||JOYUP) commandState[FORWARD] = false;
-                eventStack.push(moveCommand);
-                return;
-            case ACTION:
-                DEBUG("Action");
-                if(flag==(KEYDOWN||JOYDOWN)) commandState[ACTION] = true;
-                if(flag==KEYUP||JOYUP) commandState[ACTION] = false;
-                eventStack.push(actionCommand);
-                return;
-            case SPECIAL:
-                DEBUG("Special");
-                if(flag==(KEYDOWN||JOYDOWN)) commandState[SPECIAL] = true;
-                if(flag==KEYUP||JOYUP) commandState[SPECIAL] = false;
-                eventStack.push(specialCommand);
-                return;
-            }
+void EventHandler::actionHandler(Commands command, bool pressed)
+{
+    if (pressed && !commandState[underType(command)]) {
+        switch (command) {
+        case Commands::JUMP:
+            DEBUG("Jump");
+            eventStack.push(jumpCommand);
+            break;
+        case Commands::DUCK:
+            DEBUG("Duck");
+            eventStack.push(duckCommand);
+            break;
+        case Commands::BACK:
+            DEBUG("Back");
+            eventStack.push(moveCommand);
+            break;
+        case Commands::FORWARD:
+            DEBUG("Forward");
+            eventStack.push(moveCommand);
+            break;
+        case Commands::ACTION:
+            DEBUG("Action");
+            eventStack.push(actionCommand);
+            break;
+        case Commands::SPECIAL:
+            DEBUG("Special");
+            eventStack.push(specialCommand);
+            break;
+        default:
+            break;
+        }
+    }
+    commandState[static_cast<char>(command)] = pressed;
 }
 
 int EventHandler::inputHandler(SDL_Event &event){
-    while (SDL_PollEvent(&event) != 0) {
+    while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT)
             return 1;
-		if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()||
-			keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()) 
-            return 0;
-		DEBUG("Keypress detected. Key: "<<event.key.keysym.scancode<<" & command: "<<keysToCommands[event.key.keysym.sym]
-				<<" & command state: "<<commandState[keysToCommands[event.key.keysym.sym]]);
+
         switch (event.type) {
-			case SDL_KEYDOWN: 
-				if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()||
-					commandState[keysToCommands[event.key.keysym.sym]]==true)
-					return 0;
-				if (keysToCommands[event.key.keysym.sym]==QUIT)
-					return 1;
-				actionHandler(keysToCommands[event.key.keysym.sym],KEYDOWN);
-			case SDL_KEYUP:
-				if (keysToCommands.find(event.key.keysym.sym) == keysToCommands.end()||
-					commandState[keysToCommands[event.key.keysym.sym]]==false)
-					return 0;
-				actionHandler(keysToCommands[event.key.keysym.sym],KEYUP);
-			case SDL_CONTROLLERAXISMOTION:
-				return 0;
-			case SDL_CONTROLLERBUTTONDOWN:
-				if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()||
-					commandState[keysToCommands[event.cbutton.button]]==true)
-					return 0;
-				actionHandler(keysToCommands[event.cbutton.button],JOYDOWN);
-			case SDL_CONTROLLERBUTTONUP:
-				if (keysToCommands.find(event.cbutton.button) == keysToCommands.end()||
-					commandState[keysToCommands[event.cbutton.button]]==false)
-					return 0;
-				actionHandler(keysToCommands[event.cbutton.button],JOYUP);
+        case SDL_KEYDOWN:
+            if (!keysToCommands.count(event.key.keysym.sym))
+                continue;
+            if (keysToCommands[event.key.keysym.sym] == Commands::QUIT)
+                return 1;
+            actionHandler(keysToCommands[event.key.keysym.sym], true);
+            break;
+
+        case SDL_KEYUP:
+            if (!keysToCommands.count(event.key.keysym.sym))
+                continue;
+            actionHandler(keysToCommands[event.key.keysym.sym], false);
+            break;
+
+        case SDL_CONTROLLERAXISMOTION:
+            continue;
+
+        case SDL_CONTROLLERBUTTONDOWN:
+            if (!buttonsToCommands.count(event.cbutton.button))
+                continue;
+            actionHandler(buttonsToCommands[event.cbutton.button], true);
+            break;
+
+        case SDL_CONTROLLERBUTTONUP:
+            if (!buttonsToCommands.count(event.cbutton.button))
+                continue;
+            actionHandler(buttonsToCommands[event.cbutton.button], false);
+            break;
         }
     }
     return 0;
@@ -137,19 +147,21 @@ void EventHandler::executeEvents(){
     }
 }
 
-auto EventHandler::getCommandPtr(int cmd) -> Command*{
+auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
     switch (cmd) {
-        case JUMP://0
+        case Commands::JUMP:
             return jumpCommand;
-        case DUCK://1
+        case Commands::DUCK:
             return duckCommand;
-        case BACK://2
+        case Commands::BACK:
             return moveCommand;
-        case FORWARD://3
+        case Commands::FORWARD:
             return moveCommand;
-        case ACTION://4
+        case Commands::ACTION:
             return actionCommand;
-        case SPECIAL://5
+        case Commands::SPECIAL:
             return actionCommand;
+        default:
+            break;
     }
 }

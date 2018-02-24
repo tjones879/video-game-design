@@ -10,32 +10,25 @@
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
+enum class Commands : char {
+    JUMP,
+    DUCK,
+    BACK,
+    FORWARD,
+    ACTION,
+    SPECIAL,
+    QUIT,
+    NUM_OF_COMMANDS
+};
+
 class EventHandler
 {
 private:
     bool initialized;
-    std::array<bool,25> commandState{};
-    std::map<int,SDL_Keycode> keysToCommands; 
-    Controller ctrl;
-    enum commands{
-        JUMP,
-        DUCK,
-        BACK,
-        FORWARD,
-        ACTION,
-        SPECIAL,
-        QUIT,
-        NUM_OF_COMMANDS
-    };
-    enum flags{
-		DEFAULT,
-        KEYDOWN,
-        KEYUP,
-        JOYDOWN,
-        JOYUP,
-        STICK,
-        NUM_OF_FLAGS
-    };
+    std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
+    std::map<SDL_Keycode, Commands> keysToCommands;
+    std::map<uint8_t, Commands> buttonsToCommands;
+    Controller controller;
     class Command {
         public:
           virtual ~Command() {};
@@ -43,37 +36,39 @@ private:
     };
     class JumpCommand : public Command {
         public:
-          virtual void execute() const { 
-              DEBUG("Execute Jump");    
-              //jump(); 
+          virtual void execute() const {
+              DEBUG("Execute Jump");
+              //jump();
               return;
           }
     };
     class DuckCommand : public Command {
         public:
-          virtual void execute() const { 
-              //duck(); 
+          virtual void execute() const {
+              //duck();
           }
     };
     class MoveCommand : public Command {
         public:
-          virtual void execute() const { 
-              //Update object position 
+          virtual void execute() const {
+              //Update object position
           }
     };
     class ActionCommand : public Command {
         public:
-          virtual void execute() const { 
-              //action(); 
+          virtual void execute() const {
+              //action();
           }
     };
     class SpecialCommand : public Command {
         public:
-          virtual void execute() const { 
-              //special(); 
+          virtual void execute() const {
+              //special();
           }
     };
-    void actionHandler(const int command, const int flag, const float move);
+    void actionHandler(Commands command, bool pressed);
+    void initKeyMapping();
+    void initButtonMapping();
     std::queue<Command*> eventStack;
     JumpCommand* jumpCommand;
     MoveCommand* moveCommand;
@@ -87,5 +82,5 @@ public:
     int inputHandler(SDL_Event &event);
     void addEvent(Command &newEvent);
     void executeEvents();
-    Command* getCommandPtr(int);
+    Command *getCommandPtr(Commands cmd);
 };
