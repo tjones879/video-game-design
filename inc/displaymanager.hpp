@@ -1,8 +1,10 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include "SDL_gpu.h"
 #include <stdint.h>
 #include <string>
+#include "inc/gputarget.hpp"
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -10,20 +12,14 @@ class DisplayManager
 {
 private:
     SDL_Window *window;
-    SDL_Surface* windowSurface;
-    SDL_Renderer* renderer;
+    GPUTarget gpu;
     const int SCREEN_WIDTH = 640;
-	const int SCREEN_HEIGHT = 480;
-	bool loadMedia();
-	bool initialized;
-	SDL_Surface* testSurface;
+    const int SCREEN_HEIGHT = 480;
+    bool initialized;
 public:
     DisplayManager(const std::string &title);
     ~DisplayManager();
     bool isInitialized() const;
-    SDL_Window *operator()() const;
-    SDL_Renderer* getRenderer();
-    void clearScreen();
-    void renderScreen();
-    void renderRect(const SDL_Rect* rect, const int red, const int blue, const int green, const int alpha);
+    operator SDL_Window*() const;
+    void displayCircle();
 };

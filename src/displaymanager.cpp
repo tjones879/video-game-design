@@ -1,43 +1,28 @@
 #include <inc/displaymanager.hpp>
 #include <iostream>
+#include <stdio.h>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
 DisplayManager::DisplayManager(const std::string &title)
-    : window(NULL), initialized(false)
+    : window(NULL), initialized(false), gpu(&window)
 {
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_GAMECONTROLLER)<0){
-		std::cout << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
-	}else{
-		if( !SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" ) ){
-			std::cout<<"Warning: Linear texture filtering not enabled!"<<std::endl;
-		}
-		window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED,
-								  SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-								  SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if (!window){
-			std::cout << "SDL Window Error: " << SDL_GetError() << std::endl;
-		}else{
-			renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
-			if(!renderer){
-				std::cout << "Renderer could not be created. Error: " << SDL_GetError() << std::endl;
-			}else{
-				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
-			}
-		}
-	}
-	initialized = true;
+    if (!gpu.screen) {
+        std::cout << "sdl_gpu failed to initialize." << std::endl;
+        return;
+    } else {
+        SDL_SetWindowTitle(window, title.c_str());
+        initialized = true;
+    }
 }
 
 DisplayManager::~DisplayManager()
 {
-    SDL_DestroyRenderer( renderer );
-	SDL_DestroyWindow( window );
-	window = NULL;
-	renderer = NULL;
+    SDL_DestroyWindow(window);
+    window = NULL;
 }
 
-SDL_Window *DisplayManager::operator()() const
+DisplayManager::operator SDL_Window*() const
 {
     return window;
 }
@@ -47,32 +32,21 @@ bool DisplayManager::isInitialized() const
     return initialized;
 }
 
-bool DisplayManager::loadMedia(){
-	bool success = true;
-    testSurface = SDL_LoadBMP("../assets/hello_world.bmp");
-    if (!testSurface) {
-        std::cout << "Unable to load image: " << SDL_GetError() << std::endl;
-        success = false;
-    }
-
-    return success;
+void DisplayManager::displayCircle() {
+    GPU_Clear(gpu);
+    SDL_Color color;
+    color.r = 0;
+    color.g = 0;
+    color.b = 255;
+    color.a = 255;
+    float vertices[12] = {
+        300,150,
+        225,280,
+        75,280,
+        0,150,
+        75,20,
+        225,20,
+    };
+    GPU_PolygonFilled(gpu, 6, vertices, color);
+    GPU_Flip(gpu);
 }
-
-void DisplayManager::renderRect(const SDL_Rect* rect, const int red, const int blue, const int green, const int alpha){
-	SDL_SetRenderDrawColor( renderer, red, blue, green, alpha );		
-	SDL_RenderFillRect( renderer, rect );
-}
-
-SDL_Renderer* DisplayManager::getRenderer(){
-	return renderer;
-}
-
-void DisplayManager::renderScreen(){
-	SDL_RenderPresent( renderer );
-}
-
-void DisplayManager::clearScreen(){
-	SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
-	SDL_RenderClear( renderer );
-}
-
