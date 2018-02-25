@@ -7,15 +7,15 @@ constexpr int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
 {
-    EventHandler eventHandler;
-    if (!eventHandler.isInitialized()) {
-        std::cout << "EventHandler failed" << std::endl;
-        return 1;
-    }
-
     DisplayManager displayManager("Test Window");
     if (!displayManager.isInitialized()) {
         std::cout << "Display Manager failed" << std::endl;
+        return 1;
+    }
+
+    EventHandler eventHandler;
+    if (!eventHandler.isInitialized()) {
+        std::cout << "EventHandler failed" << std::endl;
         return 1;
     }
 

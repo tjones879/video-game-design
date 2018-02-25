@@ -7,6 +7,11 @@
 DisplayManager::DisplayManager(const std::string &title)
     : window(NULL), initialized(false), gpu(&window)
 {
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
+        std::cout << SDL_GetError() << std::endl;
+        return;
+    }
+
     if (!gpu.screen) {
         std::cout << "sdl_gpu failed to initialize." << std::endl;
         return;
