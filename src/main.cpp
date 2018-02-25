@@ -1,82 +1,38 @@
 #include <SDL2/SDL.h>
-#include "inc/initialize.hpp"
-#include "inc/window.hpp"
 #include <iostream>
+#include "inc/eventhandler.hpp"
+#include "inc/displaymanager.hpp"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-enum KeyPressSurfaces {
-    KEY_PRESS_SURFACE_DEFAULT,
-    KEY_PRESS_SURFACE_UP,
-    KEY_PRESS_SURFACE_DOWN,
-    KEY_PRESS_SURFACE_LEFT,
-    KEY_PRESS_SURFACE_RIGHT,
-    KEY_PRESS_SURFACE_TOTAL
-};
-
-SDL_Surface *gScreenSurface = NULL;
-SDL_Surface *gKeyPressSurfaces[KEY_PRESS_SURFACE_TOTAL];
-SDL_Surface *gCurrentSurface = NULL;
-SDL_Renderer *gRenderer = NULL;
-
-SDL_Surface *loadSurface(const std::string &path)
-{
-    SDL_Surface *loadedSurface = SDL_LoadBMP(path.c_str());
-
-    if (!loadedSurface) {
-        std::cout << "Unable to load image: " << path.c_str() << SDL_GetError() << std::endl;
-    }
-
-    return loadedSurface;
-}
-
-bool loadMedia()
-{
-    bool success = true;
-
-    return success;
-}
+constexpr int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
 {
-    Initialize init(SDL_INIT_VIDEO);
-    if (!init.isInitialized()) {
-        std::cout << "Initialization failed" << std::endl;
+    EventHandler eventHandler;
+    if (!eventHandler.isInitialized()) {
+        std::cout << "EventHandler failed" << std::endl;
         return 1;
     }
 
-    Window window("Example Window", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (!window.isInitialized()) {
-        std::cout << "Window failed" << std::endl;
+    DisplayManager displayManager("Test Window");
+    if (!displayManager.isInitialized()) {
+        std::cout << "Display Manager failed" << std::endl;
         return 1;
     }
 
-    gRenderer = SDL_CreateRenderer(window(), -1, SDL_RENDERER_ACCELERATED);
-    if (!gRenderer) {
-        std::cout << "Renderer could not be created!" << SDL_GetError() << std::endl;
-        return 1;
-    }
-
-    gScreenSurface = SDL_GetWindowSurface(window());
     bool quit = false;
     SDL_Event e;
-
     while (!quit) {
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT)
-                quit = true;
+        const int start = SDL_GetTicks();
+        displayManager.displayCircle();
+        if (eventHandler.inputHandler(e) == 1)
+            return 0;
+        eventHandler.executeEvents();
+        const int end = SDL_GetTicks();
+        const int millisecondsThisFrame = end - start;
+        if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
+            // If rendering faster than 60FPS, delay
+            SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
         }
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(gRenderer);
-        SDL_Rect fillRect = { SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0x00, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(gRenderer, &fillRect);
-        SDL_RenderPresent(gRenderer);
-
-        SDL_Delay(16);
     }
-
-    SDL_DestroyRenderer(gRenderer);
     return 0;
 }
