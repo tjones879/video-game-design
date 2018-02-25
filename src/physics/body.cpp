@@ -11,6 +11,8 @@ Body::Body(const BodySpec &spec)
     bodySweep.angle = spec.angle;
     bodySweep.angle0 = spec.angle;
 
+    angle = spec.angle;
+
     linearVelocity = spec.linVelocity;
     angularVelocity = spec.angVelocity;
     gravityFactor = spec.gravityFactor;
@@ -28,10 +30,7 @@ Body::Body(const BodySpec &spec)
     torque = 0.0f;
 }
 
-Body::~Body()
-{
-
-}
+Body::~Body() = default;
 
 std::weak_ptr<Shape> Body::createShape(const ShapeSpec &spec)
 {
@@ -41,7 +40,7 @@ std::weak_ptr<Shape> Body::createShape(const ShapeSpec &spec)
     return ptr;
 }
 
-void Body::destroyShape(std::weak_ptr<Shape> shape)
+void Body::destroyShape(const std::weak_ptr<Shape> &shape)
 {
     auto result = std::find(std::begin(shapeList), std::end(shapeList), shape.lock());
     if (result != std::end(shapeList))
@@ -120,7 +119,6 @@ const Vec2 &Body::getCenterMass() const
 
 void Body::setSleep()
 {
-    return;
 }
 
 bool Body::isAsleep()

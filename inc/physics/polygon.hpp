@@ -17,9 +17,9 @@ public:
      * Create a convex polygon using the given local points.
      *
      * The number of points must be in the range [3, maxPolygonVertices]
-     * @param points A list of points in local coordinates for all vertices.
+     * @param vertices_ A list of points in local coordinates for all vertices.
      */
-    void set(std::vector<Vec2> points);
+    void set(const std::vector<Vec2> &vertices_);
     /**
      * Set the polygon to be an axis-aligned box.
      *

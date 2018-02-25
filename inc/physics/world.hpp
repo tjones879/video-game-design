@@ -11,8 +11,18 @@ class Body;
 class Contact;
 
 class World {
+private:
+    Vec2 gravity;
+    std::vector<std::shared_ptr<Body>> bodyList;
+    uint8_t velocityIterations;
+    uint8_t positionIterations;
 public:
     World(const Vec2 &gravity_);
+    /**
+     * All objects referenced by the world are ref counted, so
+     * they should be automatically destroyed when any other
+     * strong references are removed.
+     */
     ~World();
 
     /**
@@ -33,7 +43,7 @@ public:
      *
      * @param body A reference to the body that should be deleted.
      */
-    void destroyBody(std::weak_ptr<Body> body);
+    void destroyBody(const std::weak_ptr<Body> &body);
 
     /**
      * Get all current bodies in the world.
@@ -67,10 +77,5 @@ public:
      * and prevent impossible conditions.
      */
     void setPositionIterations(uint8_t iterations);
-private:
-    Vec2 gravity;
-    std::vector<std::shared_ptr<Body>> bodyList;
-    uint8_t velocityIterations;
-    uint8_t positionIterations;
 };
 } /* namespace phy */

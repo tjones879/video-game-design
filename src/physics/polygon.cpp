@@ -4,6 +4,7 @@
 
 namespace phy {
 PolygonShape::PolygonShape()
+    : density(0.0)
 {
 
 }
@@ -100,7 +101,7 @@ static std::vector<Vec2> convexHull(std::vector<Vec2> vertices)
     return ret;
 }
 
-void PolygonShape::set(std::vector<Vec2> vertices_)
+void PolygonShape::set(const std::vector<Vec2> &vertices_)
 {
     if (vertices_.size() < 3)
         return;

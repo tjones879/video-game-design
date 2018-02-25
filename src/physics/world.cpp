@@ -6,16 +6,11 @@
 namespace phy {
 
 World::World(const Vec2 &gravity_)
-    : gravity(gravity_)
+    : gravity(gravity_), velocityIterations(10), positionIterations(10)
 {
 }
 
-World::~World()
-{
-    /* All objects referenced by the world are ref counted, so
-     * they should be automatically destroyed when any other
-     * strong references are removed. */
-}
+World::~World() = default;
 
 std::weak_ptr<Body> World::createBody(const BodySpec &spec)
 {
@@ -26,7 +21,7 @@ std::weak_ptr<Body> World::createBody(const BodySpec &spec)
     return bodyPtr;
 }
 
-void World::destroyBody(std::weak_ptr<Body> body)
+void World::destroyBody(const std::weak_ptr<Body> &body)
 {
     // TODO: Synchronize to avoid data race
     auto result = std::find(std::begin(bodyList), std::end(bodyList), body.lock());

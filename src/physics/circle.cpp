@@ -2,9 +2,9 @@
 
 namespace phy {
 CircleShape::CircleShape()
+    : density(0.0), radius(0.0)
 {
     shapeType = ShapeType::circle;
-    radius = 0.0f;
 }
 
 bool CircleShape::testPoint(const Transform &transform, const Vec2 &pos) const

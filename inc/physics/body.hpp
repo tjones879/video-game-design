@@ -68,7 +68,7 @@ public:
      * Note that this will not necessarily free the physical memory
      * until all other strong references have been cleared.
      */
-    void destroyShape(std::weak_ptr<Shape> shape);
+    void destroyShape(const std::weak_ptr<Shape> &shape);
     const Vec2 &getPosition() const;
 
     /**
@@ -84,8 +84,8 @@ public:
     void setAngularVelocity(float velocity);
     float getAngularVelocity();
 
-    void applyForce(const Vec2 &force, const Vec2 &point);
-    void applyTorque(float torque);
+    void applyForce(const Vec2 &force_, const Vec2 &point);
+    void applyTorque(float torque_);
 
     void applyLinearImpulse(const Vec2 &impulse, const Vec2 &point);
     void applyAngularImpulse(float impulse);
