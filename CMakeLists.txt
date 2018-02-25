@@ -21,9 +21,8 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/lib/sdl-gpu)
 add_executable(VGD
     src/main.cpp
     src/displaymanager.cpp
-    src/window.cpp
-    src/initialize.cpp
-    src/eventhandler.cpp)
+    src/eventhandler.cpp
+    src/controller.cpp)
 target_link_libraries(VGD ${SDL2_LIBRARIES} ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
 add_dependencies(VGD sdl-gpu)
 
