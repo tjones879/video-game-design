@@ -17,7 +17,7 @@ Vec2 PolygonShape::calculateCentroid() const
     float area = 0;
 
     const float inv3 = 1.0f / 3.0f;
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); i++) {
         Vec2 p1 = reference;
         Vec2 p2 = vertices[i];
         Vec2 p3 = vertices[(i + 1) % vertices.size()];
@@ -80,7 +80,7 @@ static std::vector<Vec2> convexHull(std::vector<Vec2> vertices)
     hull.push(vertices[1]);
     hull.push(vertices[2]);
 
-    for (int i = 3; i < vertices.size(); i++) {
+    for (size_t i = 3; i < vertices.size(); i++) {
         Vec2 top = hull.top();
         hull.pop();
         while (ccw(hull.top(), top, vertices[i]) <= 0) {
@@ -109,7 +109,7 @@ void PolygonShape::set(std::vector<Vec2> vertices_)
 
     vertices = convexHull(vertices_);
 
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); i++) {
         int i2 = (i + 1) % vertices.size();
 
         Vec2 edge = vertices[i2] - vertices[i];
@@ -142,7 +142,7 @@ void PolygonShape::setBox(const Vec2 &length, const Vec2 &center, float angle)
     centroid = center;
 
     Transform transform(center, angle);
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); i++) {
         vertices[i] = transform.translate(vertices[i]);
         normals[i] = transform.rotation.rotate(normals[i]);
     }
@@ -152,7 +152,7 @@ bool PolygonShape::testPoint(const Transform &transform, const Vec2 &pos) const
 {
     Vec2 localPoint = transform.rotation.invRotate(pos - transform.position);
 
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); i++) {
         float dot = normals[i].dot(localPoint - vertices[i]);
         if (dot > 0.0f)
             return false;

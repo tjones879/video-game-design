@@ -48,9 +48,6 @@ void World::step(float dt)
 {
     // If new bodies or shapes were added, find them
     // Lock the world
-    float inv_dt = 0.0f;
-    if (dt > 0)
-        inv_dt = 1.0f / dt;
 
     // TODO: Update all contacts
     // Integrate velocities

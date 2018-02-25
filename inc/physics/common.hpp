@@ -101,7 +101,7 @@ public:
     float normalize()
     {
         const float eps = 0.001f;
-        float length = length;
+        float length = this->length();
         if (length < eps)
             return 0.f;
 
