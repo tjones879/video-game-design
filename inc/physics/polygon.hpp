@@ -20,12 +20,14 @@ public:
      * @param vertices_ A list of points in local coordinates for all vertices.
      */
     void set(const std::vector<Vec2> &vertices_);
+
     /**
      * Set the polygon to be an axis-aligned box.
      *
      * @param length A vector of half the desired length of x and y edges.
      */
     void setBox(const Vec2 &length);
+
     /**
      * Set the polygon to be a box with orientation.
      *

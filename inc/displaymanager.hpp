@@ -11,15 +11,15 @@
 class DisplayManager
 {
 private:
+    bool initialized;
     SDL_Window *window;
     GPUTarget gpu;
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
-    bool initialized;
 public:
     DisplayManager(const std::string &title);
     ~DisplayManager();
     bool isInitialized() const;
     operator SDL_Window*() const;
-    void displayCircle();
+    void displayPolygon();
 };

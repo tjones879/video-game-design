@@ -5,10 +5,10 @@
 #define DEBUG(e) std::cerr << e << std::endl;
 
 DisplayManager::DisplayManager(const std::string &title)
-    : window(NULL), initialized(false), gpu(&window)
+    : initialized(false), window(nullptr), gpu(&window)
 {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
-        std::cout << SDL_GetError() << std::endl;
+        std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return;
     }
 
@@ -24,7 +24,7 @@ DisplayManager::DisplayManager(const std::string &title)
 DisplayManager::~DisplayManager()
 {
     SDL_DestroyWindow(window);
-    window = NULL;
+    window = nullptr;
 }
 
 DisplayManager::operator SDL_Window*() const
@@ -37,7 +37,7 @@ bool DisplayManager::isInitialized() const
     return initialized;
 }
 
-void DisplayManager::displayCircle() {
+void DisplayManager::displayPolygon() {
     GPU_Clear(gpu);
     SDL_Color color;
     color.r = 0;

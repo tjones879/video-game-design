@@ -32,8 +32,8 @@ public:
      */
     virtual bool testPoint(const Transform &transform, const Vec2 &pos) const = 0;
     /**
-     * Get the Axis aligned bounding box of this shape for
-     * broad-phase collision detection.
+     * Get the Axis aligned bounding box of this shape for broad-phase
+     * collision detection.
      */
     virtual void getAABB() const = 0;
     ShapeType getShapeType() const;

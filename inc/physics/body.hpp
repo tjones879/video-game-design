@@ -26,16 +26,16 @@ struct BodySpec {
     }
 
     BodyType bodyType;
-    Vec2 position;
-    float angle;
+    Vec2 position; ///< World coordinates of this body
+    float angle; ///< Rotation of this body in radians
     Vec2 linVelocity;
     float angVelocity;
-    float gravityFactor;
+    float gravityFactor; ///< Scalar factor for the world's gravity on this body
 };
 
 class Body {
 private:
-    void *extraData; ///< TODO: Change this to a structure specific to this game
+    void *extraData; ///< Any additional data that may be used in other components of the game
     std::shared_ptr<World> parentWorld;
     float mass, invMass;
     float inertia, invInertia;
@@ -84,7 +84,17 @@ public:
     void setAngularVelocity(float velocity);
     float getAngularVelocity();
 
+    /**
+     * Apply a force in Newtons to a point in local space.
+     *
+     * @param force_ Force in newtons to apply in each direction
+     * @param point  Point inside the body with local coordinates.
+     */
     void applyForce(const Vec2 &force_, const Vec2 &point);
+
+    /**
+     * Apply some amount of torque to the centroid of the body.
+     */
     void applyTorque(float torque_);
 
     void applyLinearImpulse(const Vec2 &impulse, const Vec2 &point);
@@ -110,22 +120,26 @@ public:
      * @param gravity A vector of the world's gravity effect
      */
     void updateVelocity(float dt, Vec2 gravity);
+
     /**
      * Update this body's position due to accumulated velocity.
      *
      * @param dt The amount of time in seconds since the last update
      */
     void updatePosition(float dt);
+
     /**
      * Remove all forces that are currently effecting the body.
      */
     void clearForces();
+
     /**
      * Get any extra data about this body that other components may need to use.
      *
      * @return A void pointer that must be casted into the correct type.
      */
     void *getExtraData() const;
+
     /**
      * Set the pointer to this body's extra data.
      *

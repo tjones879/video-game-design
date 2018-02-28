@@ -3,7 +3,7 @@
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
 
-constexpr int MIN_MILLISECONDS_PER_FRAME = 16;
+const int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
 {
@@ -23,7 +23,7 @@ int main(int argc, char **args)
     SDL_Event e;
     while (!quit) {
         const int start = SDL_GetTicks();
-        displayManager.displayCircle();
+        displayManager.displayPolygon();
         if (eventHandler.inputHandler(e) == 1)
             return 0;
         eventHandler.executeEvents();

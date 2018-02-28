@@ -10,12 +10,23 @@ namespace phy {
 class Body;
 class Contact;
 
+/**
+ * The world contains all bodies and constraints in the world.
+ *
+ * This class should be the primary entry point of any interactions
+ * with the physics engine.
+ *
+ * New bodies should be instantiated using a BodySpec and passed
+ * to World::createBody(spec). This body can be moved manually
+ * (in the case of a player-controlled character), but all collisions
+ * will be notified through a collision listener.
+ */
 class World {
 private:
     Vec2 gravity;
     std::vector<std::shared_ptr<Body>> bodyList;
-    uint8_t velocityIterations;
-    uint8_t positionIterations;
+    uint8_t velocityIterations; ///< Number of iterations used to resolve velocity of bodies
+    uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
 public:
     World(const Vec2 &gravity_);
     /**
@@ -28,7 +39,6 @@ public:
     /**
      * Create a body using the given BodySpec.
      *
-     * The given reference can be safely destroyed or reused after this function.
      * @return A pointer to the created body.
      */
     std::weak_ptr<Body> createBody(const BodySpec &spec);

@@ -102,6 +102,7 @@ public:
     {
         const float eps = 0.001f;
         float length = this->length();
+        // Assume the vector length is zero if it is too small
         if (length < eps)
             return 0.f;
 
@@ -113,10 +114,19 @@ public:
     }
 };
 
+/**
+ * Represent any rotation of a shape in the world.
+ *
+ * We simply save the sine and cosine of of an angle
+ * upon construction for quick rotation of a Vec2.
+ */
 struct Rotation {
     float sine, cosine;
-    Rotation() : sine(sinf(0)), cosine(cosf(0)) {}
-    Rotation(float angle) : sine(sinf(angle)), cosine(cosf(angle)) {}
+    Rotation()
+        : sine(sinf(0)), cosine(cosf(0)) {}
+    Rotation(float angle)
+        : sine(sinf(angle)), cosine(cosf(angle)) {}
+
     inline Vec2 rotate(const Vec2 &point) const
     {
         return Vec2(cosine * point.x - sine * point.y,
@@ -138,7 +148,12 @@ struct Rotation {
 struct Transform {
     Vec2 position;
     Rotation rotation;
-    Transform(Vec2 p, Rotation r) : position(p), rotation(r) {}
+    Transform(Vec2 p, Rotation r)
+        : position(p), rotation(r) {}
+
+    /**
+     * Rotate a point then apply a linear translation.
+     */
     Vec2 translate(const Vec2 &point) const
     {
         auto translated = rotation.rotate(point);
