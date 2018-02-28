@@ -1,6 +1,6 @@
 #include <inc/displaymanager.hpp>
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -39,7 +39,7 @@ bool DisplayManager::isInitialized() const
 
 void DisplayManager::displayPolygon() {
     GPU_Clear(gpu);
-    SDL_Color color;
+    SDL_Color color{};
     color.r = 0;
     color.g = 0;
     color.b = 255;

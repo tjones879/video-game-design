@@ -20,7 +20,7 @@ int main(int argc, char **args)
     }
 
     bool quit = false;
-    SDL_Event e;
+    SDL_Event e{};
     while (!quit) {
         const int start = SDL_GetTicks();
         displayManager.displayPolygon();
