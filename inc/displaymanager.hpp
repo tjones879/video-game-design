@@ -4,7 +4,7 @@
 #include "SDL_gpu.h"
 #include <stdint.h>
 #include <string>
-#include "SDL2/SDL_ttf.h"
+//#include "SDL2/SDL_ttf.h"
 #include "inc/gputarget.hpp"
 
 #define DEBUG(e) std::cerr << e << std::endl;
@@ -17,7 +17,7 @@ private:
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
     bool initialized;
-    TTF_Font *font;
+//    TTF_Font *font;
 public:
     DisplayManager(const std::string &title);
     ~DisplayManager();
