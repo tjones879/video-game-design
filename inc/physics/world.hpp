@@ -27,6 +27,7 @@ private:
     std::vector<std::shared_ptr<Body>> bodyList;
     uint8_t velocityIterations; ///< Number of iterations used to resolve velocity of bodies
     uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
+    uint32_t lastTicks; ///< Number of SDL_GetTicks() for the last iteration
 public:
     World(const Vec2 &gravity_);
     /**
@@ -65,7 +66,7 @@ public:
      */
     std::vector<std::weak_ptr<const Contact>> getContacts() const;
 
-    void step(float dt);
+    void step();
 
     void setGravity(const Vec2 &gravity_);
     Vec2 getGravity() const;
@@ -87,5 +88,7 @@ public:
      * and prevent impossible conditions.
      */
     void setPositionIterations(uint8_t iterations);
+private:
+    float updateTime();
 };
 } /* namespace phy */

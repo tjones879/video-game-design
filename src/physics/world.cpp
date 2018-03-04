@@ -1,14 +1,14 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/body.hpp"
+#include "SDL2/SDL.h"
 
 #include <algorithm>
 
 namespace phy {
 
 World::World(const Vec2 &gravity_)
-    : gravity(gravity_), velocityIterations(10), positionIterations(10)
-{
-}
+    : gravity(gravity_), velocityIterations(10), positionIterations(10),
+      lastTicks(SDL_GetTicks()) {}
 
 World::~World() = default;
 
@@ -39,33 +39,38 @@ std::vector<std::weak_ptr<const Contact>> World::getContacts() const
     return std::vector<std::weak_ptr<const Contact>>();
 }
 
-void World::step(float dt)
+float World::updateTime()
 {
+    uint32_t currentTicks = SDL_GetTicks();
+    float dt = (currentTicks - lastTicks) / 1000.f;
+    lastTicks = currentTicks;
+    return dt;
+}
+
+void World::step()
+{
+    const float dt = updateTime();
     // If new bodies or shapes were added, find them
     // Lock the world
 
     // TODO: Update all contacts
     // Integrate velocities
-    std::for_each(std::begin(bodyList), std::end(bodyList),
-        [&](auto body) {
-            body->updateVelocity(dt, gravity);
-        });
+    for (auto body : bodyList)
+        body->updateVelocity(dt, gravity);
+
     // TODO: Resolve velocity constraints
     // Integrate positions
-    std::for_each(std::begin(bodyList), std::end(bodyList),
-        [&](auto body) {
-           body->updatePosition(dt);
-        });
+    for (auto body : bodyList)
+       body->updatePosition(dt);
+
     // TODO: Resolve position constraints
 
     // TODO: Synchronize shapes for broad-phase
     // TODO: Handle TOI
 
     // Clear forces
-    std::for_each(std::begin(bodyList), std::end(bodyList),
-        [&](auto body) {
-           body->clearForces();
-        });
+    for (auto body : bodyList)
+       body->clearForces();
 }
 
 void World::setGravity(const Vec2 &gravity_)
