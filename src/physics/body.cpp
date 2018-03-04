@@ -32,9 +32,9 @@ Body::Body(const BodySpec &spec)
 
 Body::~Body() = default;
 
-std::weak_ptr<Shape> Body::createShape(const ShapeSpec &spec)
+std::weak_ptr<Shape> Body::createShape(const Shape* const shape)
 {
-    auto ptr = std::make_shared<CircleShape>();
+    auto ptr = std::make_shared<Shape>(shape);
     shapeList.push_back(ptr);
     updateMassProperties();
     return ptr;
@@ -196,7 +196,8 @@ void Body::setExtraData(void *data)
 
 std::ostream& operator<<(std::ostream &out, const Body &body)
 {
-    out << body.linearVelocity << std::endl;
+    out << "linVel: " << body.linearVelocity
+        << ", pos: " << body.position << std::endl;
     return out;
 }
 } /* namespace phy */

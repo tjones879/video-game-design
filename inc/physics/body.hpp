@@ -60,7 +60,7 @@ public:
      * The specification can be safely destroyed to changed after
      * this function exits.
      */
-    std::weak_ptr<Shape> createShape(const ShapeSpec &spec);
+    std::weak_ptr<Shape> createShape(const Shape* const spec);
 
     /**
      * Remove the reference to this shape from the world.
