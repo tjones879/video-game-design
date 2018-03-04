@@ -1,12 +1,13 @@
 #include <inc/displaymanager.hpp>
 #include <iostream>
 #include <stdio.h>
+#include <SDL2/SDL_ttf.h>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
 DisplayManager::DisplayManager(const std::string &title)
-    : window(NULL), initialized(false), gpu(&window)
-{
+    : window(NULL), initialized(false), gpu(&window){
+	
     if (!gpu.screen) {
         std::cout << "sdl_gpu failed to initialize." << std::endl;
         return;
@@ -14,6 +15,9 @@ DisplayManager::DisplayManager(const std::string &title)
         SDL_SetWindowTitle(window, title.c_str());
         initialized = true;
     }
+    if( TTF_Init() == -1 ){
+		printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+	}
 }
 
 DisplayManager::~DisplayManager()
