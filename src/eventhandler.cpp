@@ -1,6 +1,6 @@
 #include <inc/eventhandler.hpp>
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -38,8 +38,10 @@ EventHandler::EventHandler(){
     jumpCommand = new JumpCommand;
 
     // Temporarily open the first joystick to the controller if it exists
-    if (SDL_NumJoysticks() > 0)
+    if (SDL_NumJoysticks() > 0) {
         controller.setJoystick(0);
+        std::cout << controller << std::endl;
+    }
 }
 
 EventHandler::~EventHandler(){
@@ -131,7 +133,6 @@ bool EventHandler::isInitialized() const
 
 void EventHandler::addEvent(Command &newCommand){
     eventStack.push(&newCommand);
-    return;
 }
 
 void EventHandler::executeEvents(){

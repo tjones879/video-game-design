@@ -67,13 +67,13 @@ void Controller::updateAxis(SDL_ControllerAxisEvent event)
     }
 }
 
-std::ostream &operator<<(std::ostream &out, const Controller &ctrl)
+std::ostream &operator<<(std::ostream &out, const Controller &controller)
 {
-    if (!ctrl.initialized) {
+    if (!controller.initialized) {
         out << "FAILURE TO INITIALIZE" << std::endl;
     } else {
-        out << "Name: " << ctrl.name << std::endl;
-        out << "Mapping: " << ctrl.mapping << std::endl;
+        out << "Name: " << controller.name << std::endl;
+        out << "Mapping: " << controller.mapping << std::endl;
     }
     return out;
 }

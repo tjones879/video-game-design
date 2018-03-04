@@ -80,7 +80,7 @@ public:
     ~EventHandler();
     bool isInitialized() const;
     int inputHandler(SDL_Event &event);
-    void addEvent(Command &newEvent);
+    void addEvent(Command &newCommand);
     void executeEvents();
     Command *getCommandPtr(Commands cmd);
 };

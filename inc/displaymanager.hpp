@@ -12,6 +12,7 @@
 class DisplayManager
 {
 private:
+    bool initialized;
     SDL_Window *window;
     GPUTarget gpu;
     const int SCREEN_WIDTH = 640;
@@ -23,5 +24,5 @@ public:
     ~DisplayManager();
     bool isInitialized() const;
     operator SDL_Window*() const;
-    void displayCircle();
+    void displayPolygon();
 };

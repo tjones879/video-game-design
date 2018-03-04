@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-
 project(VGD)
-set(CMAKE_CXX_FLAGS "-std=c++14")
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/sdl-gpu/include)
 
@@ -12,6 +10,12 @@ add_custom_target(sdl-gpu ALL
     COMMAND make
     WORKING_DIRECTORY ./lib/sdl-gpu)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
+         -Wno-zero-as-null-pointer-constant \
+         -Wno-padded -Wno-unused-macros")
+
+
 find_package(SDL2 REQUIRED)
 find_package(SDL_ttf REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/)
@@ -21,8 +25,18 @@ include_directories(${SDL_ttf_INCLUDE_DIRS})
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/sdl-gpu)
 
+# MISC Targets (clang-format)
+file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp)
+file(GLOB_RECURSE ALL_HEADER_FILES inc/*.hpp inc/*.h)
+
 add_executable(VGD
     src/main.cpp
+    src/physics/world.cpp
+    src/physics/body.cpp
+    src/physics/shape.cpp
+    src/physics/circle.cpp
+    src/physics/edge.cpp
+    src/physics/polygon.cpp
     src/displaymanager.cpp
     src/eventhandler.cpp
     src/controller.cpp)
@@ -30,3 +44,8 @@ target_link_libraries(VGD ${SDL2_LIBRARIES} ${SDL_ttf_LIBRARIES} ${CMAKE_SOURCE_
 add_dependencies(VGD sdl-gpu)
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
+
+find_program(TIDY_PATH clang-tidy)
+if(TIDY_PATH)
+    add_custom_target(tidy COMMAND ${TIDY_PATH} ${ALL_SOURCE_FILES} -p ./)
+endif()
