@@ -155,5 +155,7 @@ private:
      *   (2) a shape's mass properties have changed
      */
     void updateMassProperties();
+    friend std::ostream& operator<<(std::ostream &out, const Body &body);
 };
+
 } /* namespace phy */

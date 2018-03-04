@@ -149,7 +149,7 @@ std::weak_ptr<const World> Body::getParentWorld() const
 void Body::updateVelocity(float dt, Vec2 gravity)
 {
     if (bodyType == BodyType::dynamicBody) {
-        linearVelocity = (gravity * gravityFactor + force * invMass) * dt;
+        linearVelocity += (gravity * gravityFactor + force * invMass) * dt;
         angularVelocity = invInertia * torque * dt;
         // TODO: Apply damping
     }
@@ -192,5 +192,11 @@ void *Body::getExtraData() const
 void Body::setExtraData(void *data)
 {
     extraData = data;
+}
+
+std::ostream& operator<<(std::ostream &out, const Body &body)
+{
+    out << body.linearVelocity << std::endl;
+    return out;
 }
 } /* namespace phy */

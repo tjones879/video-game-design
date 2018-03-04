@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <math.h>
+#include <ostream>
 
 namespace phy {
 
@@ -11,108 +12,41 @@ public:
     Vec2() : x(0.0f), y(0.0f) {}
     Vec2(float x, float y) : x(x), y(y) {}
 
-    void zeroOut()
-    {
-        x = 0.0f;
-        y = 0.0f;
-    }
-
-    void setVec(float x1, float y1)
-    {
-        x = x1;
-        y = y1;
-    }
+    void zeroOut();
+    void setVec(float x1, float y1);
 
     /**
      * Access a value by 0-based index.
      * @param i Index of the value that is wanted, must be 0 or 1.
      */
-    float operator() (int i) const
-    {
-        return (&x)[i];
-    }
-
-    void operator+= (const Vec2 &vec)
-    {
-        x += vec.x;
-        y += vec.y;
-    }
-
-    Vec2 operator+ (const Vec2 &vec) const
-    {
-        return Vec2(x + vec.x, y + vec.y);
-    }
-
-    void operator-= (const Vec2 &vec)
-    {
-        x -= vec.x;
-        y -= vec.y;
-    }
-
-    void operator*= (float scalar)
-    {
-        x *= scalar;
-        y *= scalar;
-    }
-
-    Vec2 operator* (float scalar) const
-    {
-        return Vec2(x * scalar, y * scalar);
-    }
-
-    Vec2 operator-(const Vec2& b) const
-    {
-        return Vec2(x - b.x, y - b.y);
-    }
-
+    float operator() (int i) const;
+    void operator+= (const Vec2 &vec);
+    Vec2 operator+ (const Vec2 &vec) const;
+    void operator-= (const Vec2 &vec);
+    void operator*= (float scalar);
+    Vec2 operator* (float scalar) const;
+    Vec2 operator-(const Vec2& b) const;
     /**
      * Cross product of two vectors.
      */
-    float cross(const Vec2 &b) const
-    {
-        return x * b.y - y * b.x;
-    }
-
+    float cross(const Vec2 &b) const;
     /**
      * Cross product with a scalar. This returns a Vec2 in 2 dimensions.
      */
-    Vec2 cross(float s) const
-    {
-        return Vec2(s * y, -s * x);
-    }
-
+    Vec2 cross(float s) const;
     /**
      * Calculate the dot product with another vector.
      */
-    float dot(const Vec2 &vec) const
-    {
-        return x * vec.x + y * vec.y;
-    }
-
+    float dot(const Vec2 &vec) const;
     /**
      * Calculate the absolute magnitude of the vector with
      * the sum of squares.
      */
-    float length() const
-    {
-        return x * x + y * y;
-    }
-
-    float normalize()
-    {
-        const float eps = 0.001f;
-        float length = this->length();
-        // Assume the vector length is zero if it is too small
-        if (length < eps)
-            return 0.f;
-
-        float inverse = 1.f / length;
-        x *= inverse;
-        y *= inverse;
-
-        return length;
-    }
+    float length() const;
+    float normalize();
 };
+
+std::ostream &operator<<(std::ostream &out, const Vec2 v);
 
 /**
  * Represent any rotation of a shape in the world.

@@ -28,6 +28,7 @@ file(GLOB_RECURSE ALL_HEADER_FILES inc/*.hpp inc/*.h)
 
 add_executable(VGD
     src/main.cpp
+    src/physics/common.cpp
     src/physics/world.cpp
     src/physics/body.cpp
     src/physics/shape.cpp
