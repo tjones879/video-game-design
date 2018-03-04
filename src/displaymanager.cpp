@@ -12,7 +12,7 @@ DisplayManager::DisplayManager(const std::string &title)
         std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return;
     }
-    if( TTF_Init() ){
+    if(TTF_Init()){
 		std::cout<< "SDL_ttf could not initialize! SDL_ttf Error: %s\n"<<TTF_GetError()<<std::endl;
 		return;
 	}

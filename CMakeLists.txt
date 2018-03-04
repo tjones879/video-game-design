@@ -10,6 +10,7 @@ add_custom_target(sdl-gpu ALL
     COMMAND make
     WORKING_DIRECTORY ./lib/sdl-gpu)
 
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
          -Wno-zero-as-null-pointer-constant \
@@ -17,10 +18,10 @@ set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
 
 
 find_package(SDL2 REQUIRED)
-find_package(SDL_ttf REQUIRED)
+find_package(SDL2TTF REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/)
 include_directories(${SDL2_INCLUDE_DIRS})
-include_directories(${SDL_ttf_INCLUDE_DIRS})
+include_directories(${SDL2TTF_INCLUDE_DIR})
 
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/sdl-gpu)
@@ -40,7 +41,7 @@ add_executable(VGD
     src/displaymanager.cpp
     src/eventhandler.cpp
     src/controller.cpp)
-target_link_libraries(VGD ${SDL2_LIBRARIES} ${SDL_ttf_LIBRARIES} ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
+target_link_libraries(VGD ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
 add_dependencies(VGD sdl-gpu)
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
