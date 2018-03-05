@@ -1,5 +1,4 @@
 #include "inc/physics/body.hpp"
-#include "inc/physics/circle.hpp"
 #include <algorithm>
 
 namespace phy {
@@ -32,9 +31,17 @@ Body::Body(const BodySpec &spec)
 
 Body::~Body() = default;
 
-std::weak_ptr<Shape> Body::createShape(const Shape* const shape)
+std::weak_ptr<PolygonShape> Body::addShape(const PolygonShape &shape)
 {
-    auto ptr = std::make_shared<Shape>(shape);
+    auto ptr = std::make_shared<PolygonShape>(shape);
+    shapeList.push_back(ptr);
+    updateMassProperties();
+    return ptr;
+}
+
+std::weak_ptr<CircleShape> Body::addShape(const CircleShape &shape)
+{
+    auto ptr = std::make_shared<CircleShape>(shape);
     shapeList.push_back(ptr);
     updateMassProperties();
     return ptr;
@@ -198,6 +205,8 @@ std::ostream& operator<<(std::ostream &out, const Body &body)
 {
     out << "linVel: " << body.linearVelocity
         << ", pos: " << body.position << std::endl;
+    for (auto shape : body.shapeList)
+        out << *shape;
     return out;
 }
 } /* namespace phy */

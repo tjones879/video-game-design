@@ -1,6 +1,8 @@
 #pragma once
 #include "inc/physics/common.hpp"
 #include "inc/physics/shape.hpp"
+#include "inc/physics/circle.hpp"
+#include "inc/physics/polygon.hpp"
 #include <memory>
 #include <vector>
 
@@ -60,7 +62,8 @@ public:
      * The specification can be safely destroyed to changed after
      * this function exits.
      */
-    std::weak_ptr<Shape> createShape(const Shape* const spec);
+    std::weak_ptr<PolygonShape> addShape(const PolygonShape &shape);
+    std::weak_ptr<CircleShape> addShape(const CircleShape &shape);
 
     /**
      * Remove the reference to this shape from the world.
