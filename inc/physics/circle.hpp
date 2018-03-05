@@ -15,5 +15,6 @@ public:
     virtual bool testPoint(const Transform &transform, const Vec2 &pos) const override;
     virtual void getAABB() const override;
     virtual MassProperties getMassProps() const override;
+    virtual void print(std::ostream &out) const override;
 };
 } /* namespace phy */

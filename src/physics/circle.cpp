@@ -27,4 +27,9 @@ MassProperties CircleShape::getMassProps() const
     data.inertia = data.mass * (0.5f * radius * radius + pos.dot(pos));
     return data;
 }
+
+void CircleShape::print(std::ostream &out) const
+{
+    out << "Circle: " << pos << " r: " << radius << std::endl;
+}
 } /* namespace phy */

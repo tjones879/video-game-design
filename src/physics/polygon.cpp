@@ -3,11 +3,8 @@
 #include <stack>
 
 namespace phy {
-PolygonShape::PolygonShape()
-    : density(0.0)
-{
-
-}
+PolygonShape::PolygonShape(float dens)
+    : density(dens) {}
 
 /**
  * Use triangulation to find the local center of the polygon.
@@ -174,5 +171,13 @@ MassProperties PolygonShape::getMassProps() const
     // Sum the moment of inertia for each triangle in the polygon
     props.inertia = 0;
     return props;
+}
+
+void PolygonShape::print(std::ostream &out) const
+{
+    out << "Polygon: ";
+    for (auto vec : vertices)
+        out << vec;
+    out << std::endl;
 }
 } /* namespace phy */

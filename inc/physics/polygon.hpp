@@ -8,11 +8,11 @@ const unsigned maxPolygonVertices = 255;
 namespace phy {
 class PolygonShape : public Shape {
     Vec2 centroid;
-    std::vector<Vec2> vertices;
     std::vector<Vec2> normals;
     float density;
 public:
-    PolygonShape();
+    std::vector<Vec2> vertices;
+    PolygonShape(float dens);
     /**
      * Create a convex polygon using the given local points.
      *
@@ -39,6 +39,7 @@ public:
     virtual bool testPoint(const Transform &transform, const Vec2 &pos) const override;
     virtual void getAABB() const override;
     virtual MassProperties getMassProps() const override;
+    virtual void print(std::ostream &out) const override;
 private:
     Vec2 calculateCentroid() const;
     float calculateArea() const;

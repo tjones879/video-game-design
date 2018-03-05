@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inc/physics/common.hpp"
+#include <ostream>
 
 namespace phy {
 
@@ -38,5 +39,8 @@ public:
     virtual void getAABB() const = 0;
     ShapeType getShapeType() const;
     virtual MassProperties getMassProps() const = 0;
+    virtual void print(std::ostream &out) const = 0;
 };
+
+std::ostream &operator<<(std::ostream &out, const Shape &shape);
 } /* namespace phy */
