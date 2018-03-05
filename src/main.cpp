@@ -22,7 +22,7 @@ int main(int argc, char **args)
         return 1;
     }
 
-    phy::World world(phy::Vec2(3, 5));
+    phy::World world(phy::Vec2(5, 9.8));
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
     auto shape = phy::PolygonShape(0.5f);
