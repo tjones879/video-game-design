@@ -37,21 +37,22 @@ bool DisplayManager::isInitialized() const
     return initialized;
 }
 
-void DisplayManager::displayPolygon() {
+void DisplayManager::displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr<phy::PolygonShape> shape)
+{
     GPU_Clear(gpu);
     SDL_Color color{};
     color.r = 0;
     color.g = 0;
     color.b = 255;
     color.a = 255;
-    float vertices[12] = {
-        300,150,
-        225,280,
-        75,280,
-        0,150,
-        75,20,
-        225,20,
-    };
-    GPU_PolygonFilled(gpu, 6, vertices, color);
+    auto offset = body.lock()->getPosition();
+
+    std::vector<float> vertices;
+    vertices.reserve(shape.lock()->vertices.size() * 2);
+    for (auto v : shape.lock()->vertices) {
+        vertices.push_back(v.x + offset.x);
+        vertices.push_back(v.y + offset.y);
+    }
+    GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
     GPU_Flip(gpu);
 }

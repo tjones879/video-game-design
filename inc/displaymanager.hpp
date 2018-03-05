@@ -2,9 +2,12 @@
 
 #include <SDL2/SDL.h>
 #include "SDL_gpu.h"
+#include <memory>
 #include <stdint.h>
 #include <string>
+#include "inc/physics/body.hpp"
 #include "inc/gputarget.hpp"
+#include "inc/physics/polygon.hpp"
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -21,5 +24,5 @@ public:
     ~DisplayManager();
     bool isInitialized() const;
     operator SDL_Window*() const;
-    void displayPolygon();
+    void displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr<phy::PolygonShape> shape);
 };
