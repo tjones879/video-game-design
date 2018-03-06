@@ -7,7 +7,6 @@ namespace phy {
 
 enum class ShapeType {
     circle,
-    //edge,
     polygon,
 };
 

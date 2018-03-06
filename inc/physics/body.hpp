@@ -149,6 +149,11 @@ public:
      * This data will never be used by the physics engine.
      */
     void setExtraData(void *data);
+
+    /**
+     * Get the transformation needed to convert local shapes to global coords.
+     */
+    std::vector<Transform> getShapePositions() const;
 private:
     /**
      * Recalculate all mass and inertia characteristics of this body.
