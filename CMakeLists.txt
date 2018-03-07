@@ -31,6 +31,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/sdl-gpu/include)
 
 # Compile our subprojects
 add_subdirectory(${CMAKE_SOURCE_DIR}/src)
+add_subdirectory(${CMAKE_SOURCE_DIR}/test)
 
 # MISC Targets (clang-tidy)
 file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp)
@@ -45,6 +46,5 @@ endif()
 # Create the actual game executable (./VGD) and link dependencies
 add_executable(VGD src/main.cpp)
 target_link_libraries(VGD ${SDL2_LIBRARIES} engine ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
-add_dependencies(VGD sdl-gpu)
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
