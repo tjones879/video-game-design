@@ -18,6 +18,9 @@ add_custom_target(sdl-gpu ALL
     COMMAND make
     WORKING_DIRECTORY ./lib/sdl-gpu)
 
+# Include Google Test for testing
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib/gtest)
+
 # We add the compiler flags after including the sdl-gpu to avoid
 # warnings from compiling that.
 set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
@@ -28,6 +31,8 @@ set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/sdl-gpu/include)
+
+enable_testing()
 
 # Compile our subprojects
 add_subdirectory(${CMAKE_SOURCE_DIR}/src)

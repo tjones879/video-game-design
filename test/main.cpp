@@ -1,7 +1,7 @@
 #include <iostream>
+#include "gtest/gtest.h"
 
-int main(int argc, char **argv)
+TEST(sample_test_case, sample_test)
 {
-    std::cout << "Hello world" << std::endl;
-    return 0;
+    EXPECT_EQ(1, 1);
 }

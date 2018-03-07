@@ -1,3 +1,6 @@
 [submodule "lib/sdl-gpu"]
 	path = lib/sdl-gpu
 	url = https://github.com/grimfang4/sdl-gpu.git
+[submodule "lib/gtest"]
+	path = lib/gtest
+	url = git@github.com:google/googletest.git
