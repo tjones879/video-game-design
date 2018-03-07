@@ -12,7 +12,7 @@ enum class ShapeType {
 
 struct MassProperties {
     float mass;
-    Vec2 centroid;
+    Vec2f centroid;
     float inertia;
 };
 
@@ -30,7 +30,7 @@ public:
      * Test a point to see if it is inside this shape.
      * @param point The location in world coordinates
      */
-    virtual bool testPoint(const Transform &transform, const Vec2 &pos) const = 0;
+    virtual bool testPoint(const Transform &transform, const Vec2f &pos) const = 0;
     /**
      * Get the Axis aligned bounding box of this shape for broad-phase
      * collision detection.

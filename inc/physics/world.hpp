@@ -23,12 +23,12 @@ class Contact;
  */
 class World {
 private:
-    Vec2 gravity;
+    Vec2f gravity;
     std::vector<std::shared_ptr<Body>> bodyList;
     uint8_t velocityIterations; ///< Number of iterations used to resolve velocity of bodies
     uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
 public:
-    World(const Vec2 &gravity_);
+    World(const Vec2f &gravity_);
     /**
      * All objects referenced by the world are ref counted, so
      * they should be automatically destroyed when any other
@@ -67,8 +67,8 @@ public:
 
     void step(float dt);
 
-    void setGravity(const Vec2 &gravity_);
-    Vec2 getGravity() const;
+    void setGravity(const Vec2f &gravity_);
+    Vec2f getGravity() const;
 
     /**
      * Set the number of iterations the world should use to resolve

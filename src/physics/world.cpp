@@ -5,7 +5,7 @@
 
 namespace phy {
 
-World::World(const Vec2 &gravity_)
+World::World(const Vec2f &gravity_)
     : gravity(gravity_), velocityIterations(10), positionIterations(10)
 {
 }
@@ -68,12 +68,12 @@ void World::step(float dt)
         });
 }
 
-void World::setGravity(const Vec2 &gravity_)
+void World::setGravity(const Vec2f &gravity_)
 {
     gravity = gravity_;
 }
 
-Vec2 World::getGravity() const
+Vec2f World::getGravity() const
 {
     return gravity;
 }

@@ -26,9 +26,9 @@ struct BodySpec {
     }
 
     BodyType bodyType;
-    Vec2 position; ///< World coordinates of this body
+    Vec2f position; ///< World coordinates of this body
     float angle; ///< Rotation of this body in radians
-    Vec2 linVelocity;
+    Vec2f linVelocity;
     float angVelocity;
     float gravityFactor; ///< Scalar factor for the world's gravity on this body
 };
@@ -40,11 +40,11 @@ private:
     float mass, invMass;
     float inertia, invInertia;
     BodyType bodyType;
-    Vec2 position, centroid;
-    Vec2 linearVelocity;
+    Vec2f position, centroid;
+    Vec2f linearVelocity;
     float angle;
     float angularVelocity;
-    Vec2 force;
+    Vec2f force;
     float torque;
     std::vector<std::shared_ptr<Shape>> shapeList;
     Sweep bodySweep;
@@ -69,7 +69,7 @@ public:
      * until all other strong references have been cleared.
      */
     void destroyShape(const std::weak_ptr<Shape> &shape);
-    const Vec2 &getPosition() const;
+    const Vec2f &getPosition() const;
 
     /**
      * Get the angle of the body in radians.
@@ -78,8 +78,8 @@ public:
      */
     float getRotation() const;
 
-    void setLinearVelocity(const Vec2 &velocity);
-    const Vec2 &getLinearVelocity() const;
+    void setLinearVelocity(const Vec2f &velocity);
+    const Vec2f &getLinearVelocity() const;
 
     void setAngularVelocity(float velocity);
     float getAngularVelocity();
@@ -90,19 +90,19 @@ public:
      * @param force_ Force in newtons to apply in each direction
      * @param point  Point inside the body with local coordinates.
      */
-    void applyForce(const Vec2 &force_, const Vec2 &point);
+    void applyForce(const Vec2f &force_, const Vec2f &point);
 
     /**
      * Apply some amount of torque to the centroid of the body.
      */
     void applyTorque(float torque_);
 
-    void applyLinearImpulse(const Vec2 &impulse, const Vec2 &point);
+    void applyLinearImpulse(const Vec2f &impulse, const Vec2f &point);
     void applyAngularImpulse(float impulse);
 
     float getMass() const;
     float getInertia() const;
-    const Vec2 &getCenterMass() const;
+    const Vec2f &getCenterMass() const;
 
     void setSleep();
     bool isAsleep();
@@ -119,7 +119,7 @@ public:
      * @param dt The amount of time in seconds since the last update
      * @param gravity A vector of the world's gravity effect
      */
-    void updateVelocity(float dt, Vec2 gravity);
+    void updateVelocity(float dt, Vec2f gravity);
 
     /**
      * Update this body's position due to accumulated velocity.
