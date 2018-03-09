@@ -6,7 +6,7 @@
 
 namespace phy {
 
-World::World(const Vec2 &gravity_)
+World::World(const Vec2f &gravity_)
     : gravity(gravity_), velocityIterations(10), positionIterations(10),
       lastTicks(SDL_GetTicks()) {}
 
@@ -73,12 +73,12 @@ void World::step()
        body->clearForces();
 }
 
-void World::setGravity(const Vec2 &gravity_)
+void World::setGravity(const Vec2f &gravity_)
 {
     gravity = gravity_;
 }
 
-Vec2 World::getGravity() const
+Vec2f World::getGravity() const
 {
     return gravity;
 }

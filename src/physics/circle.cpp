@@ -7,11 +7,11 @@ CircleShape::CircleShape()
     shapeType = ShapeType::circle;
 }
 
-bool CircleShape::testPoint(const Transform &transform, const Vec2 &pos) const
+bool CircleShape::testPoint(const Transform &transform, const Vec2f &pos) const
 {
-    Vec2 center = transform.position + transform.rotation.rotate(pos);
-    Vec2 distance = pos - center;
-    return distance.dot(distance) <= radius * radius;
+    Vec2f center = transform.position + transform.rotation.rotate(pos);
+    Vec2f distance = pos - center;
+    return distance.length() <= radius * radius;
 }
 
 void CircleShape::getAABB() const
@@ -24,7 +24,7 @@ MassProperties CircleShape::getMassProps() const
     MassProperties data;
     data.centroid = pos;
     data.mass = density * M_PI * radius * radius;
-    data.inertia = data.mass * (0.5f * radius * radius + pos.dot(pos));
+    data.inertia = data.mass * (0.5f * radius * radius + pos.length());
     return data;
 }
 

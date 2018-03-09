@@ -8,6 +8,8 @@ for instructions on how to do this on your machine.
 
 ------
 
+To pull all dependencies to your local machine, call `git submodule update --init --recursive`.
+
 To build the project, navigate to the root and create a directory for an out of source build:
 
 ```

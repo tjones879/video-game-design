@@ -54,7 +54,7 @@ void Body::destroyShape(const std::weak_ptr<Shape> &shape)
         shapeList.erase(result);
 }
 
-const Vec2& Body::getPosition() const
+const Vec2f& Body::getPosition() const
 {
     return position;
 }
@@ -64,12 +64,12 @@ float Body::getRotation() const
     return bodySweep.angle;
 }
 
-void Body::setLinearVelocity(const Vec2 &velocity)
+void Body::setLinearVelocity(const Vec2f &velocity)
 {
     linearVelocity = velocity;
 }
 
-const Vec2 &Body::getLinearVelocity() const
+const Vec2f &Body::getLinearVelocity() const
 {
     return linearVelocity;
 }
@@ -84,10 +84,10 @@ float Body::getAngularVelocity()
     return angularVelocity;
 }
 
-void Body::applyForce(const Vec2 &force_, const Vec2 &point)
+void Body::applyForce(const Vec2f &force_, const Vec2f &point)
 {
     force += force_;
-    torque += (point - bodySweep.center).cross(force);
+    torque += cross((point - bodySweep.center), force);
 }
 
 void Body::applyTorque(float torque_)
@@ -95,13 +95,13 @@ void Body::applyTorque(float torque_)
     torque += torque_;
 }
 
-void Body::applyLinearImpulse(const Vec2 &impulse, const Vec2 &point)
+void Body::applyLinearImpulse(const Vec2f &impulse, const Vec2f &point)
 {
     if (bodyType != BodyType::dynamicBody)
         return
 
     linearVelocity += impulse;
-    angularVelocity += (point - bodySweep.center).cross(impulse);
+    angularVelocity += cross((point - bodySweep.center), impulse);
 }
 
 void Body::applyAngularImpulse(float impulse)
@@ -119,7 +119,7 @@ float Body::getInertia() const
     return inertia;
 }
 
-const Vec2 &Body::getCenterMass() const
+const Vec2f &Body::getCenterMass() const
 {
     return centroid;
 }
@@ -153,7 +153,7 @@ std::weak_ptr<const World> Body::getParentWorld() const
     return parentWorld;
 }
 
-void Body::updateVelocity(float dt, Vec2 gravity)
+void Body::updateVelocity(float dt, Vec2f gravity)
 {
     if (bodyType == BodyType::dynamicBody) {
         linearVelocity += (gravity * gravityFactor + force * invMass) * dt;
@@ -164,7 +164,7 @@ void Body::updateVelocity(float dt, Vec2 gravity)
 
 void Body::updatePosition(float dt)
 {
-    Vec2 translation = linearVelocity * dt;
+    Vec2f translation = linearVelocity * dt;
     float rotation = angularVelocity * dt;
     position += translation;
     angle += rotation;
@@ -184,7 +184,7 @@ void Body::updateMassProperties()
     invInertia = 0.0f;
     bodySweep.center.zeroOut();
 
-    Vec2 localCenter;
+    Vec2f localCenter;
     // Sum the mass of all shapes
     // Calculate the center of mass
     // Center the inertia
