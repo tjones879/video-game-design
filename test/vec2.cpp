@@ -1,6 +1,4 @@
 #include "inc/vec2.hpp"
-#include <cstdlib>
-#include <ctime>
 #include "gtest/gtest.h"
 
 using testing::Types;
@@ -11,14 +9,7 @@ protected:
     Vec2<T> vec1;
     Vec2<T> vec2;
 
-    Vec2Test()
-    {
-        std::srand(std::time(nullptr));
-        vec1.x = std::rand();
-        vec1.y = std::rand();
-        vec2.x = std::rand();
-        vec2.y = std::rand();
-    }
+    Vec2Test() : vec1(), vec2() {}
 };
 
 typedef Types<int, uint32_t, int32_t, float, double> implementations;
@@ -27,6 +18,10 @@ TYPED_TEST_CASE(Vec2Test, implementations);
 
 TYPED_TEST(Vec2Test, SupportsAddition)
 {
+    this->vec1.x = 9;
+    this->vec1.y = 10;
+    this->vec2.x = 5;
+    this->vec2.y = 7;
     auto result = this->vec1 + this->vec2;
     EXPECT_EQ(14, result.x);
     EXPECT_EQ(17, result.y);
