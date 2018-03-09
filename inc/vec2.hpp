@@ -6,7 +6,7 @@
 
 template <typename T>
 class Vec2 {
-    static_assert(std::is_arithmetic<T>::value);
+    static_assert(std::is_arithmetic<T>::value, "Parameterized type must be arithmetic");
 public:
     T x, y;
     Vec2() : x(0), y(0) {}
@@ -85,7 +85,7 @@ auto operator+ (const Vec2<T1> &v1, const Vec2<T2> &v2) -> Vec2<decltype(T1{} + 
 template <typename T1, typename T2>
 auto operator* (const Vec2<T1> &vec, T2 scalar) -> Vec2<decltype(T1{} * T2{})>
 {
-    static_assert(std::is_arithmetic<T2>::value);
+    static_assert(std::is_arithmetic<T2>::value, "Parameterized type must be arithmetic");
     return Vec2<decltype(T1{} * T2{})>(vec.x * scalar, vec.y * scalar);
 }
 
@@ -116,7 +116,7 @@ auto cross(const Vec2<T1> &a, const Vec2<T2> &b) -> decltype(T1{} * T2{})
 template <typename T1, typename T2>
 auto cross(const Vec2<T1> &a, T2 s) -> Vec2<decltype(T1{} * T2{})>
 {
-    static_assert(std::is_arithmetic<T2>::value);
+    static_assert(std::is_arithmetic<T2>::value, "Parameterized type must be arithmetic");
     return Vec2<decltype(T1{} * T2{})>(s * a.y, -s * a.x);
 }
 
