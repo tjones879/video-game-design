@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <iostream>
+#include "inc/vec2.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
 #include "inc/physics/world.hpp"
@@ -22,11 +23,11 @@ int main(int argc, char **args)
         return 1;
     }
 
-    phy::World world(phy::Vec2(5, 9.8));
+    phy::World world(Vec2<float>(5, 9.8));
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
     auto shape = phy::PolygonShape(0.5f);
-    shape.setBox(phy::Vec2(25, 25));
+    shape.setBox(Vec2<float>(25, 25));
     auto body = world.createBody(spec);
     auto shape_ptr = body.lock()->addShape(shape);
 

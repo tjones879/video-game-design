@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <math.h>
 #include <type_traits>
+#include <ostream>
 
 template <typename T>
 class Vec2 {
@@ -127,4 +128,11 @@ template <typename T1, typename T2>
 auto dot(const Vec2<T1> &a, const Vec2<T2> &b) -> decltype(T1{} * T2{})
 {
     return a.x * b.x + a.y * b.y;
+}
+
+template <typename T>
+std::ostream &operator<<(std::ostream &out, const Vec2<T> v)
+{
+    out << "<" << v.x << ", " << v.y << ">";
+    return out;
 }

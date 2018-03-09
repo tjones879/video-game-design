@@ -1,3 +1,4 @@
+#include "inc/physics/common.hpp"
 #include "inc/physics/body.hpp"
 #include <algorithm>
 
@@ -201,13 +202,16 @@ void Body::setExtraData(void *data)
     extraData = data;
 }
 
+/*
 std::vector<Transform> Body::getShapePositions() const
 {
     transforms.reserve(shapeList.size());
     for (const auto &shape : shapeList) {
         transforms.emplace_back(std::make_pair(shape, ));
     }
+
 }
+*/
 
 std::ostream& operator<<(std::ostream &out, const Body &body)
 {

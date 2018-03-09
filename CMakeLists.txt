@@ -42,23 +42,6 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/test)
 file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp)
 file(GLOB_RECURSE ALL_HEADER_FILES inc/*.hpp inc/*.h)
 
-add_executable(VGD
-    src/main.cpp
-    src/physics/common.cpp
-    src/physics/world.cpp
-    src/physics/body.cpp
-    src/physics/shape.cpp
-    src/physics/circle.cpp
-    src/physics/edge.cpp
-    src/physics/polygon.cpp
-    src/displaymanager.cpp
-    src/eventhandler.cpp
-    src/controller.cpp)
-target_link_libraries(VGD ${SDL2_LIBRARIES} ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
-add_dependencies(VGD sdl-gpu)
-
-file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
-
 # Add command for static analysis if clang-tidy is installed
 find_program(TIDY_PATH clang-tidy)
 if(TIDY_PATH)

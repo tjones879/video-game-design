@@ -10,8 +10,6 @@ namespace phy {
 
 using Vec2f = Vec2<float>;
 
-std::ostream &operator<<(std::ostream &out, const Vec2f v);
-
 /**
  * Represent any rotation of a shape in the world.
  *
