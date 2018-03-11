@@ -41,7 +41,7 @@ public:
      */
     bool contains(const AABB &other)
     {
-        return true;
+        return lowVertex.below(other.lowVertex) && highVertex.above(other.highVertex);
     }
 };
 

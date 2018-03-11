@@ -75,6 +75,28 @@ public:
 
         return normalized;
     }
+
+    /**
+     * Test whether the Vec2 a is below Vec2 b.
+     *
+     * @return True iff the directions of a are <= the directions of b.
+     */
+    template <typename T1>
+    bool below(const Vec2<T1> &b)
+    {
+        return (x <= b.x) && (y <= b.y);
+    }
+
+    /**
+     * Test whether the Vec2 a is above Vec2 b.
+     *
+     * @return True iff the directions of a are >= the directions of b.
+     */
+    template <typename T1>
+    bool above(const Vec2<T1> &b)
+    {
+        return (x >= b.x) && (y >= b.y);
+    }
 };
 
 template <typename T1, typename T2>

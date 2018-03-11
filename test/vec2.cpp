@@ -90,3 +90,17 @@ TYPED_TEST(Vec2Test, SupportsMaxValues)
                                     std::max(this->vec1.y, this->vec2.y));
     EXPECT_EQ(expected, result);
 }
+
+TYPED_TEST(Vec2Test, SupportsBelow)
+{
+    auto result = this->vec1.below(this->vec2);
+    auto expected = this->vec1.x <= this->vec2.x && this->vec1.y <= this->vec2.y;
+    EXPECT_EQ(expected, result);
+}
+
+TYPED_TEST(Vec2Test, SupportsAbove)
+{
+    auto result = this->vec1.above(this->vec2);
+    auto expected = this->vec1.x >= this->vec2.x && this->vec1.y >= this->vec2.y;
+    EXPECT_EQ(expected, result);
+}
