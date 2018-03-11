@@ -7,6 +7,7 @@ add_library(engine
     ${SRC}/physics/circle.cpp
     ${SRC}/physics/edge.cpp
     ${SRC}/physics/polygon.cpp
+    ${SRC}/physics/aabb.cpp
     ${SRC}/displaymanager.cpp
     ${SRC}/eventhandler.cpp
     ${SRC}/controller.cpp)
