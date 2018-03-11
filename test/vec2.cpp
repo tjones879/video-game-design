@@ -74,3 +74,19 @@ TYPED_TEST(Vec2Test, SupportsDotProduct)
     auto expected = this->vec1.x * this->vec2.x + this->vec1.y * this->vec2.y;
     EXPECT_EQ(expected, result);
 }
+
+TYPED_TEST(Vec2Test, SupportsMinValues)
+{
+    auto result = minValues(this->vec1, this->vec2);
+    auto expected = Vec2<TypeParam>(std::min(this->vec1.x, this->vec2.x),
+                                    std::min(this->vec1.y, this->vec2.y));
+    EXPECT_EQ(expected, result);
+}
+
+TYPED_TEST(Vec2Test, SupportsMaxValues)
+{
+    auto result = maxValues(this->vec1, this->vec2);
+    auto expected = Vec2<TypeParam>(std::max(this->vec1.x, this->vec2.x),
+                                    std::max(this->vec1.y, this->vec2.y));
+    EXPECT_EQ(expected, result);
+}
