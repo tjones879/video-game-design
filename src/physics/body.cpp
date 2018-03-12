@@ -202,22 +202,11 @@ void Body::setExtraData(void *data)
     extraData = data;
 }
 
-/*
-std::vector<Transform> Body::getShapePositions() const
-{
-    transforms.reserve(shapeList.size());
-    for (const auto &shape : shapeList) {
-        transforms.emplace_back(std::make_pair(shape, ));
-    }
-
-}
-*/
-
 std::ostream& operator<<(std::ostream &out, const Body &body)
 {
     out << "linVel: " << body.linearVelocity
         << ", pos: " << body.position << std::endl;
-    for (auto shape : body.shapeList)
+    for (const auto &shape : body.shapeList)
         out << *shape;
     return out;
 }

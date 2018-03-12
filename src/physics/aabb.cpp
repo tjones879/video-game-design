@@ -15,8 +15,8 @@ float AABB::getPerimeter() const
 
 AABB AABB::combine(const AABB &b)
 {
-    return AABB(minValues(lowVertex, b.lowVertex),
-                maxValues(highVertex, b.highVertex));
+    return {minValues(lowVertex, b.lowVertex),
+            maxValues(highVertex, b.highVertex)};
 }
 
 bool AABB::contains(const AABB &other)

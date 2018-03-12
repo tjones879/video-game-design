@@ -55,12 +55,12 @@ void World::step()
 
     // TODO: Update all contacts
     // Integrate velocities
-    for (auto body : bodyList)
+    for (const auto &body : bodyList)
         body->updateVelocity(dt, gravity);
 
     // TODO: Resolve velocity constraints
     // Integrate positions
-    for (auto body : bodyList)
+    for (const auto &body : bodyList)
        body->updatePosition(dt);
 
     // TODO: Resolve position constraints
@@ -69,7 +69,7 @@ void World::step()
     // TODO: Handle TOI
 
     // Clear forces
-    for (auto body : bodyList)
+    for (const auto &body : bodyList)
        body->clearForces();
 }
 

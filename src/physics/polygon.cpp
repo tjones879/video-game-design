@@ -169,7 +169,7 @@ AABB PolygonShape::getAABB(const Transform &transform) const
         higher = maxValues(higher, tmp);
     }
 
-    return AABB(lower, higher);
+    return {lower, higher};
 }
 
 MassProperties PolygonShape::getMassProps() const
