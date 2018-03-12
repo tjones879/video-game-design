@@ -18,11 +18,27 @@ protected:
     }
 };
 
-TEST_F(AABBTest, ShouldCombineWithOthers)
+TEST_F(AABBTest, ShouldCombineWithOneOther)
 {
     auto result = this->a.combine(this->b);
     auto lower = minValues(this->a.lowVertex, this->b.lowVertex);
     auto higher = maxValues(this->a.highVertex, this->b.highVertex);
+    auto expected = AABB(lower, higher);
+    EXPECT_EQ(expected, result);
+}
+
+TEST_F(AABBTest, ShouldCombineWithManyOthers)
+{
+    auto third = AABB(Vec2f(rand(), rand()),
+                      Vec2f(rand(), rand()));
+    auto result = this->a.combine(this->b, third);
+
+    auto lower = minValues(this->a.lowVertex, this->b.lowVertex);
+    lower = minValues(lower, third.lowVertex);
+
+    auto higher = maxValues(this->a.highVertex, this->b.highVertex);
+    higher = maxValues(higher, third.highVertex);
+
     auto expected = AABB(lower, higher);
     EXPECT_EQ(expected, result);
 }

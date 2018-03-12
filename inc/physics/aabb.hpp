@@ -19,7 +19,7 @@ public:
     template <class T, class... Args>
     AABB combine(T first, Args&&... args)
     {
-        return combine(args...);
+        return combine(first).combine(args...);
     }
 
     /**
