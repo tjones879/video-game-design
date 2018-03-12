@@ -1,5 +1,6 @@
 #pragma once
 
+#include "inc/physics/aabb.hpp"
 #include "inc/physics/common.hpp"
 #include <ostream>
 
@@ -35,7 +36,7 @@ public:
      * Get the Axis aligned bounding box of this shape for broad-phase
      * collision detection.
      */
-    virtual void getAABB() const = 0;
+    virtual AABB getAABB(const Transform &transform) const = 0;
     ShapeType getShapeType() const;
     virtual MassProperties getMassProps() const = 0;
     virtual void print(std::ostream &out) const = 0;

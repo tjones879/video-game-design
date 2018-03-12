@@ -14,9 +14,12 @@ bool CircleShape::testPoint(const Transform &transform, const Vec2f &pos) const
     return distance.length() <= radius * radius;
 }
 
-void CircleShape::getAABB() const
+AABB CircleShape::getAABB(const Transform &transform) const
 {
-
+    AABB aabb;
+    aabb.lowVertex.setVec(pos.x - radius, pos.y - radius);
+    aabb.highVertex.setVec(pos.x + radius, pos.y + radius);
+    return aabb;
 }
 
 MassProperties CircleShape::getMassProps() const

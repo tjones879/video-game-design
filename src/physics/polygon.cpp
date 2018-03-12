@@ -158,9 +158,18 @@ bool PolygonShape::testPoint(const Transform &transform, const Vec2f &pos) const
     return true;
 }
 
-void PolygonShape::getAABB() const
+AABB PolygonShape::getAABB(const Transform &transform) const
 {
+    Vec2f lower = transform.translate(vertices[0]);
+    Vec2f higher = lower;
 
+    for (const auto &vertex : vertices) {
+        Vec2f tmp = transform.translate(vertex);
+        lower = minValues(lower, tmp);
+        higher = maxValues(higher, tmp);
+    }
+
+    return AABB(lower, higher);
 }
 
 MassProperties PolygonShape::getMassProps() const

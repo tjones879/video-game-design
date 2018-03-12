@@ -13,7 +13,7 @@ public:
     CircleShape(const Vec2f& pos, float radius);
 
     virtual bool testPoint(const Transform &transform, const Vec2f &pos) const override;
-    virtual void getAABB() const override;
+    virtual AABB getAABB(const Transform &transform) const override;
     virtual MassProperties getMassProps() const override;
     virtual void print(std::ostream &out) const override;
 };

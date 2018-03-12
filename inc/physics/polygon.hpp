@@ -37,7 +37,7 @@ public:
      */
     void setBox(const Vec2f &length, const Vec2f &center, float angle);
     virtual bool testPoint(const Transform &transform, const Vec2f &pos) const override;
-    virtual void getAABB() const override;
+    virtual AABB getAABB(const Transform &transform) const override;
     virtual MassProperties getMassProps() const override;
     virtual void print(std::ostream &out) const override;
 private:
