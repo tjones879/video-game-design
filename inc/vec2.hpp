@@ -82,7 +82,7 @@ public:
      * @return True iff the directions of a are <= the directions of b.
      */
     template <typename T1>
-    bool below(const Vec2<T1> &b)
+    bool below(const Vec2<T1> &b) const
     {
         return (x <= b.x) && (y <= b.y);
     }
@@ -93,7 +93,7 @@ public:
      * @return True iff the directions of a are >= the directions of b.
      */
     template <typename T1>
-    bool above(const Vec2<T1> &b)
+    bool above(const Vec2<T1> &b) const
     {
         return (x >= b.x) && (y >= b.y);
     }
