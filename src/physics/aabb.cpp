@@ -21,6 +21,13 @@ float AABB::getPerimeter() const
     return 2.f * (x + y);
 }
 
+float AABB::getArea() const
+{
+    float x = highVertex.x - lowVertex.x;
+    float y = highVertex.y - lowVertex.y;
+    return x * y;
+}
+
 AABB AABB::combine(const AABB &b) const
 {
     return {minValues(lowVertex, b.lowVertex),
@@ -118,7 +125,8 @@ int32_t AABBTree::allocateNode()
         auto oldSize = nodes.capacity();
         nodes.resize(oldSize * 2);
 
-        for (int32_t i = oldSize - 1; i < nodes.capacity(); i++) {
+        nodes[oldSize - 1].next = oldSize;
+        for (int32_t i = oldSize; i < nodes.capacity(); i++) {
             nodes[i].next = i + 1;
             nodes[i].height = -1;
         }
@@ -147,9 +155,9 @@ void AABBTree::insertNode(int32_t node)
         int32_t left = nodes[index].leftChild;
         int32_t right = nodes[index].rightChild;
 
-        float area = nodes[index].aabb.getPerimeter();
+        float area = nodes[index].aabb.getArea();
         auto combined = nodes[index].aabb.combine(newAABB);
-        float combinedArea = combined.getPerimeter();
+        float combinedArea = combined.getArea();
 
         float cost = 2 * combinedArea;
         float inheritanceCost = 2 * (combinedArea - area);
@@ -158,9 +166,9 @@ void AABBTree::insertNode(int32_t node)
         auto childCost = [this, &inheritanceCost, &newAABB] (int32_t child) -> float {
             auto childAABB = newAABB.combine(nodes[child].aabb);
 
-            float cost = childAABB.getPerimeter() + inheritanceCost;
+            float cost = childAABB.getArea() + inheritanceCost;
             if (!nodes[child].isLeaf()) {
-                float oldArea = nodes[child].aabb.getPerimeter();
+                float oldArea = nodes[child].aabb.getArea();
                 cost -= oldArea;
             }
             return cost;
@@ -171,6 +179,7 @@ void AABBTree::insertNode(int32_t node)
         if (cost < costLeft && cost < costRight)
             break;
 
+        // Descend into the cheaper child
         index = costLeft < costRight ? left : right;
     }
 
@@ -239,17 +248,17 @@ void AABBTree::remove(int32_t index)
         nodes[sibling].parent = grandParent;
         freeNode(parent);
 
-        int32_t index = grandParent;
-        while (index != AABBNode::null) {
-            index = balance(index);
+        int32_t gp = grandParent;
+        while (gp != AABBNode::null) {
+            gp = balance(gp);
 
-            int32_t left = nodes[index].leftChild;
-            int32_t right = nodes[index].rightChild;
+            int32_t gpLeft = nodes[gp].leftChild;
+            int32_t gpRight = nodes[gp].rightChild;
 
-            nodes[index].aabb = nodes[left].aabb.combine(nodes[right].aabb);
-            nodes[index].height = 1 + std::max(nodes[left].height, nodes[right].height);
+            nodes[gp].aabb = nodes[gpLeft].aabb.combine(nodes[gpRight].aabb);
+            nodes[gp].height = 1 + std::max(nodes[gpLeft].height, nodes[gpRight].height);
 
-            index = nodes[index].parent;
+            gp = nodes[gp].parent;
         }
     } else {
         root = sibling;
@@ -283,17 +292,11 @@ int32_t AABBTree::balance(int32_t index)
     auto left = NodePair(input()->leftChild, nodes);
     auto right = NodePair(input()->rightChild, nodes);
     int32_t balance = right()->height - left()->height;
-    std::cout << "Balance is: " << balance << std::endl;
-    std::cout << "Input:      " << *input();
-    std::cout << "Left:       " << *left();
-    std::cout << "Right:      " << *input();
 
-    // The right child is longer than the left, so rotate it
+    // The right child is longer than the left, so promote it
     if (balance > 1) {
         auto grandLeft = NodePair(right()->leftChild, nodes);
         auto grandRight = NodePair(right()->rightChild, nodes);
-        std::cout << "grandLeft:  " << *input();
-        std::cout << "grandRight: " << *input();
 
         right()->leftChild = input;
         right()->parent = input()->parent;
@@ -301,6 +304,7 @@ int32_t AABBTree::balance(int32_t index)
 
         if (right()->parent != AABBNode::null) {
             // input's old parent should point to right
+            // instead of input
             if (nodes[right()->parent].leftChild == input)
                 nodes[right()->parent].leftChild = right;
             else
@@ -335,8 +339,6 @@ int32_t AABBTree::balance(int32_t index)
     if (balance < -1) {
         auto grandLeft = NodePair(left()->leftChild, nodes);
         auto grandRight = NodePair(left()->rightChild, nodes);
-        std::cout << "grandLeft:  " << *input();
-        std::cout << "grandRight: " << *input();
 
         left()->leftChild = input;
         left()->parent = input()->parent;
@@ -405,8 +407,8 @@ std::string AABBTree::dump() const
             << "nextFreeIndex: " << nextFreeIndex
             << std::endl;
 
-    for (const auto box : nodes)
-        sstream << box;
+    for (int i = 0; i < nodes.size(); i++)
+        sstream << "i: " << std::setw(2) << i << " " << nodes[i];
     return sstream.str();
 }
 

@@ -54,6 +54,14 @@ TEST_F(AABBTest, ShouldSupportContains)
     EXPECT_EQ(expected, result);
 }
 
+TEST_F(AABBTest, ShouldSupportPerimeter)
+{
+    auto result = this->a.getPerimeter();
+    auto x = this->a.highVertex.x - this->a.lowVertex.x;
+    auto y = this->a.highVertex.y - this->a.lowVertex.y;
+    EXPECT_EQ(2 * (x + y), result);
+}
+
 class AABBTreeTest : public ::testing::Test {
 protected:
     AABBTree tree;
@@ -82,12 +90,9 @@ TEST_F(AABBTreeTest, ShouldSupportBasicInsertion)
         EXPECT_EQ(expectedHeight, nodes[2].height);
 }
 
+/*
 TEST_F(AABBTreeTest, ShouldRemainBalanced)
 {
-    auto abs = [](auto num) {
-        return num > 0 ? num : -1 * num;
-    };
-
     this->tree.insertAABB(AABB(Vec2f( 0,  0), Vec2f( 1, 1)));
     this->tree.insertAABB(AABB(Vec2f( 1,  2), Vec2f( 2, 3)));
     this->tree.insertAABB(AABB(Vec2f( 1, -1), Vec2f( 2, 0)));
@@ -95,10 +100,10 @@ TEST_F(AABBTreeTest, ShouldRemainBalanced)
     this->tree.insertAABB(AABB(Vec2f( 2,  3), Vec2f( 3, 4)));
     this->tree.insertAABB(AABB(Vec2f(-2, -1), Vec2f(-1, 0)));
     this->tree.insertAABB(AABB(Vec2f(-2,  1), Vec2f(-1, 2)));
-
-    std::cout << "# of Nodes: " << this->tree.getNodes().capacity() << std::endl;
-    std::cout << this->tree;
+    this->tree.insertAABB(AABB(Vec2f(0.5, -1), Vec2f(1.5, -0.5)));
+    this->tree.insertAABB(AABB(Vec2f(0.5, -1), Vec2f(1.5, -0.5)));
 }
+*/
 
 TEST_F(AABBTreeTest, ShouldSupportDestruction)
 {
@@ -125,4 +130,19 @@ TEST_F(AABBTreeTest, ShouldSupportDestruction)
         // remain the same: the original root before destroying A.
         EXPECT_EQ(2, nodes[indexA].next);
         EXPECT_EQ(2, nodes[indexB].next);
+}
+
+TEST_F(AABBTreeTest, ShouldSupportUpdates)
+{
+    this->tree.insertAABB(AABB(Vec2f( 0,  0), Vec2f( 1, 1)));
+    this->tree.insertAABB(AABB(Vec2f( 1,  2), Vec2f( 2, 3)));
+    this->tree.insertAABB(AABB(Vec2f( 1, -1), Vec2f( 2, 0)));
+    auto index = this->tree.insertAABB(AABB(Vec2f( 3,  1), Vec2f( 4, 2)));
+    this->tree.insertAABB(AABB(Vec2f( 2,  3), Vec2f( 3, 4)));
+    this->tree.insertAABB(AABB(Vec2f(-2, -1), Vec2f(-1, 0)));
+
+    auto newAABB = AABB(Vec2f(3, 0), Vec2f(4, 1));
+    this->tree.updateAABB(index, newAABB);
+    auto nodes = this->tree.getNodes();
+    EXPECT_EQ(true, nodes[nodes[index].parent].aabb.contains(newAABB));
 }

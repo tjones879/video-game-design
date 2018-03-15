@@ -16,6 +16,7 @@ public:
 
     Vec2f getCenter() const;
     float getPerimeter() const;
+    float getArea() const;
     AABB combine(const AABB &b) const;
 
     template <class T, class... Args>
