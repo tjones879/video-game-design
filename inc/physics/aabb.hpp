@@ -3,6 +3,7 @@
 #include "inc/physics/common.hpp"
 #include <ostream>
 #include <vector>
+#include <string>
 
 namespace phy {
 class AABB {
@@ -43,7 +44,7 @@ std::ostream &operator<<(std::ostream &out, const AABB &aabb);
 class AABBNode {
 public:
     AABB aabb;
-    static const int32_t null = -1;
+    static const int32_t null;
     int32_t parent; // Index of the parent node
     int32_t leftChild; // Index of left child (if not a leaf)
     int32_t rightChild; // Index of right child (if not a leaf)
@@ -53,12 +54,14 @@ public:
 
     AABBNode()
         : parent(null), leftChild(null), rightChild(null),
-          height(0) {}
+          height(-1) {}
     bool isLeaf() const
     {
         return rightChild == null;
     }
 };
+
+std::ostream &operator<<(std::ostream &out, const AABBNode &b);
 
 /**
  * A binary search tree containing all AABB in the world.
@@ -72,11 +75,17 @@ class AABBTree {
     int32_t root; // Index of root node
     int32_t nextFreeIndex;
 public:
+    AABBTree();
     AABBTree(size_t initialSize);
-    ~AABBTree();
 
     int32_t insertAABB(const AABB &box);
-    void update();
+    void updateAABB(int32_t index, const AABB &newAABB);
+    void destroyAABB(int32_t index);
+    std::string dump() const;
+    /**
+     * Get the list of nodes for testing purposes.
+     */
+    std::vector<AABBNode> getNodes() const;
 private:
     /**
      * Attempt to remove a node from the tree.
@@ -97,9 +106,8 @@ private:
      * Find a position for a new AABB inside the internal vector.
      */
     int32_t allocateNode();
-    /**
-     *
-     */
     void insertNode(int32_t node);
 };
+
+std::ostream &operator<<(std::ostream &out, AABBTree tree);
 } /* namespace phy */

@@ -1,7 +1,14 @@
 #include "inc/physics/aabb.hpp"
+#include <iostream>
+#include <iomanip>
 #include <vector>
+#include <strstream>
 
 namespace phy {
+// Declare the null constant outside the struct
+// to avoid linker errors.
+int32_t const AABBNode::null = -1;
+
 Vec2f AABB::getCenter() const
 {
     return 0.5f * (lowVertex + highVertex);
@@ -38,6 +45,20 @@ std::ostream &operator<<(std::ostream &out, const AABB &aabb)
     return out;
 }
 
+std::ostream &operator<<(std::ostream &out, const AABBNode &b)
+{
+    out << "Parent: " << std::setw(3) << b.parent
+        << std::setw(11) << " leftChild: " << std::setw(3) << b.leftChild
+        << std::setw(11) << " rightChild: " << std::setw(3) << b.rightChild
+        << std::setw(7) << " next: " << std::setw(3) << b.next
+        << std::setw(9) << " height: " << std::setw(3) << b.height
+        << "aabb: " << b.aabb;
+    return out;
+}
+
+AABBTree::AABBTree()
+    : AABBTree(10) {}
+
 AABBTree::AABBTree(size_t initialSize)
     : nodes(initialSize), nextFreeIndex(0)
 {
@@ -61,12 +82,41 @@ int32_t AABBTree::insertAABB(const AABB &box)
     return index;
 }
 
+void AABBTree::destroyAABB(int32_t index)
+{
+    if (index < 0 || index > nodes.capacity())
+        return;
+
+    remove(index);
+    // Reinitialize this index,it is a performance loss,
+    // but makes testing/bug finding easier.
+    nodes[index].height = -1;
+    freeNode(index);
+}
+
+void AABBTree::updateAABB(int32_t index, const AABB &newAABB)
+{
+    if (index < 0 || index > nodes.capacity())
+        return;
+
+    if (nodes[index].aabb.contains(newAABB)) {
+        return;
+    }
+
+    // Just remove, update, reinsert the node.
+    // TODO: Find a more efficient way of updating nodes.
+    remove(index);
+    nodes[index].aabb = newAABB;
+    insertNode(index);
+}
+
 int32_t AABBTree::allocateNode()
 {
     // Expand the node pool if necessary
-    if (nextFreeIndex == AABBNode::null) {
+    if (nextFreeIndex == AABBNode::null ||
+        nextFreeIndex >= nodes.capacity()) {
         auto oldSize = nodes.capacity();
-        nodes.reserve(oldSize * 2);
+        nodes.resize(oldSize * 2);
 
         for (int32_t i = oldSize - 1; i < nodes.capacity(); i++) {
             nodes[i].next = i + 1;
@@ -103,7 +153,6 @@ void AABBTree::insertNode(int32_t node)
 
         float cost = 2 * combinedArea;
         float inheritanceCost = 2 * (combinedArea - area);
-
 
         // Cost of descending into the given child
         auto childCost = [this, &inheritanceCost, &newAABB] (int32_t child) -> float {
@@ -169,7 +218,7 @@ void AABBTree::remove(int32_t index)
         return;
 
     if (index == root) {
-        root = -1;
+        root = AABBNode::null;
         return;
     }
 
@@ -233,19 +282,26 @@ int32_t AABBTree::balance(int32_t index)
 
     auto left = NodePair(input()->leftChild, nodes);
     auto right = NodePair(input()->rightChild, nodes);
-    int32_t balance = left()->height - right()->height;
+    int32_t balance = right()->height - left()->height;
+    std::cout << "Balance is: " << balance << std::endl;
+    std::cout << "Input:      " << *input();
+    std::cout << "Left:       " << *left();
+    std::cout << "Right:      " << *input();
 
-    // The right child is smaller than the left, so rotate it up
+    // The right child is longer than the left, so rotate it
     if (balance > 1) {
         auto grandLeft = NodePair(right()->leftChild, nodes);
         auto grandRight = NodePair(right()->rightChild, nodes);
+        std::cout << "grandLeft:  " << *input();
+        std::cout << "grandRight: " << *input();
 
         right()->leftChild = input;
         right()->parent = input()->parent;
         input()->parent = right;
 
         if (right()->parent != AABBNode::null) {
-            if (right()->parent == input)
+            // input's old parent should point to right
+            if (nodes[right()->parent].leftChild == input)
                 nodes[right()->parent].leftChild = right;
             else
                 nodes[right()->parent].rightChild = right;
@@ -279,6 +335,8 @@ int32_t AABBTree::balance(int32_t index)
     if (balance < -1) {
         auto grandLeft = NodePair(left()->leftChild, nodes);
         auto grandRight = NodePair(left()->rightChild, nodes);
+        std::cout << "grandLeft:  " << *input();
+        std::cout << "grandRight: " << *input();
 
         left()->leftChild = input;
         left()->parent = input()->parent;
@@ -329,5 +387,32 @@ void AABBTree::freeNode(int32_t node)
     nodes[node].next = nextFreeIndex;
     nodes[node].height = -1;
     nextFreeIndex = node;
+}
+
+std::vector<AABBNode> AABBTree::getNodes() const
+{
+    return nodes;
+}
+
+std::string AABBTree::dump() const
+{
+    if (root == AABBNode::null)
+        return "This tree is empty";
+
+    std::strstream sstream;
+
+    sstream << "root: " << root
+            << "nextFreeIndex: " << nextFreeIndex
+            << std::endl;
+
+    for (const auto box : nodes)
+        sstream << box;
+    return sstream.str();
+}
+
+std::ostream &operator<<(std::ostream &out, AABBTree tree)
+{
+    out << tree.dump() << std::endl;
+    return out;
 }
 } /* namespace phy */

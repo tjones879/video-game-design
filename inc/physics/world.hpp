@@ -2,6 +2,7 @@
 
 #include "inc/physics/common.hpp"
 #include "inc/physics/body.hpp"
+#include "inc/physics/aabb.hpp"
 #include <memory>
 #include <vector>
 
@@ -28,6 +29,7 @@ private:
     uint8_t velocityIterations; ///< Number of iterations used to resolve velocity of bodies
     uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
     uint32_t lastTicks; ///< Number of SDL_GetTicks() for the last iteration
+    AABBTree aabbTree;
 public:
     World(const Vec2f &gravity_);
     /**

@@ -5,10 +5,11 @@
 
 namespace phy {
 class CircleShape : public Shape {
+public:
     float density;
     float radius;
     Vec2f pos;
-public:
+
     CircleShape();
     CircleShape(const Vec2f& pos, float radius);
 
