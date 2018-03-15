@@ -205,7 +205,7 @@ void AABBTree::insertNode(int32_t node)
         int32_t rightChild = nodes[index].rightChild;
 
         nodes[index].height = 1 + std::max(nodes[leftChild].height, nodes[rightChild].height);
-        nodes[index].aabb = nodes[index].aabb.combine(nodes[leftChild].aabb, nodes[rightChild].aabb);
+        nodes[index].aabb = nodes[leftChild].aabb.combine(nodes[rightChild].aabb);
 
         index = nodes[index].parent;
     }
@@ -246,7 +246,7 @@ void AABBTree::remove(int32_t index)
             int32_t left = nodes[index].leftChild;
             int32_t right = nodes[index].rightChild;
 
-            nodes[index].aabb = nodes[index].aabb.combine(nodes[left].aabb, nodes[right].aabb);
+            nodes[index].aabb = nodes[left].aabb.combine(nodes[right].aabb);
             nodes[index].height = 1 + std::max(nodes[left].height, nodes[right].height);
 
             index = nodes[index].parent;
@@ -313,8 +313,8 @@ int32_t AABBTree::balance(int32_t index)
             right()->rightChild = grandLeft;
             input()->rightChild = grandRight;
             grandRight()->parent = input;
-            input()->aabb = input()->aabb.combine(left()->aabb, grandRight()->aabb);
-            right()->aabb = right()->aabb.combine(input()->aabb, grandLeft()->aabb);
+            input()->aabb = left()->aabb.combine(grandRight()->aabb);
+            right()->aabb = input()->aabb.combine(grandLeft()->aabb);
 
             input()->height = 1 + std::max(left()->height, grandRight()->height);
             right()->height = 1 + std::max(input()->height, grandLeft()->height);
@@ -322,8 +322,8 @@ int32_t AABBTree::balance(int32_t index)
             right()->rightChild = grandRight;
             input()->rightChild = grandLeft;
             grandLeft()->parent = input;
-            input()->aabb = input()->aabb.combine(left()->aabb, grandLeft()->aabb);
-            right()->aabb = right()->aabb.combine(input()->aabb, grandRight()->aabb);
+            input()->aabb = left()->aabb.combine(grandLeft()->aabb);
+            right()->aabb = input()->aabb.combine(grandRight()->aabb);
 
             input()->height = 1 + std::max(left()->height, grandLeft()->height);
             right()->height = 1 + std::max(input()->height, grandRight()->height);
@@ -356,8 +356,8 @@ int32_t AABBTree::balance(int32_t index)
             input()->leftChild = grandRight;
             grandRight()->parent = input;
 
-            input()->aabb = input()->aabb.combine(right()->aabb, grandRight()->aabb);
-            left()->aabb = left()->aabb.combine(input()->aabb, grandLeft()->aabb);
+            input()->aabb = right()->aabb.combine(grandRight()->aabb);
+            left()->aabb = input()->aabb.combine(grandLeft()->aabb);
 
             input()->height = 1 + std::max(right()->height, grandRight()->height);
             left()->height = 1 + std::max(input()->height, grandLeft()->height);
@@ -366,8 +366,8 @@ int32_t AABBTree::balance(int32_t index)
             input()->leftChild = grandLeft;
             grandLeft()->parent = input;
 
-            input()->aabb = input()->aabb.combine(right()->aabb, grandLeft()->aabb);
-            left()->aabb = left()->aabb.combine(input()->aabb, grandRight()->aabb);
+            input()->aabb = right()->aabb.combine(grandLeft()->aabb);
+            left()->aabb = input()->aabb.combine(grandRight()->aabb);
 
             input()->height = 1 + std::max(right()->height, grandLeft()->height);
             left()->height = 1 + std::max(input()->height, grandRight()->height);
