@@ -72,7 +72,13 @@ public:
 std::ostream &operator<<(std::ostream &out, const AABBNode &b);
 
 class BroadphaseCallback {
-    virtual bool callback() = 0;
+public:
+    /**
+     * Callback for when the dynamic tree finds an overlap
+     * in AABB.
+     */
+    virtual bool registerCollision(const AABB &a, int32_t nodeID) = 0;
+    virtual bool registerCollision(int32_t a, int32_t b) = 0;
 };
 
 
@@ -98,11 +104,7 @@ public:
      * Find any any AABB in the tree that overlap with the
      * one that is given.
      */
-    void findCollisions(BroadphaseCallback* callback, const AABB &aabb) const;
-    /**
-     *
-     */
-    void updateCollisions(BroadphaseCallback *callback);
+    void findCollisions(BroadphaseCallback *callback, const AABB &aabb) const;
     /**
      * Convert the tree to a string for debugging purposes.
      */

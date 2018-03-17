@@ -416,6 +416,16 @@ void AABBTree::findCollisions(BroadphaseCallback *callback, const AABB &aabb) co
         if (index == AABBNode::null)
             continue;
 
+        const AABBNode *node = &nodes[index];
+        if (node->aabb.overlaps(aabb)) {
+            if (node->isLeaf()) {
+                if (!callback->registerCollision(aabb, index))
+                    return;
+            } else {
+                stack.push(node->leftChild);
+                stack.push(node->rightChild);
+            }
+        }
     }
 }
 
