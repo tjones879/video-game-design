@@ -62,6 +62,45 @@ TEST_F(AABBTest, ShouldSupportPerimeter)
     EXPECT_EQ(2 * (x + y), result);
 }
 
+TEST_F(AABBTest, ShouldSupportArea)
+{
+    auto result = this->a.getArea();
+    auto expected =
+        (this->a.highVertex.x - this->a.lowVertex.x) *
+        (this->a.highVertex.y - this->a.lowVertex.y);
+    EXPECT_EQ(expected, result);
+}
+
+TEST_F(AABBTest, ShouldSupportSideLengths)
+{
+    auto result = this->a.getSideLengths();
+    Vec2f expected = {
+        this->a.highVertex.x - this->a.lowVertex.x,
+        this->a.highVertex.y - this->a.lowVertex.y
+    };
+    EXPECT_EQ(expected, result);
+}
+
+TEST_F(AABBTest, ShouldSupportOverlapsTrue)
+{
+    AABB a = {{1, 1}, {3, 3}};
+    AABB b = {{0, 0}, {2, 2}};
+    auto AoverlapsB = a.overlaps(b);
+    EXPECT_EQ(true, AoverlapsB);
+    auto BoverlapsA = b.overlaps(a);
+    EXPECT_EQ(true, BoverlapsA);
+}
+
+TEST_F(AABBTest, ShouldSupportOverlapsFalse)
+{
+    AABB a = {{1, 1}, {3, 3}};
+    AABB b = {{0, 0}, {1, 1}};
+    auto AoverlapsB = a.overlaps(b);
+    EXPECT_EQ(false, AoverlapsB);
+    auto BoverlapsA = b.overlaps(a);
+    EXPECT_EQ(AoverlapsB, BoverlapsA);
+}
+
 class AABBTreeTest : public ::testing::Test {
 protected:
     AABBTree tree;

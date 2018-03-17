@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <vector>
 #include <strstream>
+#include <stack>
+#include <cmath>
 
 namespace phy {
 // Declare the null constant outside the struct
@@ -16,16 +18,14 @@ Vec2f AABB::getCenter() const
 
 float AABB::getPerimeter() const
 {
-    float x = highVertex.x - lowVertex.x;
-    float y = highVertex.y - lowVertex.y;
-    return 2.f * (x + y);
+    auto sides = getSideLengths();
+    return 2.f * (sides.x + sides.y);
 }
 
 float AABB::getArea() const
 {
-    float x = highVertex.x - lowVertex.x;
-    float y = highVertex.y - lowVertex.y;
-    return x * y;
+    auto sides = getSideLengths();
+    return sides.x * sides.y;
 }
 
 AABB AABB::combine(const AABB &b) const
@@ -37,6 +37,21 @@ AABB AABB::combine(const AABB &b) const
 bool AABB::contains(const AABB &other) const
 {
     return lowVertex.below(other.lowVertex) && highVertex.above(other.highVertex);
+}
+
+Vec2f AABB::getSideLengths() const
+{
+    return {highVertex.x - lowVertex.x,
+            highVertex.y - lowVertex.y};
+}
+
+bool AABB::overlaps(const AABB &other) const
+{
+    auto centerDiff = getCenter() - other.getCenter();
+    auto sides = getSideLengths();
+    auto otherSides = other.getSideLengths();
+    return (abs(centerDiff.x * 2) < (sides.x + otherSides.x)) &&
+           (abs(centerDiff.y * 2) < (sides.y + otherSides.y));
 }
 
 bool operator==(const AABB &a, const AABB& b)
@@ -389,6 +404,19 @@ void AABBTree::freeNode(int32_t node)
     nodes[node].next = nextFreeIndex;
     nodes[node].height = -1;
     nextFreeIndex = node;
+}
+
+void AABBTree::findCollisions(BroadphaseCallback *callback, const AABB &aabb) const
+{
+    std::stack<int32_t> stack;
+    stack.push(root);
+    while (stack.size() > 0) {
+        int32_t index = stack.top();
+
+        if (index == AABBNode::null)
+            continue;
+
+    }
 }
 
 std::vector<AABBNode> AABBTree::getNodes() const

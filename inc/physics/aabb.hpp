@@ -17,6 +17,7 @@ public:
     Vec2f getCenter() const;
     float getPerimeter() const;
     float getArea() const;
+    Vec2f getSideLengths() const;
     AABB combine(const AABB &b) const;
 
     template <class T, class... Args>
@@ -31,6 +32,12 @@ public:
      * @return True if the other AABB is completely inside.
      */
     bool contains(const AABB &other) const;
+    /**
+     * Determine if this AABB overlaps with the given AABB.
+     *
+     * @return True if the other AABB overlaps with this.
+     */
+    bool overlaps(const AABB &other) const;
 };
 
 bool operator==(const AABB &a, const AABB& b);
@@ -64,6 +71,11 @@ public:
 
 std::ostream &operator<<(std::ostream &out, const AABBNode &b);
 
+class BroadphaseCallback {
+    virtual bool callback() = 0;
+};
+
+
 /**
  * A binary search tree containing all AABB in the world.
  *
@@ -82,6 +94,18 @@ public:
     int32_t insertAABB(const AABB &box);
     void updateAABB(int32_t index, const AABB &newAABB);
     void destroyAABB(int32_t index);
+    /**
+     * Find any any AABB in the tree that overlap with the
+     * one that is given.
+     */
+    void findCollisions(BroadphaseCallback* callback, const AABB &aabb) const;
+    /**
+     *
+     */
+    void updateCollisions(BroadphaseCallback *callback);
+    /**
+     * Convert the tree to a string for debugging purposes.
+     */
     std::string dump() const;
     /**
      * Get the list of nodes for testing purposes.
