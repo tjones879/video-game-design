@@ -112,10 +112,10 @@ protected:
 
 TEST_F(AABBTreeTest, ShouldSupportBasicInsertion)
 {
-        AABB a(Vec2f(-5, -5),
-               Vec2f(-1, -1));
-        AABB b(Vec2f( 1,  1),
-               Vec2f( 5,  5));
+        AABB a({-5, -5},
+               {-1, -1});
+        AABB b({ 1,  1},
+               { 5,  5});
         this->tree.insertAABB(a);
         this->tree.insertAABB(b);
         // Root should contain both inserted AABB nodes and a root
@@ -132,24 +132,24 @@ TEST_F(AABBTreeTest, ShouldSupportBasicInsertion)
 /*
 TEST_F(AABBTreeTest, ShouldRemainBalanced)
 {
-    this->tree.insertAABB(AABB(Vec2f( 0,  0), Vec2f( 1, 1)));
-    this->tree.insertAABB(AABB(Vec2f( 1,  2), Vec2f( 2, 3)));
-    this->tree.insertAABB(AABB(Vec2f( 1, -1), Vec2f( 2, 0)));
-    this->tree.insertAABB(AABB(Vec2f( 3,  1), Vec2f( 4, 2)));
-    this->tree.insertAABB(AABB(Vec2f( 2,  3), Vec2f( 3, 4)));
-    this->tree.insertAABB(AABB(Vec2f(-2, -1), Vec2f(-1, 0)));
-    this->tree.insertAABB(AABB(Vec2f(-2,  1), Vec2f(-1, 2)));
-    this->tree.insertAABB(AABB(Vec2f(0.5, -1), Vec2f(1.5, -0.5)));
-    this->tree.insertAABB(AABB(Vec2f(0.5, -1), Vec2f(1.5, -0.5)));
+    this->tree.insertAABB(AABB({ 0,  0}, { 1, 1}));
+    this->tree.insertAABB(AABB({ 1,  2}, { 2, 3}));
+    this->tree.insertAABB(AABB({ 1, -1}, { 2, 0}));
+    this->tree.insertAABB(AABB({ 3,  1}, { 4, 2}));
+    this->tree.insertAABB(AABB({ 2,  3}, { 3, 4}));
+    this->tree.insertAABB(AABB({-2, -1}, {-1, 0}));
+    this->tree.insertAABB(AABB({-2,  1}, {-1, 2}));
+    this->tree.insertAABB(AABB({0.5, -1}, {1.5, -0.5}));
+    this->tree.insertAABB(AABB({0.5, -1}, {1.5, -0.5}));
 }
 */
 
 TEST_F(AABBTreeTest, ShouldSupportDestruction)
 {
-        AABB a(Vec2f(-5, -5),
-               Vec2f(-1, -1));
-        AABB b(Vec2f( 1,  1),
-               Vec2f( 5,  5));
+        AABB a({-5, -5},
+               {-1, -1});
+        AABB b({ 1,  1},
+               { 5,  5});
         auto indexA = this->tree.insertAABB(a);
         auto indexB = this->tree.insertAABB(b);
         this->tree.destroyAABB(indexA);
@@ -173,15 +173,53 @@ TEST_F(AABBTreeTest, ShouldSupportDestruction)
 
 TEST_F(AABBTreeTest, ShouldSupportUpdates)
 {
-    this->tree.insertAABB(AABB(Vec2f( 0,  0), Vec2f( 1, 1)));
-    this->tree.insertAABB(AABB(Vec2f( 1,  2), Vec2f( 2, 3)));
-    this->tree.insertAABB(AABB(Vec2f( 1, -1), Vec2f( 2, 0)));
-    auto index = this->tree.insertAABB(AABB(Vec2f( 3,  1), Vec2f( 4, 2)));
-    this->tree.insertAABB(AABB(Vec2f( 2,  3), Vec2f( 3, 4)));
-    this->tree.insertAABB(AABB(Vec2f(-2, -1), Vec2f(-1, 0)));
+    this->tree.insertAABB(AABB({ 0,  0}, { 1, 1}));
+    this->tree.insertAABB(AABB({ 1,  2}, { 2, 3}));
+    this->tree.insertAABB(AABB({ 1, -1}, { 2, 0}));
+    auto index = this->tree.insertAABB(AABB({ 3,  1}, { 4, 2}));
+    this->tree.insertAABB(AABB({ 2,  3}, { 3, 4}));
+    this->tree.insertAABB(AABB({-2, -1}, {-1, 0}));
 
-    auto newAABB = AABB(Vec2f(3, 0), Vec2f(4, 1));
+    auto newAABB = AABB({3, 0}, {4, 1});
     this->tree.updateAABB(index, newAABB);
     auto nodes = this->tree.getNodes();
     EXPECT_EQ(true, nodes[nodes[index].parent].aabb.contains(newAABB));
+}
+
+/* We must build a mock interface for the AABBTree to callback onto
+ * when a collision is found. */
+struct TestCallback : public AABBCallback {
+    int count = 0;
+    bool findAll;
+    TestCallback(bool keepGoing)
+        : findAll(keepGoing) {}
+    virtual bool registerCollision(const AABB &a, int32_t nodeid) override
+    {
+        count++;
+        return findAll;
+    }
+};
+
+TEST_F(AABBTreeTest, ShouldSupportFindCollisionsMany)
+{
+    TestCallback callback(true);
+    this->tree.insertAABB(AABB({0, 0}, {1, 1}));
+    this->tree.insertAABB(AABB({1, 2}, {2, 3}));
+    this->tree.insertAABB(AABB({0, 0}, {0.5, 0.5}));
+    auto aabb = AABB({0.5, 0.5}, {1.5, 2.5});
+    //auto index = this->tree.insertAABB(aabb);
+    this->tree.findCollisions(&callback, aabb);
+    EXPECT_EQ(2, callback.count);
+}
+
+TEST_F(AABBTreeTest, ShouldSupportFindCollisionsOne)
+{
+    TestCallback callback(false);
+    this->tree.insertAABB(AABB({0, 0}, {1, 1}));
+    this->tree.insertAABB(AABB({1, 2}, {2, 3}));
+    this->tree.insertAABB(AABB({0, 0}, {0.5, 0.5}));
+    auto aabb = AABB({0.5, 0.5}, {1.5, 2.5});
+    //auto index = this->tree.insertAABB(aabb);
+    this->tree.findCollisions(&callback, aabb);
+    EXPECT_EQ(1, callback.count);
 }

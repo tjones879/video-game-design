@@ -17,6 +17,9 @@ public:
     Vec2f getCenter() const;
     float getPerimeter() const;
     float getArea() const;
+    /**
+     * Get the size of the AABB in each direction.
+     */
     Vec2f getSideLengths() const;
     AABB combine(const AABB &b) const;
 
@@ -71,14 +74,13 @@ public:
 
 std::ostream &operator<<(std::ostream &out, const AABBNode &b);
 
-class BroadphaseCallback {
+class AABBCallback {
 public:
     /**
      * Callback for when the dynamic tree finds an overlap
      * in AABB.
      */
     virtual bool registerCollision(const AABB &a, int32_t nodeID) = 0;
-    virtual bool registerCollision(int32_t a, int32_t b) = 0;
 };
 
 
@@ -104,7 +106,7 @@ public:
      * Find any any AABB in the tree that overlap with the
      * one that is given.
      */
-    void findCollisions(BroadphaseCallback *callback, const AABB &aabb) const;
+    void findCollisions(AABBCallback *callback, const AABB &aabb) const;
     /**
      * Convert the tree to a string for debugging purposes.
      */
@@ -133,6 +135,9 @@ private:
      * Find a position for a new AABB inside the internal vector.
      */
     int32_t allocateNode();
+    /**
+     * Find the correct position in the tree for an allocated node.
+     */
     void insertNode(int32_t node);
 };
 

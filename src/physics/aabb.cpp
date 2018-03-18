@@ -406,12 +406,13 @@ void AABBTree::freeNode(int32_t node)
     nextFreeIndex = node;
 }
 
-void AABBTree::findCollisions(BroadphaseCallback *callback, const AABB &aabb) const
+void AABBTree::findCollisions(AABBCallback *callback, const AABB &aabb) const
 {
     std::stack<int32_t> stack;
     stack.push(root);
     while (stack.size() > 0) {
         int32_t index = stack.top();
+        stack.pop();
 
         if (index == AABBNode::null)
             continue;
