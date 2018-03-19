@@ -129,21 +129,6 @@ TEST_F(AABBTreeTest, ShouldSupportBasicInsertion)
         EXPECT_EQ(expectedHeight, nodes[2].height);
 }
 
-/*
-TEST_F(AABBTreeTest, ShouldRemainBalanced)
-{
-    this->tree.insertAABB(AABB({ 0,  0}, { 1, 1}));
-    this->tree.insertAABB(AABB({ 1,  2}, { 2, 3}));
-    this->tree.insertAABB(AABB({ 1, -1}, { 2, 0}));
-    this->tree.insertAABB(AABB({ 3,  1}, { 4, 2}));
-    this->tree.insertAABB(AABB({ 2,  3}, { 3, 4}));
-    this->tree.insertAABB(AABB({-2, -1}, {-1, 0}));
-    this->tree.insertAABB(AABB({-2,  1}, {-1, 2}));
-    this->tree.insertAABB(AABB({0.5, -1}, {1.5, -0.5}));
-    this->tree.insertAABB(AABB({0.5, -1}, {1.5, -0.5}));
-}
-*/
-
 TEST_F(AABBTreeTest, ShouldSupportDestruction)
 {
         AABB a({-5, -5},
@@ -207,7 +192,6 @@ TEST_F(AABBTreeTest, ShouldSupportFindCollisionsMany)
     this->tree.insertAABB(AABB({1, 2}, {2, 3}));
     this->tree.insertAABB(AABB({0, 0}, {0.5, 0.5}));
     auto aabb = AABB({0.5, 0.5}, {1.5, 2.5});
-    //auto index = this->tree.insertAABB(aabb);
     this->tree.findCollisions(&callback, aabb);
     EXPECT_EQ(2, callback.count);
 }
@@ -219,7 +203,6 @@ TEST_F(AABBTreeTest, ShouldSupportFindCollisionsOne)
     this->tree.insertAABB(AABB({1, 2}, {2, 3}));
     this->tree.insertAABB(AABB({0, 0}, {0.5, 0.5}));
     auto aabb = AABB({0.5, 0.5}, {1.5, 2.5});
-    //auto index = this->tree.insertAABB(aabb);
     this->tree.findCollisions(&callback, aabb);
     EXPECT_EQ(1, callback.count);
 }
