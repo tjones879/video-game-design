@@ -430,6 +430,12 @@ void AABBTree::findCollisions(AABBCallback *callback, const AABB &aabb) const
     }
 }
 
+void AABBTree::findCollisions(AABBCallback *callback, int32_t index) const
+{
+    const AABB aabb = nodes[index].aabb;
+    findCollisions(callback, aabb);
+}
+
 std::vector<AABBNode> AABBTree::getNodes() const
 {
     return nodes;

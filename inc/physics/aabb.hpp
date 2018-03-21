@@ -107,6 +107,7 @@ public:
      * one that is given.
      */
     void findCollisions(AABBCallback *callback, const AABB &aabb) const;
+    void findCollisions(AABBCallback *callback, int32_t index) const;
     /**
      * Convert the tree to a string for debugging purposes.
      */

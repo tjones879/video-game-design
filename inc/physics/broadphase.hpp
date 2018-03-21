@@ -11,8 +11,8 @@ namespace phy {
 class BroadPhase : public AABBCallback {
 private:
     AABBTree tree;
-    std::vector<std::pair<const std::weak_ptr<const Shape>, int32_t>> mapping;
-    uint32_t movedCount;
+    std::vector<std::pair<std::weak_ptr<const Shape>, int32_t>> mapping;
+    std::vector<int32_t> moved;
 public:
     BroadPhase();
     /**
@@ -37,6 +37,6 @@ private:
      *      the first value denotes whether the shape was found.
      *      the second value is the result of std::find().
      */
-    auto findShape(std::weak_ptr<const Shape> shape);
+    auto findShape(const std::weak_ptr<const Shape> &shape);
 };
 } /* namespace phy */

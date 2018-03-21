@@ -3,6 +3,7 @@
 #include "inc/physics/aabb.hpp"
 #include "inc/physics/common.hpp"
 #include <ostream>
+#include <memory>
 
 namespace phy {
 

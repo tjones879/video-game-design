@@ -1,20 +1,20 @@
 #include "inc/physics/broadphase.hpp"
+#include <iostream>
+#include <algorithm>
 
 namespace phy {
-auto BroadPhase::findShape(std::weak_ptr<const Shape> shape)
+auto BroadPhase::findShape(const std::weak_ptr<const Shape> &shape)
 {
-    auto pos = std::find(std::begin(mapping), std::end(mapping),
-            [shape](auto item) -> bool {
-                item.first == shape;
+    auto pos = std::find_if(std::begin(mapping), std::end(mapping),
+            [shape](auto item) {
+                return item.first.owner_before(shape) && !shape.owner_before(item.first);
             });
     if (pos != std::end(mapping))
         return std::make_pair(true, pos);
     else
         return std::make_pair(false, pos);
 }
-    /*
-    std::vector<std::pair<const std::weak_ptr<const Shape>, int32_t>> mapping;
-     */
+
 void BroadPhase::addNewBody(const Body *body)
 {
     const auto transform = body->getTransform();
@@ -33,6 +33,7 @@ void BroadPhase::updateBody(const Body *updatedBody)
         // If the shape is already known, update it.
         if (pos.first) {
             tree.updateAABB(pos.second->second, aabb);
+            moved.push_back(pos.second->second);
         // Insert the shape's AABB otherwise.
         } else {
             mapping.emplace_back(shape, tree.insertAABB(aabb));
@@ -51,15 +52,16 @@ void BroadPhase::deleteBody(const Body *deletedBody)
 
 void BroadPhase::updatePairs()
 {
-    // For each recently updated pair:
-    /* The world should always call BroadPhase::deleteBody() before deleting a body
-     * but check to delete any expired shapes regardless. */
+    for (auto index : moved) {
+        tree.findCollisions(this, index);
+    }
 
-    //   Check for collisions
+    moved.clear();
 }
 
 bool BroadPhase::registerCollision(const AABB &a, int32_t nodeID)
 {
+    std::cout << "Collision with: " << a << "Index: " << nodeID << std::endl;
     return true;
 }
 } /* namespace phy */
