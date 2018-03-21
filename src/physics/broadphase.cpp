@@ -3,6 +3,8 @@
 #include <algorithm>
 
 namespace phy {
+BroadPhase::BroadPhase() : tree(10) {}
+
 auto BroadPhase::findShape(const std::weak_ptr<const Shape> &shape)
 {
     auto pos = std::find_if(std::begin(mapping), std::end(mapping),

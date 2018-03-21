@@ -177,6 +177,11 @@ void Body::clearForces()
     torque = 0.0f;
 }
 
+Transform Body::getTransform() const
+{
+    return Transform(position, angle);
+}
+
 void Body::updateMassProperties()
 {
     mass = 0.0f;

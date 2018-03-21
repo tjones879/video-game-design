@@ -8,7 +8,7 @@ namespace phy {
 
 World::World(const Vec2f &gravity_)
     : gravity(gravity_), velocityIterations(10), positionIterations(10),
-      lastTicks(SDL_GetTicks()), aabbTree(5) {}
+      lastTicks(SDL_GetTicks()) {}
 
 World::~World() = default;
 
