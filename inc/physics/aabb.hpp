@@ -116,6 +116,7 @@ public:
      * Get the list of nodes for testing purposes.
      */
     std::vector<AABBNode> getNodes() const;
+    const AABB operator[](int i) const;
 private:
     /**
      * Attempt to remove a node from the tree.

@@ -433,7 +433,28 @@ void AABBTree::findCollisions(AABBCallback *callback, const AABB &aabb) const
 void AABBTree::findCollisions(AABBCallback *callback, int32_t index) const
 {
     const AABB aabb = nodes[index].aabb;
-    findCollisions(callback, aabb);
+    std::stack<int32_t> stack;
+    stack.push(root);
+    while (stack.size() > 0) {
+        int32_t top = stack.top();
+        stack.pop();
+
+        if (top == AABBNode::null)
+            continue;
+
+        const AABBNode *node = &nodes[top];
+        if (index != top && node->aabb.overlaps(aabb)) {
+            if (node->isLeaf()) {
+                for (auto node : nodes)
+                    std::cout << node;
+                if (!callback->registerCollision(aabb, top))
+                    return;
+            } else {
+                stack.push(node->leftChild);
+                stack.push(node->rightChild);
+            }
+        }
+    }
 }
 
 std::vector<AABBNode> AABBTree::getNodes() const
