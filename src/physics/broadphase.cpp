@@ -9,7 +9,7 @@ auto BroadPhase::findShape(const std::weak_ptr<const Shape> &shape)
 {
     auto pos = std::find_if(std::begin(mapping), std::end(mapping),
             [shape](auto item) {
-                return item.first.owner_before(shape) && !shape.owner_before(item.first);
+                return !item.first.owner_before(shape) && !shape.owner_before(item.first);
             });
     if (pos != std::end(mapping))
         return std::make_pair(true, pos);

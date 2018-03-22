@@ -445,8 +445,6 @@ void AABBTree::findCollisions(AABBCallback *callback, int32_t index) const
         const AABBNode *node = &nodes[top];
         if (index != top && node->aabb.overlaps(aabb)) {
             if (node->isLeaf()) {
-                for (auto node : nodes)
-                    std::cout << node;
                 if (!callback->registerCollision(aabb, top))
                     return;
             } else {
