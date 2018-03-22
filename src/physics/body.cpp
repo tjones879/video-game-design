@@ -6,10 +6,7 @@ namespace phy {
 Body::Body(const BodySpec &spec)
     : extraData(nullptr)
 {
-    bodySweep.center0 = spec.position;
-    bodySweep.center = spec.position;
-    bodySweep.angle = spec.angle;
-    bodySweep.angle0 = spec.angle;
+    position = spec.position;
 
     angle = spec.angle;
 
