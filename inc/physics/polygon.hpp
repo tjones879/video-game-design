@@ -13,6 +13,7 @@ class PolygonShape : public Shape {
 public:
     std::vector<Vec2f> vertices;
     PolygonShape(float dens);
+    PolygonShape(const PolygonShape &shape, const Transform &transform);
     /**
      * Create a convex polygon using the given local points.
      *
@@ -36,11 +37,15 @@ public:
      * @param angle The orientation of the box in radians.
      */
     void setBox(const Vec2f &length, const Vec2f &center, float angle);
+    const std::vector<Vec2f> getNormals() const;
+    std::pair<float, float> projectShape(Vec2f axis) const;
+
     virtual bool testPoint(const Transform &transform, const Vec2f &pos) const override;
     virtual AABB getAABB(const Transform &transform) const override;
     virtual MassProperties getMassProps() const override;
     virtual void print(std::ostream &out) const override;
 private:
+    std::vector<Vec2f> calculateNormals() const;
     Vec2f calculateCentroid() const;
     float calculateArea() const;
 };

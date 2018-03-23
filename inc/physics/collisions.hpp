@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "inc/physics/circle.hpp"
+#include "inc/physics/polygon.hpp"
 #include "inc/physics/common.hpp"
 
 namespace phy {
@@ -16,8 +17,9 @@ struct ManifoldPoint {
  * A manifold describes the properties of a collision between two objects.
  */
 struct Manifold {
-    enum class Type {
+    enum class Type : char {
         circles,
+        polygons,
         INVALID
     };
     static const size_t maxPoints = 2;
@@ -32,4 +34,7 @@ struct Manifold {
 
 Manifold collideCircles(const CircleShape &a, const Transform &transformA,
                         const CircleShape &b, const Transform &transformB);
+
+Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
+                         const PolygonShape &b, const Transform &transformB);
 } /* namespace phy */

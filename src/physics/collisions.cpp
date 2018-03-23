@@ -1,4 +1,5 @@
 #include "inc/physics/collisions.hpp"
+#include <iostream>
 
 namespace phy {
 Manifold collideCircles(const CircleShape &a, const Transform &transformA,
@@ -20,4 +21,39 @@ Manifold collideCircles(const CircleShape &a, const Transform &transformA,
     return manifold;
 }
 
+Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
+                         const PolygonShape &b, const Transform &transformB)
+{
+    Manifold manifold;
+
+    auto polyA = PolygonShape(a, transformA);
+    auto axesA = polyA.getNormals();
+    auto polyB = PolygonShape(b, transformB);
+    auto axesB = polyB.getNormals();
+
+    auto overlaps = [](const auto &p1, const auto &p2) -> bool {
+        return !(p1.first > p2.second || p2.first > p1.second);
+    };
+
+    for (auto axis : axesA) {
+        auto p1 = polyA.projectShape(axis);
+        auto p2 = polyB.projectShape(axis);
+
+        if (!overlaps(p1, p2)) {
+            return manifold;
+        }
+    }
+
+    for (auto axis : axesB) {
+        auto p1 = polyA.projectShape(axis);
+        auto p2 = polyB.projectShape(axis);
+
+        if (!overlaps(p1, p2)) {
+            return manifold;
+        }
+    }
+
+    manifold.type = Manifold::Type::polygons;
+    return manifold;
+}
 } /*namespace phy */

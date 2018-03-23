@@ -1,10 +1,23 @@
 #include "inc/physics/polygon.hpp"
+#include <iostream>
 #include <algorithm>
 #include <stack>
 
 namespace phy {
 PolygonShape::PolygonShape(float dens)
     : density(dens) {}
+
+PolygonShape::PolygonShape(const PolygonShape &shape, const Transform &transform)
+{
+    vertices.reserve(shape.vertices.size());
+    normals.reserve(shape.normals.size());
+
+    std::transform(std::begin(shape.vertices), std::end(shape.vertices),
+                   std::back_inserter(vertices),
+                   [&transform](auto a) { return transform.translate(a); });
+    normals = std::move(calculateNormals());
+    centroid = calculateCentroid();
+}
 
 /**
  * Use triangulation to find the local center of the polygon.
@@ -106,16 +119,23 @@ void PolygonShape::set(const std::vector<Vec2f> &vertices_)
         return;
 
     vertices = convexHull(vertices_);
+    normals = calculateNormals();
+    centroid = calculateCentroid();
+}
 
+std::vector<Vec2f> PolygonShape::calculateNormals() const
+{
+    std::vector<Vec2f> newNormals;
+    newNormals.reserve(vertices.size());
     for (size_t i = 0; i < vertices.size(); i++) {
         int i2 = (i + 1) % vertices.size();
 
         Vec2f edge = vertices[i2] - vertices[i];
-        normals[i] = cross(edge, 1.0f);
-        normals[i].normalize();
+        newNormals.emplace_back(cross(edge, 1.0f));
+        newNormals[i].normalize();
     }
 
-    centroid = calculateCentroid();
+    return newNormals;
 }
 
 void PolygonShape::setBox(const Vec2f &length)
@@ -170,6 +190,25 @@ AABB PolygonShape::getAABB(const Transform &transform) const
     }
 
     return {lower, higher};
+}
+
+const std::vector<Vec2f> PolygonShape::getNormals() const
+{
+    return normals;
+}
+
+std::pair<float, float> PolygonShape::projectShape(Vec2f axis) const
+{
+    float min = dot(axis, vertices[0]);
+    float max = min;
+
+    for (const auto &vertex : vertices) {
+        auto projection = dot(axis, vertex);
+        min = std::min(min, projection);
+        max = std::max(max, projection);
+    }
+
+    return std::make_pair(min, max);
 }
 
 MassProperties PolygonShape::getMassProps() const
