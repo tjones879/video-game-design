@@ -22,13 +22,12 @@ struct Manifold {
         polygons,
         INVALID
     };
-    static const size_t maxPoints = 2;
 
     Manifold()
-        : type(Type::INVALID), points(maxPoints) {}
-    std::vector<ManifoldPoint> points;
+        : type(Type::INVALID), penetration({{}, -1000000}) {}
     Vec2f localNormal;
     Vec2f localPoint;
+    std::pair<Vec2f, float> penetration;
     Type type;
 };
 

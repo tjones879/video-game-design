@@ -7,6 +7,12 @@ CircleShape::CircleShape()
     shapeType = ShapeType::circle;
 }
 
+CircleShape::CircleShape(float dens, float rad)
+    : density(dens), radius(rad)
+{
+    shapeType = ShapeType::circle;
+}
+
 bool CircleShape::testPoint(const Transform &transform, const Vec2f &pos) const
 {
     Vec2f center = transform.position + transform.rotation.rotate(pos);

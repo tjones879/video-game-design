@@ -16,8 +16,7 @@ Manifold collideCircles(const CircleShape &a, const Transform &transformA,
         return manifold;
 
     manifold.type = Manifold::Type::circles;
-    manifold.localPoint = a.pos;
-    manifold.points[0].localPoint = b.pos;
+    // TODO: Find MTV
     return manifold;
 }
 
@@ -25,7 +24,7 @@ Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
                          const PolygonShape &b, const Transform &transformB)
 {
     Manifold manifold;
-
+    std::pair<Vec2f, float> pen;
     auto polyA = PolygonShape(a, transformA);
     auto axesA = polyA.getNormals();
     auto polyB = PolygonShape(b, transformB);
@@ -34,6 +33,9 @@ Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
     auto overlaps = [](const auto &p1, const auto &p2) -> bool {
         return !(p1.first > p2.second || p2.first > p1.second);
     };
+    auto getOverlap = [](const auto &p1, const auto &p2) {
+        return p1.first - p2.second;
+    };
 
     for (auto axis : axesA) {
         auto p1 = polyA.projectShape(axis);
@@ -41,6 +43,12 @@ Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
 
         if (!overlaps(p1, p2)) {
             return manifold;
+        } else {
+            auto depth = getOverlap(p1, p2);
+            if (depth > pen.second) {
+                pen.first = axis;
+                pen.second = depth;
+            }
         }
     }
 
@@ -50,10 +58,17 @@ Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
 
         if (!overlaps(p1, p2)) {
             return manifold;
+        } else {
+            auto depth = getOverlap(p1, p2);
+            if (depth > pen.second) {
+                pen.first = axis;
+                pen.second = depth;
+            }
         }
     }
 
     manifold.type = Manifold::Type::polygons;
+    manifold.penetration = pen;
     return manifold;
 }
 } /*namespace phy */

@@ -8,6 +8,7 @@ PolygonShape::PolygonShape(float dens)
     : density(dens) {}
 
 PolygonShape::PolygonShape(const PolygonShape &shape, const Transform &transform)
+    : density(shape.density)
 {
     vertices.reserve(shape.vertices.size());
     normals.reserve(shape.normals.size());
