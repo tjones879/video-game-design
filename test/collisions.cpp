@@ -37,13 +37,16 @@ TEST(CollidePolygonTest, ShouldFindCollisions)
     Transform transformA({{50, 50}, 0});
     auto polyB = PolygonShape(5);
     polyB.setBox({25, 25});
-    Transform transformB({{45, 50}, 0});
+    Transform transformB({{95, 50}, 0});
+    float depth = 5;
+    Vec2f axis{1, 0};
 
     auto manifold = collidePolygons(polyA, transformA,
                                     polyB, transformB);
 
-    std::cout << manifold.penetration.first << ", " << manifold.penetration.second << std::endl;
     EXPECT_EQ(Manifold::Type::polygons, manifold.type);
+    EXPECT_EQ(depth, manifold.depth);
+    EXPECT_EQ(axis, manifold.localNormal);
 }
 
 TEST(CollidePolygonTest, ShoudFindNonCollisions)

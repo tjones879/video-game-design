@@ -24,7 +24,6 @@ Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
                          const PolygonShape &b, const Transform &transformB)
 {
     Manifold manifold;
-    std::pair<Vec2f, float> pen;
     auto polyA = PolygonShape(a, transformA);
     auto axesA = polyA.getNormals();
     auto polyB = PolygonShape(b, transformB);
@@ -34,41 +33,44 @@ Manifold collidePolygons(const PolygonShape &a, const Transform &transformA,
         return !(p1.first > p2.second || p2.first > p1.second);
     };
     auto getOverlap = [](const auto &p1, const auto &p2) {
-        return p1.first - p2.second;
+        return std::min(p1.second - p2.first, p2.second - p1.first);
     };
 
     for (auto axis : axesA) {
-        auto p1 = polyA.projectShape(axis);
-        auto p2 = polyB.projectShape(axis);
+        auto normalized = axis.normalize();
+        auto p1 = polyA.projectShape(normalized);
+        auto p2 = polyB.projectShape(normalized);
 
         if (!overlaps(p1, p2)) {
             return manifold;
         } else {
             auto depth = getOverlap(p1, p2);
-            if (depth > pen.second) {
-                pen.first = axis;
-                pen.second = depth;
+            std::cout << "Axis: " << normalized << "Pen depth: " << depth << std::endl;
+            if (depth < manifold.depth) {
+                manifold.localNormal = normalized;
+                manifold.depth = depth;
             }
         }
     }
 
     for (auto axis : axesB) {
-        auto p1 = polyA.projectShape(axis);
-        auto p2 = polyB.projectShape(axis);
+        auto normalized = axis.normalize();
+        auto p1 = polyA.projectShape(normalized);
+        auto p2 = polyB.projectShape(normalized);
 
         if (!overlaps(p1, p2)) {
             return manifold;
         } else {
             auto depth = getOverlap(p1, p2);
-            if (depth > pen.second) {
-                pen.first = axis;
-                pen.second = depth;
+            std::cout << "Axis: " << normalized << "Pen depth: " << depth << std::endl;
+            if (depth < manifold.depth) {
+                manifold.localNormal = normalized;
+                manifold.depth = depth;
             }
         }
     }
 
     manifold.type = Manifold::Type::polygons;
-    manifold.penetration = pen;
     return manifold;
 }
 } /*namespace phy */

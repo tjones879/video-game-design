@@ -6,13 +6,6 @@
 #include "inc/physics/common.hpp"
 
 namespace phy {
-
-struct ManifoldPoint {
-    Vec2f localPoint;
-    float normalImpulse;
-    float frictionImpulse;
-};
-
 /**
  * A manifold describes the properties of a collision between two objects.
  */
@@ -24,10 +17,9 @@ struct Manifold {
     };
 
     Manifold()
-        : type(Type::INVALID), penetration({{}, -1000000}) {}
+        : type(Type::INVALID), depth(1000000) {}
     Vec2f localNormal;
-    Vec2f localPoint;
-    std::pair<Vec2f, float> penetration;
+    float depth;
     Type type;
 };
 

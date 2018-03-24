@@ -65,7 +65,7 @@ public:
     {
         const float eps = 0.001f;
         Vec2<float> normalized;
-        T length = this->length();
+        float length = sqrt(this->length());
         // Assume the vector length is zero if it is too small
         if (length > eps) {
             float inverse = 1.f / length;
@@ -122,6 +122,12 @@ template <typename T1, typename T2>
 auto operator- (const Vec2<T1> &a, const Vec2<T2> &b) -> Vec2<decltype(T1{} - T2{})>
 {
     return Vec2<decltype(T1{} - T2{})>(a.x - b.x, a.y - b.y);
+}
+
+template <typename T>
+auto operator-(const Vec2<T> &a) -> Vec2<decltype(-T())>
+{
+    return {-a.x, - a.y};
 }
 
 template <typename T1, typename T2>

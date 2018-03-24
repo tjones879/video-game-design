@@ -104,3 +104,19 @@ TYPED_TEST(Vec2Test, SupportsAbove)
     auto expected = this->vec1.x >= this->vec2.x && this->vec1.y >= this->vec2.y;
     EXPECT_EQ(expected, result);
 }
+
+TYPED_TEST(Vec2Test, SupportsNormalization)
+{
+    this->vec1.setVec(5, 10);
+    auto result = this->vec1.normalize();
+    float invLength = 1 / sqrt(this->vec1.length());
+    Vec2<float> expected = {this->vec1.x * invLength, this->vec1.y * invLength};
+    EXPECT_EQ(expected, result);
+}
+
+TYPED_TEST(Vec2Test, SupportsUnaryMinus)
+{
+    auto result = -this->vec1;
+    auto expected = Vec2<TypeParam>(-this->vec1.x, -this->vec1.y);
+    EXPECT_EQ(expected, result);
+}
