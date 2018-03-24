@@ -149,8 +149,10 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
         case Commands::DUCK:
             return duckCommand;
         case Commands::BACK:
+            addPlayerVel({-1,0});
             return moveCommand;
         case Commands::FORWARD:
+            addPlayerVel({1,0});
             return moveCommand;
         case Commands::ACTION:
             return actionCommand;
@@ -159,4 +161,18 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
         default:
             break;
     }
+}
+
+void EventHandler::setPlayer(phy::Body *bodyPtr){
+    /*
+    body
+    auto currVel = body->getLinearVelocity();
+    body->setLinearVelocity(currVel + {5, 0});
+    */
+    body = bodyPtr;
+}
+
+void EventHandler::addPlayerVel(Vec2<int> addVelocity){
+    auto currVel = body->getLinearVelocity();
+    body->setLinearVelocity(currVel + addVelocity);
 }

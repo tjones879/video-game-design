@@ -7,6 +7,8 @@
 #include <map>
 #include <queue>
 #include <iostream>
+#include <inc/vec2.hpp>
+#include <inc/physics/body.hpp>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -28,6 +30,7 @@ private:
     std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
+    phy::Body* body;
     Controller controller;
     class Command {
         public:
@@ -50,8 +53,8 @@ private:
     };
     class MoveCommand : public Command {
         public:
-          virtual void execute() const {
-              //Update object position
+          virtual void execute(Vec2<int> addVelocity) const {
+              
           }
     };
     class ActionCommand : public Command {
@@ -83,4 +86,6 @@ public:
     void addEvent(Command &newCommand);
     void executeEvents();
     Command *getCommandPtr(Commands cmd);
+    void setPlayer(phy::Body *bodyPtr);
+    void addPlayerVel(Vec2<int> addVelocity);
 };
