@@ -7,6 +7,8 @@
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
 
+#define DEBUG(e) std::cerr << e << std::endl;
+
 const int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
@@ -34,7 +36,10 @@ int main(int argc, char **args)
     auto shape2 = phy::PolygonShape(0.5f);
     shape2.setBox(Vec2<float>(50.0,50.0));
     auto body2 = world.createBody(spec);
-    auto shape_ptr2 = body2.lock()->addShape(shape2);    
+    auto shape_ptr2 = body2.lock()->addShape(shape2);
+    eventHandler.setPlayer(body2);
+
+    DEBUG(body2.getLinearVelocity());
 
     bool quit = false;
     SDL_Event e{};
