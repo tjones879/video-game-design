@@ -5,9 +5,49 @@
 TEST(sample_thread_case, sample_test)
 {
     ThreadManager manager;
-    manager.spawnThread("TEST", [](std::atomic<bool> *flag, int n){
-                std::cout << "n: " << n << std::endl;
+    auto fun = [](std::atomic<bool> *flag, ThreadManager * parent, int n) {
+                EXPECT_EQ(1, 1);
+            };
+    manager.spawnThread(fun, 5);
+}
+
+TEST(sample_thread_case, SupportsSendingMessages)
+{
+    struct TestMessage : Message {
+        int num;
+        TestMessage(int n) : num(n) {}
+        virtual MessageType getType() const override {
+            return MessageType::INVALID;
+        }
+    };
+    ThreadManager manager;
+    manager.spawnThread([](std::atomic<bool> *flag, ThreadManager *manager, int n) {
+                auto tmpMsg = std::make_unique<TestMessage>(5);
+                EXPECT_EQ(tmpMsg->num, 5);
+                manager->openBuffer("EXAMPLE");
+                manager->sendMessage("EXAMPLE", std::move(tmpMsg));
+                EXPECT_TRUE(!tmpMsg);
             }, 5);
-    sleep(0);
-    EXPECT_EQ(1, manager.threads.size());
+}
+
+TEST(sample_thread_case, SupportsGettingMessages)
+{
+    struct TestMessage : Message {
+        int num;
+        TestMessage() : num(-1) {}
+        TestMessage(int n) : num(n) {}
+        virtual MessageType getType() const override {
+            return MessageType::INVALID;
+        }
+    };
+    ThreadManager manager;
+    manager.spawnThread([](std::atomic<bool> *flag, ThreadManager *manager, int n) {
+                auto tmpMsg = std::make_unique<TestMessage>(5);
+                EXPECT_EQ(tmpMsg->num, 5);
+                manager->openBuffer("EXAMPLE");
+                manager->sendMessage("EXAMPLE", std::move(tmpMsg));
+                EXPECT_TRUE(!tmpMsg);
+                auto retMsg = manager->getMessage<TestMessage>("EXAMPLE");
+                EXPECT_EQ(retMsg->num, 5);
+            }, 5);
 }

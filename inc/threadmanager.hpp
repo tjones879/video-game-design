@@ -21,39 +21,52 @@ struct Message {
 class ThreadBuffer {
 private:
     std::mutex mut;
-    std::deque<Message> buffer;
+    std::deque<std::unique_ptr<Message>> buffer;
 public:
+    ThreadBuffer() = default;
+    ThreadBuffer(ThreadBuffer &&rhs)
+    {
+        std::lock_guard<std::mutex> lock(rhs.mut);
+        buffer = std::move(rhs.buffer);
+    }
+
     template <class T>
-    void addMessage(T&& msg)
+    void addMessage(std::unique_ptr<T>&& msg)
     {
         static_assert(std::is_base_of<Message, T>::value,
                       "MessageType must be derived from Message");
         std::lock_guard<std::mutex> lock(mut);
-        buffer.push_back(std::forward<T>(msg));
+        buffer.push_back(std::forward<std::unique_ptr<T>>(msg));
     }
 
     template <class T>
-    T getMessage()
+    std::unique_ptr<T> getMessage()
     {
+        std::unique_ptr<T> msg;
         static_assert(std::is_base_of<Message, T>::value,
                       "MessageType must be derived from Message");
-        T msg;
         {
             std::unique_lock<std::mutex> lock(mut);
             if (buffer.size() > 0) {
-                msg = static_cast<T>(buffer.back());
+                // Copy the unique ptr and unlock
+                auto uniqueMsg = std::move(buffer.back());
                 buffer.pop_back();
+                lock.unlock();
+
+                // Cast the ABC Message pointer to T.
+                auto msgPtr = dynamic_cast<T *>(uniqueMsg.get());
+                uniqueMsg.release();
+                msg.reset(msgPtr);
             }
         }
         return msg;
     }
 };
 
-template <typename... Ts>
 class ThreadManager {
+    std::map<std::thread::id, std::shared_ptr<std::thread>> threads;
+    std::map<std::string, std::pair<std::thread::id, ThreadBuffer>> buffers;
 public:
-    std::map<std::string, std::shared_ptr<std::thread>> threads;
-    std::map<std::string, ThreadBuffer> buffers;
     std::atomic<bool> stopThreads; ///< Denote whether or not we want to kill the program.
     ThreadManager() : stopThreads(false) {}
 
@@ -65,12 +78,33 @@ public:
     /**
      * Spawn a thread to be managed.
      */
-    template <class FunType, class... FunArgs>
-    void spawnThread(std::string tag, FunType &&function, FunArgs&&... args)
+    template <typename FunType, typename... FunArgs>
+    void spawnThread(FunType &&function, FunArgs&&... args)
     {
-        buffers.emplace(std::make_pair(tag, ThreadBuffer()));
-        auto thread = new std::thread(function, &stopThreads, std::forward<FunArgs>(args)...);
-        threads.emplace(std::make_pair(tag, thread));
+        auto thread = new std::thread(function,
+                                      &stopThreads,
+                                      this,
+                                      std::forward<FunArgs>(args)...);
+        auto threadID = thread->get_id();
+        threads.emplace(std::make_pair(threadID, thread));
+    }
+
+    void openBuffer(std::string tag)
+    {
+        std::thread::id id = std::this_thread::get_id();
+        buffers.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(tag),
+                        std::forward_as_tuple(std::make_pair(id, ThreadBuffer())));
+    }
+
+    void closeBuffer(std::string tag)
+    {
+        auto id = std::this_thread::get_id();
+        auto bufferLoc = buffers.find(tag);
+
+        if (bufferLoc != buffers.end() && id == bufferLoc->second.first) {
+            buffers.erase(bufferLoc);
+        }
     }
 
     void waitAll()
@@ -85,18 +119,22 @@ public:
     }
 
     template<typename T>
-    void sendMessage(std::string tag, T message)
+    void sendMessage(std::string tag, std::unique_ptr<T>&& message)
     {
-        // TODO: Denote some kind of error condition if tag was not found
         auto loc = buffers.find(tag);
         if (loc != buffers.end())
-            loc->second.addMessage(message);
+            loc->second.second.addMessage(std::move(message));
     }
 
     template<typename T>
-    T getMessage(std::string tag)
+    std::unique_ptr<T> getMessage(std::string tag)
     {
-        // TODO: Check to make sure that calling thread is correct one.
-        return T();
+        auto id = std::this_thread::get_id();
+        auto bufferLoc = buffers.find(tag);
+        if (bufferLoc != buffers.end() && id == bufferLoc->second.first) {
+            auto buffer = &bufferLoc->second.second;
+            return buffer->getMessage<T>();
+        }
+        return std::make_unique<T>();
     }
 };
