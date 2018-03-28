@@ -58,19 +58,19 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            eventStack.push(jumpCommand);
+            moveCommand->addCommand({0,-3});
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            eventStack.push(duckCommand);
+            moveCommand->addCommand({0,3});
             break;
         case Commands::BACK:
             DEBUG("Back");
-            eventStack.push(moveCommand);
+            moveCommand->addCommand({-3,0});
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            moveCommand->addCommand({1,0});
+            moveCommand->addCommand({3,0});
             break;
         case Commands::ACTION:
             DEBUG("Action");
@@ -167,8 +167,6 @@ void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
 }
 
 void EventHandler::addPlayerVel(Vec2<int> addVelocity){
-    DEBUG("Step3");
-    //auto currVel = body.getLinearVelocity();
-    DEBUG("Step4");
-    //body.setLinearVelocity(currVel + addVelocity);
+    auto currVel = body.lock()->getLinearVelocity();
+    body.lock()->setLinearVelocity(currVel + addVelocity);
 }

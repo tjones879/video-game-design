@@ -26,6 +26,7 @@ int main(int argc, char **args)
     }
 
     phy::World world(Vec2<float>(0, 0));
+    spec.position = {350,350}
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
     auto shape = phy::PolygonShape(0.5f);
@@ -33,19 +34,18 @@ int main(int argc, char **args)
     auto body = world.createBody(spec);
     auto shape_ptr = body.lock()->addShape(shape);
 
+    spec.position = {150,150};
     auto shape2 = phy::PolygonShape(0.5f);
     shape2.setBox(Vec2<float>(50.0,50.0));
     auto body2 = world.createBody(spec);
     auto shape_ptr2 = body2.lock()->addShape(shape2);
     eventHandler.setPlayer(body2);
 
-    DEBUG(body2.getLinearVelocity());
-
     bool quit = false;
     SDL_Event e{};
     while (!quit) {
         const int start = SDL_GetTicks();
-        //displayManager.displayPolygon(body, shape_ptr);
+        displayManager.displayPolygon(body, shape_ptr);
         displayManager.displayPolygon(body2, shape_ptr2);
         if (eventHandler.inputHandler(e) == 1)
             return 0;
