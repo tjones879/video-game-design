@@ -33,6 +33,7 @@ set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
 # Define all of our include paths
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/)
+include_directories(${SDL_MIXER_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/lib/sdl-gpu/include)
 
 enable_testing()
@@ -53,6 +54,10 @@ endif()
 
 # Create the actual game executable (./VGD) and link dependencies
 add_executable(VGD src/main.cpp)
-target_link_libraries(VGD ${SDL2_LIBRARIES} engine ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
+target_link_libraries(VGD
+    ${SDL2_LIBRARIES}
+    ${SDL_MIXER_LIBRARIES}
+    engine
+    ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
