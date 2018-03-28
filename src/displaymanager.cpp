@@ -56,3 +56,8 @@ void DisplayManager::displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr
     GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
     GPU_Flip(gpu);
 }
+
+void DisplayManager::addRenderable(std::unique_ptr<RenderMessage>&& msg)
+{
+    renderables.push_back(std::move(msg));
+}

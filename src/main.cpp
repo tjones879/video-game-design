@@ -1,21 +1,46 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "inc/vec2.hpp"
+#include "inc/threadmanager.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
 #include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
+#include <chrono>
 
-const int MIN_MILLISECONDS_PER_FRAME = 16;
+const std::chrono::milliseconds timePerFrame(16);
+
+void displayThings(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    DisplayManager displayManager("Test Window");
+    const std::string renderBuff("render");
+
+    if (!displayManager.isInitialized()) {
+        std::cout << "Display Manager failed" << std::endl;
+        return;
+    }
+    manager->openBuffer(renderBuff);
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+        while (manager->newMessages(renderBuff)) {
+            std::unique_ptr<RenderMessage> msg = manager->getMessage<RenderMessage>(renderBuff);
+            displayManager.addRenderable(std::move(msg));
+        }
+        displayManager.renderAll();
+        auto end = std::chrono::high_resolution_clock::now();
+        if (end - start < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - (end - start));
+    }
+}
+
+void makeSoundThings(std::atomic<bool> *quit, ThreadManager *manager)
+{
+}
 
 int main(int argc, char **args)
 {
-    DisplayManager displayManager("Test Window");
-    if (!displayManager.isInitialized()) {
-        std::cout << "Display Manager failed" << std::endl;
-        return 1;
-    }
+    ThreadManager threadManager;
 
     EventHandler eventHandler;
     if (!eventHandler.isInitialized()) {
@@ -34,20 +59,21 @@ int main(int argc, char **args)
     bool quit = false;
     SDL_Event e{};
     while (!quit) {
-        const int start = SDL_GetTicks();
-        displayManager.displayPolygon(body, shape_ptr);
+        auto start = std::chrono::high_resolution_clock::now();
         if (eventHandler.inputHandler(e) == 1)
             return 0;
         eventHandler.executeEvents();
 
         world.step();
-        std::cout << *body.lock();
 
         const int millisecondsThisFrame = SDL_GetTicks() - start;
         if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
             // If rendering faster than 60FPS, delay
             SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
         }
+        auto end = std::chrono::high_resolution_clock::now();
+        if (end - start < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - (end - start));
     }
     return 0;
 }
