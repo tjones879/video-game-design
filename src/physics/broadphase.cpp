@@ -63,7 +63,6 @@ void BroadPhase::updatePairs()
 
 bool BroadPhase::registerCollision(const AABB &a, int32_t nodeID)
 {
-    std::cout << "Collision with: " << a << "Index: " << nodeID << std::endl;
     return true;
 }
 } /* namespace phy */
