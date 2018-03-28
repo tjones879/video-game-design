@@ -17,7 +17,7 @@ auto BroadPhase::findShape(const std::weak_ptr<const Shape> &shape)
         return std::make_pair(false, pos);
 }
 
-void BroadPhase::addNewBody(const Body *body)
+void BroadPhase::addNewBody(const std::shared_ptr<Body> body)
 {
     const auto transform = body->getTransform();
     for (auto shape : body->getShapes()) {
@@ -26,7 +26,7 @@ void BroadPhase::addNewBody(const Body *body)
     }
 }
 
-void BroadPhase::updateBody(const Body *updatedBody)
+void BroadPhase::updateBody(const std::shared_ptr<Body> updatedBody)
 {
     const auto transform = updatedBody->getTransform();
     for (auto shape : updatedBody->getShapes()) {
@@ -43,7 +43,7 @@ void BroadPhase::updateBody(const Body *updatedBody)
     }
 }
 
-void BroadPhase::deleteBody(const Body *deletedBody)
+void BroadPhase::deleteBody(const std::shared_ptr<Body> deletedBody)
 {
     for (auto shape : deletedBody->getShapes()) {
         auto find = findShape(shape);

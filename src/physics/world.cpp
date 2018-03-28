@@ -19,7 +19,7 @@ std::weak_ptr<Body> World::createBody(const BodySpec &spec)
     // TODO: Synchronize to avoid data race.
     auto bodyPtr = std::make_shared<Body>(spec);
     bodyList.push_back(bodyPtr);
-    broadPhase.addNewBody(bodyPtr.get());
+    broadPhase.addNewBody(bodyPtr);
     return bodyPtr;
 }
 
@@ -28,7 +28,7 @@ void World::destroyBody(const std::weak_ptr<Body> &body)
     // TODO: Synchronize to avoid data race
     auto result = std::find(std::begin(bodyList), std::end(bodyList), body.lock());
     if (result != std::end(bodyList)) {
-        broadPhase.deleteBody(body.lock().get());
+        broadPhase.deleteBody(body.lock());
         bodyList.erase(result);
     }
 }
@@ -59,16 +59,18 @@ void World::step()
 
     // TODO: Update all contacts
     // Integrate velocities
-    for (const auto &body : bodyList)
+    for (const auto body : bodyList)
         body->updateVelocity(dt, gravity);
 
     // TODO: Resolve velocity constraints
     // Integrate positions
-    for (const auto &body : bodyList) {
+    for (const auto body : bodyList) {
        body->updatePosition(dt);
+       broadPhase.updateBody(body);
     }
 
     // TODO: Resolve position constraints
+    broadPhase.updatePairs();
 
     // TODO: Synchronize shapes for broad-phase
     // TODO: Handle TOI
