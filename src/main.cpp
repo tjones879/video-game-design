@@ -7,22 +7,12 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
-#define WAV_PATH "assests/scratch.wav"
+#define WAV_PATH "assets/scratch.wav"
 Mix_Chunk *wave = NULL;
 const int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
 {
-
-    //Initialize SDL_mixer 
-    if( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 ) == -1 ) 
-        return -1; 
-    
-    // Load our sound effect
-    wave = Mix_LoadWAV(WAV_PATH);
-    if (wave == NULL)
-        return -1;
-
     DisplayManager displayManager("Test Window");
     if (!displayManager.isInitialized()) {
         std::cout << "Display Manager failed" << std::endl;
@@ -33,6 +23,19 @@ int main(int argc, char **args)
     if (!eventHandler.isInitialized()) {
         std::cout << "EventHandler failed" << std::endl;
         return 1;
+    }
+
+    //Initialize SDL_mixer 
+    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+        std::cout << "Error in Mix_OpenAudio" << std::endl;
+        return -1;
+    }
+
+    // Load our sound effect
+    wave = Mix_LoadWAV("assets/scratch.wav");
+    if (wave == NULL) {
+        std::cout << "Error in Mix_LoadWAV" << std::endl;
+        return -1;
     }
 
     phy::World world(Vec2<float>(5, 9.8));
