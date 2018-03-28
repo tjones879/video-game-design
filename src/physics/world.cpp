@@ -66,11 +66,9 @@ void World::step()
     // Integrate positions
     for (const auto &body : bodyList) {
        body->updatePosition(dt);
-       broadPhase.updateBody(body.get());
     }
 
     // TODO: Resolve position constraints
-    broadPhase.updatePairs();
 
     // TODO: Synchronize shapes for broad-phase
     // TODO: Handle TOI

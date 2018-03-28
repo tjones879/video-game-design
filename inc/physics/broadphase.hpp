@@ -29,6 +29,7 @@ public:
     void deleteBody(const Body *deletedBody);
     void updatePairs();
     virtual bool registerCollision(const AABB &a, int32_t nodeID) override;
+    void printTree(std::ostream &out);
 private:
     /**
      * Attempt to find the position of a shape being managed.

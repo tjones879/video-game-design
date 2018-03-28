@@ -65,4 +65,9 @@ bool BroadPhase::registerCollision(const AABB &a, int32_t nodeID)
 {
     return true;
 }
+
+void BroadPhase::printTree(std::ostream &out)
+{
+    out << tree;
+}
 } /* namespace phy */
