@@ -18,15 +18,15 @@ public:
     /**
      * Insert a new body and all of its shapes to the broadphase manager.
      */
-    void addNewBody(const Body *body);
+    void addNewBody(const std::shared_ptr<Body> body);
     /**
      * Update the position of a shape.
      */
-    void updateBody(const Body *updatedBody);
+    void updateBody(const std::shared_ptr<Body> updatedBody);
     /**
      * Remove a body from any future broadphase calculations.
      */
-    void deleteBody(const Body *deletedBody);
+    void deleteBody(const std::shared_ptr<Body> deletedBody);
     void updatePairs();
     virtual bool registerCollision(const AABB &a, int32_t nodeID) override;
     void printTree(std::ostream &out);
