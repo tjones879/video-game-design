@@ -7,7 +7,7 @@
 DisplayManager::DisplayManager(const std::string &title)
     : initialized(false), window(nullptr), gpu(&window)
 {
-    if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0) {
         std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return;
     }

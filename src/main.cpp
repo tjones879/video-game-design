@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include "inc/vec2.hpp"
 #include "inc/eventhandler.hpp"
@@ -6,11 +7,22 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
-
+#define WAV_PATH "assests/scratch.wav"
+Mix_Chunk *wave = NULL;
 const int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
 {
+
+    //Initialize SDL_mixer 
+    if( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 ) == -1 ) 
+        return -1; 
+    
+    // Load our sound effect
+    wave = Mix_LoadWAV(WAV_PATH);
+    if (wave == NULL)
+        return -1;
+
     DisplayManager displayManager("Test Window");
     if (!displayManager.isInitialized()) {
         std::cout << "Display Manager failed" << std::endl;
@@ -51,7 +63,8 @@ int main(int argc, char **args)
     std::vector<std::weak_ptr<phy::PolygonShape>> shapes;
     shapes.push_back(shape_ptr);
     shapes.push_back(shape_ptr1);
-
+    if ( Mix_PlayChannel(-1, wave, 0) == -1 )
+        return -1;
     bool quit = false;
     SDL_Event e{};
     while (!quit) {
