@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.2)
 project(VGD)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 # Make sure that SDL2 is installed on the machine.
 find_package(SDL2 REQUIRED)
+find_package(SDL2_Mixer REQUIRED)
 
 # Attempt to compile the sdl-gpu library
 # Do not compile components that we do not need
