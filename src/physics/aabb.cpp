@@ -252,7 +252,7 @@ void AABBTree::remove(int32_t index)
     if (nodes[parent].leftChild == index)
         sibling = nodes[parent].rightChild;
     else
-        sibling = nodes[grandParent].leftChild;
+        sibling = nodes[parent].leftChild;
 
     if (grandParent != AABBNode::null) {
         if (nodes[grandParent].leftChild == parent)
