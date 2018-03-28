@@ -7,6 +7,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 # Make sure that SDL2 is installed on the machine.
 find_package(SDL2 REQUIRED)
 find_package(SDL2_Mixer REQUIRED)
+if (${SDL2_MIXER_FOUND})
+    message(STATUS ${SDL2_MIXER_LIBRARIES})
+endif()
 
 # Attempt to compile the sdl-gpu library
 # Do not compile components that we do not need
@@ -33,7 +36,7 @@ set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
 # Define all of our include paths
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/)
-include_directories(${SDL_MIXER_INCLUDE_DIRS})
+include_directories(${SDL2_MIXER_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/lib/sdl-gpu/include)
 
 enable_testing()
@@ -56,8 +59,8 @@ endif()
 add_executable(VGD src/main.cpp)
 target_link_libraries(VGD
     ${SDL2_LIBRARIES}
-    ${SDL_MIXER_LIBRARIES}
     engine
-    ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
+    ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so
+    ${SDL2_MIXER_LIBRARIES})
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
