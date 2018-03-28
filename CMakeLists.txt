@@ -5,6 +5,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Make sure that SDL2 is installed on the machine.
 find_package(SDL2 REQUIRED)
 
+find_package(Threads REQUIRED)
+
 # Attempt to compile the sdl-gpu library
 # Do not compile components that we do not need
 set (SDL_gpu_BUILD_DEMOS OFF)
@@ -50,6 +52,6 @@ endif()
 
 # Create the actual game executable (./VGD) and link dependencies
 add_executable(VGD src/main.cpp)
-target_link_libraries(VGD ${SDL2_LIBRARIES} engine ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
+target_link_libraries(VGD ${CMAKE_THREAD_LIBS_INIT} ${SDL2_LIBRARIES} engine ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so)
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
