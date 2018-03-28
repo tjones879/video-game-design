@@ -6,10 +6,7 @@ namespace phy {
 Body::Body(const BodySpec &spec)
     : extraData(nullptr)
 {
-    bodySweep.center0 = spec.position;
-    bodySweep.center = spec.position;
-    bodySweep.angle = spec.angle;
-    bodySweep.angle0 = spec.angle;
+    position = spec.position;
 
     angle = spec.angle;
 
@@ -179,6 +176,11 @@ void Body::clearForces()
     torque = 0.0f;
 }
 
+Transform Body::getTransform() const
+{
+    return Transform(position, angle);
+}
+
 void Body::updateMassProperties()
 {
     mass = 0.0f;
@@ -204,22 +206,11 @@ void Body::setExtraData(void *data)
     extraData = data;
 }
 
-/*
-std::vector<Transform> Body::getShapePositions() const
-{
-    transforms.reserve(shapeList.size());
-    for (const auto &shape : shapeList) {
-        transforms.emplace_back(std::make_pair(shape, ));
-    }
-
-}
-*/
-
 std::ostream& operator<<(std::ostream &out, const Body &body)
 {
     out << "linVel: " << body.linearVelocity
         << ", pos: " << body.position << std::endl;
-    for (auto shape : body.shapeList)
+    for (const auto &shape : body.shapeList)
         out << *shape;
     return out;
 }
