@@ -21,13 +21,15 @@ void displayThings(std::atomic<bool> *quit, ThreadManager *manager)
         return;
     }
     manager->openBuffer(renderBuff);
+
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
         while (manager->newMessages(renderBuff)) {
             std::unique_ptr<RenderMessage> msg = manager->getMessage<RenderMessage>(renderBuff);
             displayManager.addRenderable(std::move(msg));
         }
-        displayManager.renderAll();
+
+        //displayManager.renderAll();
         auto end = std::chrono::high_resolution_clock::now();
         if (end - start < timePerFrame)
             std::this_thread::sleep_for(timePerFrame - (end - start));
@@ -66,14 +68,9 @@ int main(int argc, char **args)
 
         world.step();
 
-        const int millisecondsThisFrame = SDL_GetTicks() - start;
-        if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
-            // If rendering faster than 60FPS, delay
-            SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        if (end - start < timePerFrame)
-            std::this_thread::sleep_for(timePerFrame - (end - start));
+        auto dt = std::chrono::high_resolution_clock::now() - start;
+        if (dt < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - dt);
     }
     return 0;
 }

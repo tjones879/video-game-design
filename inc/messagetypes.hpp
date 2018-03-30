@@ -1,6 +1,6 @@
 #pragma once
 
-namespace 
+#include "inc/physics/polygon.hpp"
 
 enum class MessageType : char {
     Render,
@@ -12,6 +12,7 @@ struct Message {
 };
 
 struct RenderMessage : Message {
+    std::unique_ptr<std::vector<phy::PolygonShape>> shapes;
     virtual MessageType getType() const override {
         return MessageType::Render;
     }

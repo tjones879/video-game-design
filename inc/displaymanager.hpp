@@ -27,6 +27,6 @@ public:
     bool isInitialized() const;
     operator SDL_Window*() const;
     void displayAll();
-    //void displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr<phy::PolygonShape> shape);
+    void displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr<phy::PolygonShape> shape);
     void addRenderable(std::unique_ptr<RenderMessage>&& msg);
 };
