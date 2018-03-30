@@ -57,7 +57,6 @@ int main(int argc, char **args)
         if (eventHandler.inputHandler(e) == 1)
             return 0;
         eventHandler.executeEvents();
-
         world.step();
 
         const int millisecondsThisFrame = SDL_GetTicks() - start;

@@ -137,7 +137,6 @@ void EventHandler::addEvent(Command &newCommand){
 
 void EventHandler::executeEvents(){
     while (!eventStack.empty()) {
-        DEBUG("Step2");
         eventStack.front()->execute();
         eventStack.pop();
     }
