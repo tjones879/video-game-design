@@ -166,6 +166,7 @@ void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
 }
 
 void EventHandler::addPlayerVel(Vec2<int> addVelocity){
-    auto currVel = body.lock()->getLinearVelocity();
-    body.lock()->setLinearVelocity(currVel + addVelocity);
+    auto locked = body.lock();
+    auto currVel = locked->getLinearVelocity();
+    locked->setLinearVelocity(currVel + addVelocity);
 }
