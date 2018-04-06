@@ -1,7 +1,10 @@
 #pragma once
 
 #include "inc/controller.hpp"
+#include "inc/sound.hpp"
+#include <SDL2/SDL_mixer.h>
 
+#define WAV_PATH "assets/scratch.wav"
 #include <SDL2/SDL.h>
 #include <array>
 #include <map>
@@ -35,9 +38,11 @@ private:
           virtual void execute() const = 0;
     };
     class JumpCommand : public Command {
+      Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
         public:
           virtual void execute() const {
               DEBUG("Execute Jump");
+              effect->playSound();
               //jump();
               return;
           }

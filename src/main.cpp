@@ -7,8 +7,10 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
+#include "inc/sound.hpp"
+#include "sound.cpp"
 #define WAV_PATH "assets/scratch.wav"
-Mix_Chunk *wave = NULL;
+//Mix_Chunk *wave = NULL;
 const int MIN_MILLISECONDS_PER_FRAME = 16;
 
 int main(int argc, char **args)
@@ -18,6 +20,9 @@ int main(int argc, char **args)
         std::cout << "Display Manager failed" << std::endl;
         return 1;
     }
+    Sound::init();
+
+    Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
 
     EventHandler eventHandler;
     if (!eventHandler.isInitialized()) {
@@ -26,17 +31,19 @@ int main(int argc, char **args)
     }
 
     //Initialize SDL_mixer 
-    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-        std::cout << "Error in Mix_OpenAudio" << std::endl;
-        return -1;
-    }
+    //if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+        //std::cout << "Error in Mix_OpenAudio" << std::endl;
+        //return -1;
+    //
+
+
 
     // Load our sound effect
-    wave = Mix_LoadWAV("assets/scratch.wav");
-    if (wave == NULL) {
-        std::cout << "Error in Mix_LoadWAV" << std::endl;
-        return -1;
-    }
+    //wave = Mix_LoadWAV("assets/scratch.wav");
+    //if (wave == NULL) {
+        //std::cout << "Error in Mix_LoadWAV" << std::endl;
+        //return -1;
+    //}
 
     phy::World world(Vec2<float>(5, 9.8));
 
@@ -66,8 +73,9 @@ int main(int argc, char **args)
     std::vector<std::weak_ptr<phy::PolygonShape>> shapes;
     shapes.push_back(shape_ptr);
     shapes.push_back(shape_ptr1);
-    if ( Mix_PlayChannel(-1, wave, 0) == -1 )
-        return -1;
+    //if ( Mix_PlayChannel(-1, wave, 0) == -1 )
+        //return -1;
+    effect->playSound();
     bool quit = false;
     SDL_Event e{};
     while (!quit) {

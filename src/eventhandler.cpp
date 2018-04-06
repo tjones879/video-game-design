@@ -1,8 +1,10 @@
 #include <inc/eventhandler.hpp>
+#include <inc/sound.hpp>
 #include <iostream>
 #include <cstdio>
 
 #define DEBUG(e) std::cerr << e << std::endl;
+
 
 void EventHandler::initButtonMapping()
 {
@@ -54,6 +56,7 @@ EventHandler::~EventHandler(){
 
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
+
     if (pressed && !commandState[static_cast<char>(command)]) {
         switch (command) {
         case Commands::JUMP:
