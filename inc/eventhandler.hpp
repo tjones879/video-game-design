@@ -52,10 +52,20 @@ private:
           }
     };
     class MoveCommand : public Command {
-        public:
-          virtual void execute(Vec2<int> addVelocity) const {
-              
-          }
+      private:
+        Vec2<int> addVelocity;
+        EventHandler* eventHandler;
+      public:
+        MoveCommand(EventHandler* eventhandler){
+          eventHandler = eventhandler;
+        }
+        void addCommand(Vec2<int> addVel) {
+          addVelocity = addVel;
+          eventHandler->eventStack.push(eventHandler->moveCommand);
+        }
+        virtual void execute() const override {
+          eventHandler->addPlayerVel(addVelocity);
+        }
     };
     class ActionCommand : public Command {
         public:
