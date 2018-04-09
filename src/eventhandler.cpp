@@ -34,7 +34,7 @@ EventHandler::EventHandler(){
     duckCommand = new DuckCommand;
     specialCommand = new SpecialCommand;
     actionCommand = new ActionCommand;
-    moveCommand = new MoveCommand;
+    moveCommand = new MoveCommand(this);
     jumpCommand = new JumpCommand;
 
     // Temporarily open the first joystick to the controller if it exists
@@ -58,19 +58,19 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            eventStack.push(jumpCommand);
+            moveCommand->addCommand({0,-6});
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            eventStack.push(duckCommand);
+            moveCommand->addCommand({0,6});
             break;
         case Commands::BACK:
             DEBUG("Back");
-            eventStack.push(moveCommand);
+            moveCommand->addCommand({-6,0});
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            eventStack.push(moveCommand);
+            moveCommand->addCommand({6,0});
             break;
         case Commands::ACTION:
             DEBUG("Action");
@@ -163,7 +163,7 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
     }
 }
 
-void EventHandler::setPlayer(phy::Body *bodyPtr){
+void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     /*
     body
     auto currVel = body->getLinearVelocity();
@@ -173,6 +173,6 @@ void EventHandler::setPlayer(phy::Body *bodyPtr){
 }
 
 void EventHandler::addPlayerVel(Vec2<int> addVelocity){
-    auto currVel = body->getLinearVelocity();
-    body->setLinearVelocity(currVel + addVelocity);
+    auto currVel = body.lock()->getLinearVelocity();
+    body.lock()->setLinearVelocity(currVel + addVelocity);
 }

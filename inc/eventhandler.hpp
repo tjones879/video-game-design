@@ -30,7 +30,7 @@ private:
     std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
-    phy::Body* body;
+    std::weak_ptr<phy::Body> body;
     Controller controller;
     class Command {
         public:
@@ -96,6 +96,6 @@ public:
     void addEvent(Command &newCommand);
     void executeEvents();
     Command *getCommandPtr(Commands cmd);
-    void setPlayer(phy::Body *bodyPtr);
+    void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
     void addPlayerVel(Vec2<int> addVelocity);
 };

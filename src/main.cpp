@@ -29,7 +29,7 @@ int main(int argc, char **args)
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
-    spec.position = {100, 100};
+    spec.position = {200, 200};
     spec.gravityFactor = 1;
     auto shape = phy::PolygonShape(1.0f);
     shape.setBox(Vec2<float>(25, 25));

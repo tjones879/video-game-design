@@ -19,6 +19,8 @@ private:
     GPUTarget gpu;
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
+    GPU_Camera camera;
+    void setCamera(Vec2<float> playerVel, Vec2<float> playerPos, Vec2<float> enemyVel, Vec2<float> enemyPos);
 public:
     DisplayManager(const std::string &title);
     ~DisplayManager();
