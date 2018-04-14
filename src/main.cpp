@@ -38,10 +38,10 @@ int main(int argc, char **args)
 
     spec.position = {150,150};
     auto shape2 = phy::PolygonShape(0.5f);
-    shape2.setBox(Vec2<float>(50.0,50.0));
+    shape2.setBox(Vec2<float>(40.0,40.0));
     auto body2 = world.createBody(spec);
     auto shape_ptr2 = body2.lock()->addShape(shape2);
-    eventHandler.setPlayer(body2);
+    eventHandler.setPlayer(body);
     std::vector<std::weak_ptr<phy::Body>> bodies;
     bodies.push_back(body);
     bodies.push_back(body2);

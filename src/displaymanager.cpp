@@ -19,6 +19,10 @@ DisplayManager::DisplayManager(const std::string &title)
         SDL_SetWindowTitle(window, title.c_str());
         initialized = true;
     }
+    playerColor.r = 1;
+    playerColor.g = 2;
+    playerColor.b = 3;
+    playerColor.a = 255;
     camera = GPU_GetCamera(gpu);
     GPU_EnableCamera(gpu, true);
     camera.x = 150 - (SCREEN_HEIGHT/2);
@@ -47,10 +51,9 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
                                     const std::vector<std::weak_ptr<phy::PolygonShape>> &shapes)
 {
     GPU_Clear(gpu);
-    SDL_Color color{};
     color.r = 0;
-    color.g = 0;
-    color.b = 255;
+    color.g = 125;
+    color.b = 125;
     color.a = 255;
 
 
@@ -60,7 +63,7 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
         auto offset = body.lock()->getPosition();
         auto vel = body.lock()->getLinearVelocity();
         //std::cout << offset.x << ' ' << i << std::endl;
-        setCamera(bodies[1].lock()->getLinearVelocity(),bodies[1].lock()->getPosition(),bodies[0].lock()->getLinearVelocity(),bodies[0].lock()->getPosition());
+        setCamera(bodies[0].lock()->getLinearVelocity(),bodies[0].lock()->getPosition(),bodies[1].lock()->getLinearVelocity(),bodies[1].lock()->getPosition());
 
         std::vector<float> vertices;
         vertices.reserve(shape.lock()->vertices.size() * 2);
@@ -68,7 +71,11 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
             vertices.push_back(v.x + offset.x);
             vertices.push_back(v.y + offset.y);
         }
-        GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
+        if(i==0){
+            setPlayerColor();
+            GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], playerColor);
+        }else
+            GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
     }
     GPU_Flip(gpu);
 }
@@ -86,7 +93,6 @@ void DisplayManager::setCamera(const Vec2<float> playerVel,
         camera.y = (playerPos.y - (SCREEN_HEIGHT/4));
     if(playerPos.y > (camera.y + (3*SCREEN_HEIGHT/4)))
         camera.y = (playerPos.y - (3*SCREEN_HEIGHT/4));
-    
     //This zooms the camera based on the enemy
     if(camera.zoom <= 1.5 && camera.zoom >= 0.5){
         if(enemyPos.x < (camera.x + (SCREEN_WIDTH/4))){
@@ -111,4 +117,25 @@ void DisplayManager::setCamera(const Vec2<float> playerVel,
         }
     }
     GPU_SetCamera(gpu, &camera);
+}
+
+void DisplayManager::setPlayerColor(){
+    if ( playerColor.r == 255 || playerColor.r == 0)
+        r = !r;
+    if ( playerColor.g == 254 || playerColor.g == 0)
+        g = !g;
+    if ( playerColor.b == 255 || playerColor.b == 0)
+        b = !b;
+    if ( !r )
+        playerColor.r += 1;
+    if ( !g )
+        playerColor.g += 2;
+    if ( !b )
+        playerColor.b += 3;
+    if ( r )
+        playerColor.r -= 1;
+    if ( g )
+        playerColor.g -= 2;
+    if ( b )
+        playerColor.b -= 3;
 }

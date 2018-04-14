@@ -20,6 +20,9 @@ private:
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
     GPU_Camera camera;
+    SDL_Color color{};
+    SDL_Color playerColor{};
+    bool r = false, g = false, b = false;
     void setCamera(Vec2<float> playerVel, Vec2<float> playerPos, Vec2<float> enemyVel, Vec2<float> enemyPos);
 public:
     DisplayManager(const std::string &title);
@@ -28,4 +31,5 @@ public:
     operator SDL_Window*() const;
     void displayPolygon(const std::vector<std::weak_ptr<phy::Body>> &bodies,
                         const std::vector<std::weak_ptr<phy::PolygonShape>> &shapes);
+    void setPlayerColor();
 };
