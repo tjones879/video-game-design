@@ -2,6 +2,7 @@
 #include <inc/sound.hpp>
 #include <iostream>
 #include <cstdio>
+#define WAV_PATH "assets/high.wav"
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -56,11 +57,12 @@ EventHandler::~EventHandler(){
 
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
-
+    Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
     if (pressed && !commandState[static_cast<char>(command)]) {
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
+            effect->playSound(0);
             eventStack.push(jumpCommand);
             break;
         case Commands::DUCK:

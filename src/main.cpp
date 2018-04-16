@@ -9,7 +9,8 @@
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
 #include "sound.cpp"
-#define WAV_PATH "assets/scratch.wav"
+#define WAV_PATH "assets/beat.wav"
+
 //Mix_Chunk *wave = NULL;
 const int MIN_MILLISECONDS_PER_FRAME = 16;
 
@@ -75,7 +76,9 @@ int main(int argc, char **args)
     shapes.push_back(shape_ptr1);
     //if ( Mix_PlayChannel(-1, wave, 0) == -1 )
         //return -1;
-    effect->playSound();
+
+    Sound* music = new Sound(WAV_PATH, SOUND_MUSIC);
+    music->playSound(127);
     bool quit = false;
     SDL_Event e{};
     while (!quit) {
