@@ -42,7 +42,9 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
-    auto shape = phy::PolygonShape(0.5f);
+    spec.position = {100, 100};
+    spec.gravityFactor = 1;
+    auto shape = phy::PolygonShape(1.0f);
     shape.setBox(Vec2<float>(25, 25));
     auto body = world.createBody(spec);
     auto shape_ptr = body.lock()->addShape(shape);

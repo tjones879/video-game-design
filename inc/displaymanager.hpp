@@ -27,7 +27,6 @@ public:
     bool isInitialized() const;
     operator SDL_Window*() const;
     void displayAll();
-    void displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr<phy::PolygonShape> shape);
     inline std::vector<float> toFloatVector(const phy::PolygonShape &shape, const phy::Transform &offset);
     void addRenderable(std::unique_ptr<RenderMessage>&& msg);
 };

@@ -65,7 +65,7 @@ public:
     {
         const float eps = 0.001f;
         Vec2<float> normalized;
-        T length = this->length();
+        float length = sqrt(this->length());
         // Assume the vector length is zero if it is too small
         if (length > eps) {
             float inverse = 1.f / length;
@@ -74,6 +74,28 @@ public:
         }
 
         return normalized;
+    }
+
+    /**
+     * Test whether the Vec2 a is below Vec2 b.
+     *
+     * @return True iff the directions of a are <= the directions of b.
+     */
+    template <typename T1>
+    bool below(const Vec2<T1> &b) const
+    {
+        return (x <= b.x) && (y <= b.y);
+    }
+
+    /**
+     * Test whether the Vec2 a is above Vec2 b.
+     *
+     * @return True iff the directions of a are >= the directions of b.
+     */
+    template <typename T1>
+    bool above(const Vec2<T1> &b) const
+    {
+        return (x >= b.x) && (y >= b.y);
     }
 };
 
@@ -91,15 +113,55 @@ auto operator* (const Vec2<T1> &vec, T2 scalar) -> Vec2<decltype(T1{} * T2{})>
 }
 
 template <typename T1, typename T2>
-auto operator- (const Vec2<T1>& a, const Vec2<T2>& b) -> Vec2<decltype(T1{} - T2{})>
+auto operator* (T2 scalar, const Vec2<T1> &vec) -> Vec2<decltype(T1{} * T2{})>
+{
+    return vec * scalar;
+}
+
+template <typename T1, typename T2>
+auto operator- (const Vec2<T1> &a, const Vec2<T2> &b) -> Vec2<decltype(T1{} - T2{})>
 {
     return Vec2<decltype(T1{} - T2{})>(a.x - b.x, a.y - b.y);
 }
 
+template <typename T>
+auto operator-(const Vec2<T> &a) -> Vec2<decltype(-T())>
+{
+    return {-a.x, - a.y};
+}
+
 template <typename T1, typename T2>
-auto operator/ (const Vec2<T1>& a, const Vec2<T2>& b) -> Vec2<decltype(T1{} / T2{})>
+auto operator/ (const Vec2<T1> &a, const Vec2<T2> &b) -> Vec2<decltype(T1{} / T2{})>
 {
     return Vec2<decltype(T1{} / T2{})>(a.x / b.x, a.y / b.y);
+}
+
+template <typename T>
+bool operator== (const Vec2<T> &a, const Vec2<T> &b)
+{
+    return (a.x == b.x) && (a.y == b.y);
+}
+
+/**
+ * Calculate the minimum values for each direction in the Vec2.
+ *
+ * @return Returns the minimum x and minimum y in the form of a Vec2<T>.
+ */
+template <typename T>
+Vec2<T> minValues(const Vec2<T>& a, const Vec2<T>& b)
+{
+    return Vec2<T>(std::min(a.x, b.x), std::min(a.y, b.y));
+}
+
+/**
+ * Calculate the maximum values for each direction in the Vec2.
+ *
+ * @return Returns the maximum x and maximum y in the form of a Vec2<T>.
+ */
+template <typename T>
+Vec2<T> maxValues(const Vec2<T>& a, const Vec2<T>& b)
+{
+    return Vec2<T>(std::max(a.x, b.x), std::max(a.y, b.y));
 }
 
 /**

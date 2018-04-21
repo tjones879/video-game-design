@@ -6,10 +6,7 @@ namespace phy {
 Body::Body(const BodySpec &spec)
     : extraData(nullptr)
 {
-    bodySweep.center0 = spec.position;
-    bodySweep.center = spec.position;
-    bodySweep.angle = spec.angle;
-    bodySweep.angle0 = spec.angle;
+    position = spec.position;
 
     angle = spec.angle;
 
@@ -212,7 +209,7 @@ std::ostream& operator<<(std::ostream &out, const Body &body)
 {
     out << "linVel: " << body.linearVelocity
         << ", pos: " << body.position << std::endl;
-    for (auto shape : body.shapeList)
+    for (const auto &shape : body.shapeList)
         out << *shape;
     return out;
 }
