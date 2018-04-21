@@ -94,7 +94,7 @@ public:
      *
      *
      */
-    RenderMessage getObjects();
+    std::unique_ptr<RenderMessage> getObjects();
 
 private:
     float updateTime();

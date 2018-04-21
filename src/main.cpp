@@ -12,7 +12,7 @@
 const std::chrono::milliseconds timePerFrame(16);
 const std::string renderBuff("render");
 
-void displayThings(std::atomic<bool> *quit, ThreadManager *manager)
+void display(std::atomic<bool> *quit, ThreadManager *manager)
 {
     DisplayManager displayManager("Test Window");
 
@@ -25,7 +25,7 @@ void displayThings(std::atomic<bool> *quit, ThreadManager *manager)
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
         while (manager->newMessages(renderBuff)) {
-            std::unique_ptr<RenderMessage> msg = manager->getMessage<RenderMessage>(renderBuff);
+            auto&& msg = manager->getMessage<RenderMessage>(renderBuff);
             displayManager.addRenderable(std::move(msg));
         }
 
@@ -51,7 +51,7 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
         auto start = std::chrono::high_resolution_clock::now();
 
         world.step();
-        manager->sendMessage(renderBuff, <#std::unique_ptr<T> &&message#>);
+        manager->sendMessage(renderBuff, std::move(world.getObjects()));
 
         auto dt = std::chrono::high_resolution_clock::now() - start;
         if (dt < timePerFrame)
@@ -63,29 +63,25 @@ int main(int argc, char **args)
 {
     ThreadManager threadManager;
 
+    threadManager.spawnThread(display);
+    threadManager.spawnThread(physics);
+
     EventHandler eventHandler;
     if (!eventHandler.isInitialized()) {
         std::cout << "EventHandler failed" << std::endl;
         return 1;
     }
 
-    phy::World world(Vec2<float>(5, 9.8));
-    phy::BodySpec spec;
-    spec.bodyType = phy::BodyType::dynamicBody;
-    auto shape = phy::PolygonShape(0.5f);
-    shape.setBox(Vec2<float>(25, 25));
-    auto body = world.createBody(spec);
-    auto shape_ptr = body.lock()->addShape(shape);
-
     bool quit = false;
     SDL_Event e{};
     while (!quit) {
         auto start = std::chrono::high_resolution_clock::now();
-        if (eventHandler.inputHandler(e) == 1)
+        if (eventHandler.inputHandler(e) == 1) {
+            threadManager.waitAll();
             return 0;
-        eventHandler.executeEvents();
+        }
 
-        world.step();
+        eventHandler.executeEvents();
 
         auto dt = std::chrono::high_resolution_clock::now() - start;
         if (dt < timePerFrame)

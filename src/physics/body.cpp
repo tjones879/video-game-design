@@ -169,6 +169,7 @@ void Body::updatePosition(float dt)
     float rotation = angularVelocity * dt;
     position += translation;
     angle += rotation;
+    transform = Transform(position, angle);
 }
 
 void Body::clearForces()
@@ -202,16 +203,10 @@ void Body::setExtraData(void *data)
     extraData = data;
 }
 
-/*
-std::vector<Transform> Body::getShapePositions() const
+Transform Body::getTransform() const
 {
-    transforms.reserve(shapeList.size());
-    for (const auto &shape : shapeList) {
-        transforms.emplace_back(std::make_pair(shape, ));
-    }
-
+    return transform;
 }
-*/
 
 std::ostream& operator<<(std::ostream &out, const Body &body)
 {

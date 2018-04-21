@@ -51,6 +51,7 @@ private:
     std::vector<std::shared_ptr<Shape>> shapeList;
     Sweep bodySweep;
     float gravityFactor; ///< This factor must be a positive nonzero value
+    Transform transform;
     friend class World;
 public:
     Body(const BodySpec &spec);
@@ -152,8 +153,8 @@ public:
 
     /**
      * Get the transformation needed to convert local shapes to global coords.
-    std::vector<Transform> getShapePositions() const;
      */
+    Transform getTransform() const;
 private:
     /**
      * Recalculate all mass and inertia characteristics of this body.
