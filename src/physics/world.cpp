@@ -92,4 +92,16 @@ void World::setPositionIterations(uint8_t iterations)
 {
     positionIterations = iterations;
 }
+
+RenderMessage World::getObjects()
+{
+    std::vector<std::pair<phy::PolygonShape, phy::Transform>> shapes;
+
+    for (auto&& b : bodyList) {
+        for (auto&& s : b->shapeList) {
+            auto polygon = std::dynamic_pointer_cast<std::shared_ptr<phy::PolygonShape>>(s);
+            shapes.push_back(std::make_pair(*s, /* TODO */))
+        }
+    }
+}
 } /* namespace phy */

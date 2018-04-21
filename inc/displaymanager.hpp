@@ -15,7 +15,7 @@
 class DisplayManager
 {
 private:
-    std::vector<std::unique_ptr<RenderMessage>> renderables;
+    std::vector<std::pair<phy::PolygonShape, phy::Transform>> shapes;
     bool initialized;
     SDL_Window *window;
     GPUTarget gpu;
@@ -28,5 +28,6 @@ public:
     operator SDL_Window*() const;
     void displayAll();
     void displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr<phy::PolygonShape> shape);
+    inline std::vector<float> toFloatVector(const phy::PolygonShape &shape, const phy::Transform &offset);
     void addRenderable(std::unique_ptr<RenderMessage>&& msg);
 };

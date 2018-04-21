@@ -10,11 +10,11 @@
 #include <chrono>
 
 const std::chrono::milliseconds timePerFrame(16);
+const std::string renderBuff("render");
 
 void displayThings(std::atomic<bool> *quit, ThreadManager *manager)
 {
     DisplayManager displayManager("Test Window");
-    const std::string renderBuff("render");
 
     if (!displayManager.isInitialized()) {
         std::cout << "Display Manager failed" << std::endl;
@@ -29,15 +29,34 @@ void displayThings(std::atomic<bool> *quit, ThreadManager *manager)
             displayManager.addRenderable(std::move(msg));
         }
 
-        //displayManager.renderAll();
+        displayManager.displayAll();
         auto end = std::chrono::high_resolution_clock::now();
         if (end - start < timePerFrame)
             std::this_thread::sleep_for(timePerFrame - (end - start));
     }
 }
 
-void makeSoundThings(std::atomic<bool> *quit, ThreadManager *manager)
+void physics(std::atomic<bool> *quit, ThreadManager *manager)
 {
+    phy::World world(Vec2<float>(5, 9.8));
+
+    phy::BodySpec spec;
+    spec.bodyType = phy::BodyType::dynamicBody;
+    auto shape = phy::PolygonShape(0.5f);
+    shape.setBox(Vec2<float>(25, 25));
+    auto body = world.createBody(spec);
+    auto shape_ptr = body.lock()->addShape(shape);
+
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        world.step();
+        manager->sendMessage(renderBuff, <#std::unique_ptr<T> &&message#>);
+
+        auto dt = std::chrono::high_resolution_clock::now() - start;
+        if (dt < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - dt);
+    }
 }
 
 int main(int argc, char **args)

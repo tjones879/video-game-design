@@ -2,6 +2,7 @@
 
 #include "inc/physics/common.hpp"
 #include "inc/physics/body.hpp"
+#include "inc/messagetypes.hpp"
 #include <memory>
 #include <vector>
 
@@ -88,6 +89,13 @@ public:
      * and prevent impossible conditions.
      */
     void setPositionIterations(uint8_t iterations);
+
+    /**
+     *
+     *
+     */
+    RenderMessage getObjects();
+
 private:
     float updateTime();
 };

@@ -59,5 +59,40 @@ void DisplayManager::displayPolygon(std::weak_ptr<phy::Body> body, std::weak_ptr
 
 void DisplayManager::addRenderable(std::unique_ptr<RenderMessage>&& msg)
 {
-    renderables.push_back(std::move(msg));
+    shapes.resize(msg->shapes->size());
+    shapes = std::move(*msg->shapes.get());
+}
+
+inline std::vector<float> DisplayManager::toFloatVector(const phy::PolygonShape &shape,
+                                                        const phy::Transform &offset)
+{
+    std::vector<float> vertices;
+    vertices.reserve(shape.vertices.size() * 2);
+    for (auto v : shape.vertices) {
+        auto point = std::move(offset.translate(v));
+        vertices.push_back(point.x);
+        vertices.push_back(point.y);
+    }
+
+    return vertices;
+}
+
+void DisplayManager::displayAll()
+{
+    GPU_Clear(gpu);
+    SDL_Color color{};
+    color.r = 0;
+    color.g = 0;
+    color.b = 255;
+    color.a = 255;
+
+    for (const auto &s : shapes) {
+        auto shape = s.first;
+        auto transform = s.second;
+
+        auto vertices = std::move(toFloatVector(shape, transform));
+        GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], color);
+    }
+
+    GPU_Flip(gpu);
 }

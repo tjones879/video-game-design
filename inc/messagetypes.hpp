@@ -12,7 +12,8 @@ struct Message {
 };
 
 struct RenderMessage : Message {
-    std::unique_ptr<std::vector<phy::PolygonShape>> shapes;
+    std::unique_ptr<std::vector<std::pair<phy::PolygonShape, phy::Transform>>> shapes;
+
     virtual MessageType getType() const override {
         return MessageType::Render;
     }

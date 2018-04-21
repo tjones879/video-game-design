@@ -13,6 +13,7 @@ class PolygonShape : public Shape {
 public:
     std::vector<Vec2f> vertices;
     PolygonShape(float dens);
+    PolygonShape() {}
     /**
      * Create a convex polygon using the given local points.
      *
