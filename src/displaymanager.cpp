@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cstdio>
 
+#include <GL/glew.h>
+
 #define DEBUG(e) std::cerr << e << std::endl;
 
 DisplayManager::DisplayManager(const std::string &title)
@@ -59,12 +61,16 @@ inline std::vector<float> DisplayManager::toFloatVector(const phy::PolygonShape 
 
 void DisplayManager::displayAll()
 {
-    GPU_Clear(gpu);
+    GPU_ClearRGBA(gpu, 0x00, 0x00, 0x00, 0xFF);
+    glClear(GL_STENCIL_BUFFER_BIT);
+
     SDL_Color color{};
     color.r = 0;
     color.g = 0;
     color.b = 255;
     color.a = 255;
+
+    gpu.createGUI(640, 480);
 
     for (const auto &s : shapes) {
         auto shape = s.first;

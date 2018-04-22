@@ -29,7 +29,8 @@ set(CMAKE_CXX_FLAGS "--std=c++14 -g -Wall \
          -Wno-zero-as-null-pointer-constant \
          -Wno-padded -Wno-unused-macros")
 
-# Add the subdirectory for nanovg
+# Add the subdirectory and necessary libs for nanovg
+find_package(GLEW REQUIRED)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib)
 
 # Define all of our include paths
@@ -59,6 +60,7 @@ add_executable(VGD src/main.cpp)
 target_link_libraries(VGD
     ${CMAKE_THREAD_LIBS_INIT}
     ${SDL2_LIBRARIES}
+    ${GLEW_LIBRARIES}
     engine
     SDL_gpu_shared
     nanovg_lib)
