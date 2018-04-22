@@ -1,5 +1,7 @@
 set(SRC ${CMAKE_SOURCE_DIR}/src)
 
+include_directories(${CMAKE_SOURCE_DIR}/../lib/sdl-gpu/include)
+
 add_library(engine
     ${SRC}/physics/world.cpp
     ${SRC}/physics/body.cpp
@@ -11,5 +13,6 @@ add_library(engine
     ${SRC}/physics/broadphase.cpp
     ${SRC}/physics/collisions.cpp
     ${SRC}/displaymanager.cpp
+    ${SRC}/gputarget.cpp
     ${SRC}/eventhandler.cpp
     ${SRC}/controller.cpp)
