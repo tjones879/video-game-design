@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cstdio>
 
-#include <GL/glew.h>
-
 #define DEBUG(e) std::cerr << e << std::endl;
 
 DisplayManager::DisplayManager(const std::string &title)

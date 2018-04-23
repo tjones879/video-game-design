@@ -1,6 +1,7 @@
 #include "inc/gputarget.hpp"
-#include "SDL_gpu.h"
 #include <vector>
+#include "nanovg_gl.h"
+#include "nanovg_gl_utils.h"
 
 GPU_Image *generateFBO(NVGcontext *_vg, const float _w, const float _h,
                        void (*draw)(NVGcontext *, const float, const float, const float, const float))
@@ -22,11 +23,11 @@ GPU_Image *generateFBO(NVGcontext *_vg, const float _w, const float _h,
 }
 
 void drawNVG(NVGcontext *vg, const float x, const float y, const float w, const float h) {
-    const float squarer = 5.0f;
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, x, y, w, h, squarer);
-    auto bgPaint = nvgLinearGradient(vg, x, y, x + w, y + h, nvgRGBA(255, 255, 255, 255), nvgRGBA(255, 255, 255, 155));
-    nvgFillPaint(vg, bgPaint);
+    nvgRect(vg, 100,100, 120,30);
+    nvgCircle(vg, 120,120, 5);
+    nvgPathWinding(vg, NVG_HOLE);   // Mark circle as a hole.
+    nvgFillColor(vg, nvgRGBA(255,192,0,255));
     nvgFill(vg);
 }
 

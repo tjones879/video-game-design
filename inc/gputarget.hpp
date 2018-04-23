@@ -1,15 +1,13 @@
 #pragma once
 
+#include <GL/glew.h>
+#include <GL/glut.h>
+#define NANOVG_GL3_IMPLEMENTATION
+#include "nanovg.h"
+
 #include <iostream>
 #include "SDL2/SDL.h"
 #include "SDL_gpu.h"
-#define NANOVG_GL3_IMPLEMENTATION
-#include "nanovg.h"
-#include "nanovg_gl.h"
-#include "nanovg_gl_utils.h"
-
-#define GLEW_STATIC
-#include <GL/glew.h>
 
 class GPUTarget {
 public:

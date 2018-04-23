@@ -38,6 +38,7 @@ include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/)
 include_directories(${CMAKE_SOURCE_DIR}/lib/sdl-gpu/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/nanovg/src)
+include_directories(${GLEW_INCLUDE_DIRS})
 
 enable_testing()
 
@@ -60,9 +61,10 @@ add_executable(VGD src/main.cpp)
 target_link_libraries(VGD
     ${CMAKE_THREAD_LIBS_INIT}
     ${SDL2_LIBRARIES}
-    ${GLEW_LIBRARIES}
     engine
     SDL_gpu_shared
-    nanovg_lib)
+    nanovg_lib
+    ${GLEW_LIBRARIES}
+    )
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
