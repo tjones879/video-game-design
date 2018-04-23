@@ -62,21 +62,20 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            moveCommand->addCommand({0,-3});
             effect->playSound(0);
-            eventStack.push(jumpCommand);
+            moveCommand->addCommand({0,-6});
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            moveCommand->addCommand({0,3});
+            moveCommand->addCommand({0,6});
             break;
         case Commands::BACK:
             DEBUG("Back");
-            moveCommand->addCommand({-3,0});
+            moveCommand->addCommand({-6,0});
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            moveCommand->addCommand({3,0});
+            moveCommand->addCommand({6,0});
             break;
         case Commands::ACTION:
             DEBUG("Action");
@@ -143,7 +142,6 @@ void EventHandler::addEvent(Command &newCommand){
 
 void EventHandler::executeEvents(){
     while (!eventStack.empty()) {
-        DEBUG("Step2");
         eventStack.front()->execute();
         eventStack.pop();
     }
@@ -156,9 +154,14 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
         case Commands::DUCK:
             return duckCommand;
         case Commands::BACK:
+            addPlayerVel({-1,0});
             return moveCommand;
         case Commands::FORWARD:
+<<<<<<< HEAD
             
+=======
+            addPlayerVel({1,0});
+>>>>>>> camera
             return moveCommand;
         case Commands::ACTION:
             return actionCommand;
@@ -170,11 +173,15 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
 }
 
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
+    /*
+    body
+    auto currVel = body->getLinearVelocity();
+    body->setLinearVelocity(currVel + {5, 0});
+    */
     body = bodyPtr;
 }
 
 void EventHandler::addPlayerVel(Vec2<int> addVelocity){
-    auto locked = body.lock();
-    auto currVel = locked->getLinearVelocity();
-    locked->setLinearVelocity(currVel + addVelocity);
+    auto currVel = body.lock()->getLinearVelocity();
+    body.lock()->setLinearVelocity(currVel + addVelocity);
 }

@@ -30,31 +30,29 @@ class EventHandler
 {
 private:
     bool initialized;
-    void addPlayerVel(Vec2<int> addVelocity);
     std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> body;
     Controller controller;
     class Command {
-      public:
-        virtual ~Command() {};
-        virtual void execute() const = 0;
+        public:
+          virtual ~Command() {};
+          virtual void execute() const = 0;
     };
     class JumpCommand : public Command {
-      public:
-        virtual void execute() const {
-            DEBUG("Execute Jump");
-            //jump();
-            return;
-        }
-
+        public:
+          virtual void execute() const {
+              DEBUG("Execute Jump");
+              //jump();
+              return;
+          }
     };
     class DuckCommand : public Command {
-      public:
-        virtual void execute() const {
-            //duck();
-        }
+        public:
+          virtual void execute() const {
+              //duck();
+          }
     };
     class MoveCommand : public Command {
       private:
@@ -73,16 +71,16 @@ private:
         }
     };
     class ActionCommand : public Command {
-      public:
-        virtual void execute() const {
-            //action();
-        }
+        public:
+          virtual void execute() const {
+              //action();
+          }
     };
     class SpecialCommand : public Command {
-      public:
-        virtual void execute() const {
-            //special();
-        }
+        public:
+          virtual void execute() const {
+              //special();
+          }
     };
     void actionHandler(Commands command, bool pressed);
     void initKeyMapping();
@@ -102,4 +100,5 @@ public:
     void executeEvents();
     Command *getCommandPtr(Commands cmd);
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
+    void addPlayerVel(Vec2<int> addVelocity);
 };
