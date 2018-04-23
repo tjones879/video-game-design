@@ -94,6 +94,10 @@ int EventHandler::inputHandler(SDL_Event &event){
 
         switch (event.type) {
         case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_8)
+                return 8;
+            if (event.key.keysym.sym == SDLK_9)
+                return 9;
             if (!keysToCommands.count(event.key.keysym.sym))
                 continue;
             if (keysToCommands[event.key.keysym.sym] == Commands::QUIT)

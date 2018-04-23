@@ -29,3 +29,11 @@ struct RenderMessage : Message {
         return MessageType::Render;
     }
 };
+
+struct InputMessage : Message {
+    int command;
+
+    virtual MessageType getType() const override {
+        return MessageType::INVALID;
+    }
+};

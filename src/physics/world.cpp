@@ -53,6 +53,9 @@ float World::updateTime()
 
 void World::step()
 {
+    if (lastPause.first)
+        return;
+
     const float dt = updateTime();
     // If new bodies or shapes were added, find them
     // Lock the world
@@ -113,5 +116,24 @@ std::unique_ptr<RenderMessage> World::getObjects()
 
     auto msg = RenderMessage(std::make_unique<RenderMessage::ShapeList>(shapes));
     return std::make_unique<RenderMessage>(std::move(msg));
+}
+
+void World::pause()
+{
+    if (lastPause.first)
+        return;
+
+    lastPause = {true, SDL_GetTicks() - lastTicks};
+    std::cout << "<" << lastPause.first << ", " << lastPause.second << ">" << std::endl;
+}
+
+void World::unpause()
+{
+    if (!lastPause.first)
+        return;
+
+    lastTicks = SDL_GetTicks() - lastPause.second;
+    lastPause = {false, 0};
+    std::cout << "<" << lastPause.first << ", " << lastPause.second << ">" << std::endl;
 }
 } /* namespace phy */

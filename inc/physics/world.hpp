@@ -31,6 +31,7 @@ private:
     uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
     uint32_t lastTicks; ///< Number of SDL_GetTicks() for the last iteration
     BroadPhase broadPhase;
+    std::pair<bool, uint32_t> lastPause;
 public:
     World(const Vec2f &gravity_);
     /**
@@ -98,6 +99,11 @@ public:
      */
     std::unique_ptr<RenderMessage> getObjects();
 
+    /**
+     * Pause the world so that no objects are moved.
+     */
+    void pause();
+    void unpause();
 private:
     float updateTime();
 };

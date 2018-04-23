@@ -11,6 +11,7 @@
 
 const std::chrono::milliseconds timePerFrame(16);
 const std::string renderBuff("render");
+const std::string inputBuff("input");
 
 void display(std::atomic<bool> *quit, ThreadManager *manager)
 {
@@ -40,6 +41,8 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 {
     phy::World world(Vec2<float>(5, 9.8));
 
+    manager->openBuffer(inputBuff);
+
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
     spec.position = {100, 100};
@@ -51,6 +54,16 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
+        while (manager->newMessages(inputBuff)) {
+            auto&& msg = manager->getMessage<InputMessage>(inputBuff);
+            if (msg->command == 8) {
+                std::cout << "World Pausing" << std::endl;
+                world.pause();
+            } else if (msg->command == 9) {
+                std::cout << "World Unpausing" << std::endl;
+                world.unpause();
+            }
+        }
 
         world.step();
         manager->sendMessage(renderBuff, std::move(world.getObjects()));
@@ -78,9 +91,14 @@ int main(int argc, char **args)
     SDL_Event e{};
     while (!quit) {
         auto start = std::chrono::high_resolution_clock::now();
-        if (eventHandler.inputHandler(e) == 1) {
+        auto ret = eventHandler.inputHandler(e);
+        if (ret== 1) {
             threadManager.waitAll();
             return 0;
+        } else if (ret == 8 || ret == 9) {
+            auto msg = std::make_unique<InputMessage>();
+            msg->command = ret;
+            threadManager.sendMessage(inputBuff, std::move(msg));
         }
 
         eventHandler.executeEvents();
