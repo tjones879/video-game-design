@@ -1,8 +1,11 @@
 #include <inc/eventhandler.hpp>
+#include <inc/sound.hpp>
 #include <iostream>
 #include <cstdio>
+#define WAV_PATH "assets/high.wav"
 
 #define DEBUG(e) std::cerr << e << std::endl;
+
 
 void EventHandler::initButtonMapping()
 {
@@ -54,11 +57,14 @@ EventHandler::~EventHandler(){
 
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
+    Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
     if (pressed && !commandState[static_cast<char>(command)]) {
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
             moveCommand->addCommand({0,-3});
+            effect->playSound(0);
+            eventStack.push(jumpCommand);
             break;
         case Commands::DUCK:
             DEBUG("Duck");
@@ -152,6 +158,7 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
         case Commands::BACK:
             return moveCommand;
         case Commands::FORWARD:
+            
             return moveCommand;
         case Commands::ACTION:
             return actionCommand;

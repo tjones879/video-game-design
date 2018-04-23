@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include "inc/vec2.hpp"
 #include "inc/eventhandler.hpp"
@@ -6,8 +7,13 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
+#include "inc/sound.hpp"
+#include "sound.cpp"
+#define WAV_PATH "assets/beat.wav"
+
 
 #define DEBUG(e) std::cerr << e << std::endl;
+
 
 const int MIN_MILLISECONDS_PER_FRAME = 16;
 
@@ -18,6 +24,9 @@ int main(int argc, char **args)
         std::cout << "Display Manager failed" << std::endl;
         return 1;
     }
+    Sound::init();
+
+    Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
 
     EventHandler eventHandler;
     if (!eventHandler.isInitialized()) {
@@ -25,7 +34,9 @@ int main(int argc, char **args)
         return 1;
     }
 
+
     phy::World world(Vec2<float>(0, 0));
+
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
@@ -49,6 +60,8 @@ int main(int argc, char **args)
     shapes.push_back(shape_ptr);
     shapes.push_back(shape_ptr2);
 
+    Sound* music = new Sound(WAV_PATH, SOUND_MUSIC);
+    music->playSound(127);
     bool quit = false;
     SDL_Event e{};
     while (!quit) {

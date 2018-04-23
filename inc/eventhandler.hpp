@@ -1,7 +1,10 @@
 #pragma once
 
 #include "inc/controller.hpp"
+#include "inc/sound.hpp"
+#include <SDL2/SDL_mixer.h>
 
+#define WAV_PATH "assets/scratch.wav"
 #include <SDL2/SDL.h>
 #include <array>
 #include <map>
@@ -45,6 +48,7 @@ private:
             //jump();
             return;
         }
+
     };
     class DuckCommand : public Command {
       public:
