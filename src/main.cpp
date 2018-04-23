@@ -56,13 +56,6 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
         auto start = std::chrono::high_resolution_clock::now();
         while (manager->newMessages(inputBuff)) {
             auto&& msg = manager->getMessage<InputMessage>(inputBuff);
-            if (msg->command == 8) {
-                std::cout << "World Pausing" << std::endl;
-                world.pause();
-            } else if (msg->command == 9) {
-                std::cout << "World Unpausing" << std::endl;
-                world.unpause();
-            }
         }
 
         world.step();
@@ -91,14 +84,9 @@ int main(int argc, char **args)
     SDL_Event e{};
     while (!quit) {
         auto start = std::chrono::high_resolution_clock::now();
-        auto ret = eventHandler.inputHandler(e);
-        if (ret== 1) {
+        if (eventHandler.inputHandler(e) == 1) {
             threadManager.waitAll();
             return 0;
-        } else if (ret == 8 || ret == 9) {
-            auto msg = std::make_unique<InputMessage>();
-            msg->command = ret;
-            threadManager.sendMessage(inputBuff, std::move(msg));
         }
 
         eventHandler.executeEvents();
