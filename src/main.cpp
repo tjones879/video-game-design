@@ -1,31 +1,44 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "inc/vec2.hpp"
+#include "inc/threadmanager.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
 #include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
+#include <chrono>
 
-#define DEBUG(e) std::cerr << e << std::endl;
+const std::chrono::milliseconds timePerFrame(16);
+const std::string renderBuff("render");
 
-const int MIN_MILLISECONDS_PER_FRAME = 16;
-
-int main(int argc, char **args)
+void display(std::atomic<bool> *quit, ThreadManager *manager)
 {
     DisplayManager displayManager("Test Window");
+
     if (!displayManager.isInitialized()) {
         std::cout << "Display Manager failed" << std::endl;
-        return 1;
+        return;
     }
+    manager->openBuffer(renderBuff);
 
-    EventHandler eventHandler;
-    if (!eventHandler.isInitialized()) {
-        std::cout << "EventHandler failed" << std::endl;
-        return 1;
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+        while (manager->newMessages(renderBuff)) {
+            auto&& msg = manager->getMessage<RenderMessage>(renderBuff);
+            displayManager.addRenderable(std::move(msg));
+        }
+
+        displayManager.displayAll();
+        auto end = std::chrono::high_resolution_clock::now();
+        if (end - start < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - (end - start));
     }
+}
 
-    phy::World world(Vec2<float>(0, 0));
+void physics(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    phy::World world(Vec2<float>(5, 9.8));
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
@@ -36,35 +49,45 @@ int main(int argc, char **args)
     auto body = world.createBody(spec);
     auto shape_ptr = body.lock()->addShape(shape);
 
-    spec.position = {150,150};
-    auto shape2 = phy::PolygonShape(0.5f);
-    shape2.setBox(Vec2<float>(50.0,50.0));
-    auto body2 = world.createBody(spec);
-    auto shape_ptr2 = body2.lock()->addShape(shape2);
-    eventHandler.setPlayer(body2);
-    std::vector<std::weak_ptr<phy::Body>> bodies;
-    bodies.push_back(body);
-    bodies.push_back(body2);
-    std::vector<std::weak_ptr<phy::PolygonShape>> shapes;
-    shapes.push_back(shape_ptr);
-    shapes.push_back(shape_ptr2);
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        world.step();
+        manager->sendMessage(renderBuff, std::move(world.getObjects()));
+
+        auto dt = std::chrono::high_resolution_clock::now() - start;
+        if (dt < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - dt);
+    }
+}
+
+int main(int argc, char **args)
+{
+    ThreadManager threadManager;
+
+    threadManager.spawnThread(display);
+    threadManager.spawnThread(physics);
+
+    EventHandler eventHandler;
+    if (!eventHandler.isInitialized()) {
+        std::cout << "EventHandler failed" << std::endl;
+        return 1;
+    }
 
     bool quit = false;
     SDL_Event e{};
     while (!quit) {
-        const int start = SDL_GetTicks();
-        displayManager.displayPolygon(bodies, shapes);
-        if (eventHandler.inputHandler(e) == 1)
+        auto start = std::chrono::high_resolution_clock::now();
+        if (eventHandler.inputHandler(e) == 1) {
+            threadManager.waitAll();
             return 0;
+        }
+
         eventHandler.executeEvents();
 
-        world.step();
-
-        const int millisecondsThisFrame = SDL_GetTicks() - start;
-        if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
-            // If rendering faster than 60FPS, delay
-            SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
-        }
+        auto dt = std::chrono::high_resolution_clock::now() - start;
+        if (dt < timePerFrame)
+            std::this_thread::sleep_for(timePerFrame - dt);
     }
     return 0;
 }

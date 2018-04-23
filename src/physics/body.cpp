@@ -168,17 +168,13 @@ void Body::updatePosition(float dt)
     float rotation = angularVelocity * dt;
     position += translation;
     angle += rotation;
+    transform = Transform(position, angle);
 }
 
 void Body::clearForces()
 {
     force.zeroOut();
     torque = 0.0f;
-}
-
-Transform Body::getTransform() const
-{
-    return Transform(position, angle);
 }
 
 void Body::updateMassProperties()
@@ -204,6 +200,11 @@ void *Body::getExtraData() const
 void Body::setExtraData(void *data)
 {
     extraData = data;
+}
+
+Transform Body::getTransform() const
+{
+    return transform;
 }
 
 std::ostream& operator<<(std::ostream &out, const Body &body)

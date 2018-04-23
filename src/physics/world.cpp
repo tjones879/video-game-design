@@ -99,4 +99,19 @@ void World::setPositionIterations(uint8_t iterations)
 {
     positionIterations = iterations;
 }
+
+std::unique_ptr<RenderMessage> World::getObjects()
+{
+    RenderMessage::ShapeList shapes;
+
+    for (auto&& b : bodyList) {
+        for (auto&& s : b->shapeList) {
+            auto polygon = std::dynamic_pointer_cast<phy::PolygonShape>(s);
+            shapes.push_back(std::make_pair(*polygon.get(), b->getTransform()));
+        }
+    }
+
+    auto msg = RenderMessage(std::make_unique<RenderMessage::ShapeList>(shapes));
+    return std::make_unique<RenderMessage>(std::move(msg));
+}
 } /* namespace phy */

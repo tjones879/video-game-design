@@ -51,6 +51,7 @@ private:
     std::vector<std::shared_ptr<Shape>> shapeList;
     Sweep bodySweep;
     float gravityFactor; ///< This factor must be a positive nonzero value
+    Transform transform;
     friend class World;
 public:
     Body(const BodySpec &spec);
