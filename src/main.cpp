@@ -9,7 +9,7 @@
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
 #include "sound.cpp"
-#define WAV_PATH "assets/beat.wav"
+#define WAV_PATH "assets/minor_clam.wav"
 
 
 #define DEBUG(e) std::cerr << e << std::endl;
@@ -67,6 +67,9 @@ int main(int argc, char **args)
     while (!quit) {
         const int start = SDL_GetTicks();
         displayManager.displayPolygon(bodies, shapes);
+        int camX = displayManager.getCamPosX();
+        eventHandler.setCamPosX(camX);
+
         if (eventHandler.inputHandler(e) == 1)
             return 0;
         eventHandler.executeEvents();

@@ -28,4 +28,5 @@ public:
     operator SDL_Window*() const;
     void displayPolygon(const std::vector<std::weak_ptr<phy::Body>> &bodies,
                         const std::vector<std::weak_ptr<phy::PolygonShape>> &shapes);
+    int getCamPosX();
 };

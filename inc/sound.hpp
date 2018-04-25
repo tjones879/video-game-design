@@ -35,7 +35,6 @@ public:
 
 	void playSound(int left);
 
-	// A vector of Sound to hold instances of initialized Light class for easier accessing purposes
 	static vector<Sound*> sounds;
 
 private:

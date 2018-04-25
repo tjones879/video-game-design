@@ -1,5 +1,6 @@
 #include "inc/sound.hpp"
 #define WAV_PATH "assets/scratch.wav"
+#define DEBUG(e) std::cerr << e << std::endl;
 vector<Sound*> Sound::sounds;
 
 Sound::Sound(string in_filename, SOUND_TYPE in_type)
@@ -78,7 +79,8 @@ void Sound::playSound(int left)
 		if( Mix_PlayingMusic() == 0 )
 		{
 			//play the music
-			Mix_FadeInMusic( soundMusic, -1, 3000 );
+			Mix_VolumeMusic(60);
+			Mix_FadeInMusic( soundMusic, -1, 6000 );
 		}
 		//if music is being played
 		else
@@ -100,9 +102,10 @@ void Sound::playSound(int left)
 
 	if(soundType == SOUND_EFFECT)
 	{
-		
-		Mix_SetPanning(2, left, 254 - left);
-		Mix_PlayChannel( 2, soundEffect, 0 );
+
+		Mix_PlayChannel( MIX_DEFAULT_CHANNELS, soundEffect, 0 );
+		// Sets appropriate volume for left and right channels
+		Mix_SetPanning( MIX_DEFAULT_CHANNELS, left, 254 - left);
 
 	}
 }

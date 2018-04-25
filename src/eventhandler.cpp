@@ -40,6 +40,7 @@ EventHandler::EventHandler(){
     moveCommand = new MoveCommand(this);
     jumpCommand = new JumpCommand;
 
+
     // Temporarily open the first joystick to the controller if it exists
     if (SDL_NumJoysticks() > 0) {
         controller.setJoystick(0);
@@ -55,6 +56,19 @@ EventHandler::~EventHandler(){
     delete duckCommand;
 }
 
+int EventHandler::getSoundOrigin() {
+    auto player = body.lock()->getPosition();
+    DEBUG(camPosX);
+    double soundRatio = double(abs(camPosX - player.x))/640; //640 is Screen width
+    int soundOrigin = soundRatio*255;// 255 is max volume per channel
+    DEBUG(soundOrigin);
+    return soundOrigin*-1; // return inverse since this is used for left channel -- see Mix_SetPanning in sound.cpp
+}
+
+void EventHandler::setCamPosX(int camX) {
+    camPosX = camX;
+}
+
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
     Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
@@ -62,7 +76,6 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            effect->playSound(0);
             moveCommand->addCommand({0,-6});
             break;
         case Commands::DUCK:
@@ -79,6 +92,7 @@ void EventHandler::actionHandler(Commands command, bool pressed)
             break;
         case Commands::ACTION:
             DEBUG("Action");
+            effect->playSound(getSoundOrigin());
             eventStack.push(actionCommand);
             break;
         case Commands::SPECIAL:
@@ -157,11 +171,7 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
             addPlayerVel({-1,0});
             return moveCommand;
         case Commands::FORWARD:
-<<<<<<< HEAD
-            
-=======
             addPlayerVel({1,0});
->>>>>>> camera
             return moveCommand;
         case Commands::ACTION:
             return actionCommand;

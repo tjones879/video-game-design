@@ -11,6 +11,7 @@
 #include <queue>
 #include <iostream>
 #include <inc/vec2.hpp>
+#include <inc/displaymanager.hpp>
 #include <inc/physics/body.hpp>
 
 #define DEBUG(e) std::cerr << e << std::endl;
@@ -35,6 +36,8 @@ private:
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> body;
     Controller controller;
+    int camPosX;
+
     class Command {
         public:
           virtual ~Command() {};
@@ -101,4 +104,6 @@ public:
     Command *getCommandPtr(Commands cmd);
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
     void addPlayerVel(Vec2<int> addVelocity);
+    int getSoundOrigin();
+    void setCamPosX(int camX);
 };

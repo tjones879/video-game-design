@@ -23,7 +23,7 @@ DisplayManager::DisplayManager(const std::string &title)
     GPU_EnableCamera(gpu, true);
     camera.x = 150 - (SCREEN_HEIGHT/2);
     camera.y = 150 - (SCREEN_HEIGHT/2);
-    camera.zoom = 0.5;
+    camera.zoom = 1.5;
     GPU_SetCamera(gpu, &camera);
 }
 
@@ -71,6 +71,10 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
         GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
     }
     GPU_Flip(gpu);
+}
+
+int DisplayManager::getCamPosX() {
+    return camera.x;
 }
 
 void DisplayManager::setCamera(const Vec2<float> playerVel, 
