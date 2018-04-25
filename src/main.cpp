@@ -29,14 +29,14 @@ int main(int argc, char **args)
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
-    spec.position = {200, 200};
+    spec.position = {160, 120};
     spec.gravityFactor = 1;
     auto shape = phy::PolygonShape(1.0f);
     shape.setBox(Vec2<float>(25, 25));
     auto body = world.createBody(spec);
     auto shape_ptr = body.lock()->addShape(shape);
 
-    spec.position = {150,150};
+    spec.position = {200,150};
     auto shape2 = phy::PolygonShape(0.5f);
     shape2.setBox(Vec2<float>(40.0,40.0));
     auto body2 = world.createBody(spec);
