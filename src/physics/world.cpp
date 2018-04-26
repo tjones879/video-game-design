@@ -1,14 +1,15 @@
 #include "inc/physics/world.hpp"
 #include "inc/physics/body.hpp"
 #include "SDL2/SDL.h"
+#include "inc/threadmanager.hpp"
 
 #include <algorithm>
 #include <iostream>
 
 namespace phy {
 
-World::World(const Vec2f &gravity_)
-    : gravity(gravity_), velocityIterations(10), positionIterations(10),
+World::World(const Vec2f &gravity_, ThreadManager *manager)
+    : gravity(gravity_), threadManager(manager), velocityIterations(10), positionIterations(10),
       lastTicks(SDL_GetTicks()) {}
 
 World::~World() = default;
@@ -16,16 +17,15 @@ World::~World() = default;
 std::weak_ptr<Body> World::createBody(const BodySpec &spec)
 {
     // TODO: Provide custom allocator to improve cache locality in vector and improve performance.
-    // TODO: Synchronize to avoid data race.
     auto bodyPtr = std::make_shared<Body>(spec);
     bodyList.push_back(bodyPtr);
     broadPhase.addNewBody(bodyPtr);
+    threadManager->sendMessage(buffers::bodies, std::make_unique<BodyMessage>(bodyPtr));
     return bodyPtr;
 }
 
 void World::destroyBody(const std::weak_ptr<Body> &body)
 {
-    // TODO: Synchronize to avoid data race
     auto result = std::find(std::begin(bodyList), std::end(bodyList), body.lock());
     if (result != std::end(bodyList)) {
         broadPhase.deleteBody(body.lock());

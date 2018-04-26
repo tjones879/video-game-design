@@ -1,3 +1,4 @@
+#include <inc/messagetypes.hpp>
 #include <inc/eventhandler.hpp>
 #include <iostream>
 #include <cstdio>
@@ -26,7 +27,7 @@ void EventHandler::initKeyMapping()
     keysToCommands[SDLK_ESCAPE]=Commands::QUIT;
 }
 
-EventHandler::EventHandler(){
+EventHandler::EventHandler(ThreadManager *manager) : threadManager(manager) {
     initialized = true;
     commandState.fill(false);
     initKeyMapping();
@@ -127,32 +128,17 @@ bool EventHandler::isInitialized() const
 void EventHandler::executeEvents(){
     while (!eventStack.empty()) {
         DEBUG("Step2");
-        eventStack.front()->execute();
+        // Check the message and see if there is anything that needs to be done.
+        threadManager->sendMessage(buffers::input, std::make_unique<InputMessage>(std::move(eventStack.front())));
         eventStack.pop();
     }
 }
 
-/*
-auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
-    switch (cmd) {
-        case Commands::JUMP:
-            return jumpCommand;
-        case Commands::DUCK:
-            return duckCommand;
-        case Commands::BACK:
-            return moveCommand;
-        case Commands::FORWARD:
-            return moveCommand;
-        case Commands::ACTION:
-            return actionCommand;
-        case Commands::SPECIAL:
-            return actionCommand;
-        default:
-            break;
-    }
-}
-*/
-
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     body = bodyPtr;
+}
+
+std::weak_ptr<const phy::Body> EventHandler::getPlayer() const
+{
+    return body;
 }

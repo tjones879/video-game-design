@@ -1,15 +1,21 @@
 #pragma once
 
+struct Message;
+struct RenderMessage;
+struct InputMessage;
+struct BodyMessage;
+
 #include "inc/physics/polygon.hpp"
 #include "inc/eventhandler.hpp"
 
 enum class MessageType : char {
     Render,
     Input,
+    Body,
     INVALID
 };
 
-struct Message { 
+struct Message {
     virtual MessageType getType() const {
         return MessageType::INVALID;
     }
@@ -46,5 +52,16 @@ struct InputMessage : Message {
 
     virtual MessageType getType() const override {
         return MessageType::Input;
+    }
+};
+
+struct BodyMessage : Message {
+    std::weak_ptr<phy::Body> body;
+
+    BodyMessage() {}
+    BodyMessage(std::weak_ptr<phy::Body> bod) : body(bod) {}
+
+    virtual MessageType getType() const override {
+        return MessageType::Body;
     }
 };

@@ -1,16 +1,21 @@
 #include <SDL2/SDL.h>
+#include "inc/threadmanager.hpp"
 #include <iostream>
 #include "inc/vec2.hpp"
-#include "inc/threadmanager.hpp"
+#include "inc/physics/world.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
-#include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
 #include <chrono>
 
 const std::chrono::milliseconds timePerFrame(16);
-const std::string renderBuff("render");
+
+void sleepForTimeLeft(std::chrono::time_point<std::chrono::high_resolution_clock> startTime) {
+    auto end = std::chrono::high_resolution_clock::now();
+    if (end - startTime < timePerFrame)
+        std::this_thread::sleep_for(timePerFrame - (end - startTime));
+}
 
 void display(std::atomic<bool> *quit, ThreadManager *manager)
 {
@@ -20,25 +25,25 @@ void display(std::atomic<bool> *quit, ThreadManager *manager)
         std::cout << "Display Manager failed" << std::endl;
         return;
     }
-    manager->openBuffer(renderBuff);
+    manager->openBuffer(buffers::render);
 
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
-        while (manager->newMessages(renderBuff)) {
-            auto&& msg = manager->getMessage<RenderMessage>(renderBuff);
+        while (manager->newMessages(buffers::render)) {
+            auto&& msg = manager->getMessage<RenderMessage>(buffers::render);
             displayManager.addRenderable(std::move(msg));
         }
 
         displayManager.displayAll();
-        auto end = std::chrono::high_resolution_clock::now();
-        if (end - start < timePerFrame)
-            std::this_thread::sleep_for(timePerFrame - (end - start));
+        sleepForTimeLeft(start);
     }
 }
 
 void physics(std::atomic<bool> *quit, ThreadManager *manager)
 {
-    phy::World world(Vec2<float>(5, 9.8));
+    phy::World world(Vec2<float>(5, 9.8), manager);
+
+    manager->openBuffer(buffers::input);
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
@@ -52,12 +57,61 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
 
-        world.step();
-        manager->sendMessage(renderBuff, std::move(world.getObjects()));
+        while (manager->newMessages(buffers::input)) {
+            auto &&msg = manager->getMessage<InputMessage>(buffers::input);
+            msg->command->execute();
+        }
 
-        auto dt = std::chrono::high_resolution_clock::now() - start;
-        if (dt < timePerFrame)
-            std::this_thread::sleep_for(timePerFrame - dt);
+        world.step();
+        manager->sendMessage(buffers::render, world.getObjects());
+
+        sleepForTimeLeft(start);
+    }
+}
+
+void audio(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    manager->openBuffer(buffers::sound);
+
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        while (manager->newMessages(buffers::sound)) {
+            // TODO: GET MESSAGE
+            // TODO: ACT ON MESSAGE
+        }
+
+        sleepForTimeLeft(start);
+    }
+}
+
+void events(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    EventHandler eventHandler(manager);
+    if (!eventHandler.isInitialized()) {
+        std::cout << "EventHandler failed" << std::endl;
+        return;
+    }
+
+    manager->openBuffer(buffers::bodies);
+
+    SDL_Event e{};
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+        if (eventHandler.inputHandler(e) == 1) {
+            manager->waitAll();
+            return;
+        }
+
+        if (manager->newMessages(buffers::bodies)) {
+            auto&& body = manager->getMessage<BodyMessage>(buffers::bodies);
+            if (!eventHandler.getPlayer().lock())
+                eventHandler.setPlayer(body->body);
+        }
+
+        eventHandler.executeEvents();
+
+        sleepForTimeLeft(start);
     }
 }
 
@@ -67,27 +121,9 @@ int main(int argc, char **args)
 
     threadManager.spawnThread(display);
     threadManager.spawnThread(physics);
+    events(&threadManager.stopThreads, &threadManager);
 
-    EventHandler eventHandler;
-    if (!eventHandler.isInitialized()) {
-        std::cout << "EventHandler failed" << std::endl;
-        return 1;
-    }
+    threadManager.waitAll();
 
-    bool quit = false;
-    SDL_Event e{};
-    while (!quit) {
-        auto start = std::chrono::high_resolution_clock::now();
-        if (eventHandler.inputHandler(e) == 1) {
-            threadManager.waitAll();
-            return 0;
-        }
-
-        eventHandler.executeEvents();
-
-        auto dt = std::chrono::high_resolution_clock::now() - start;
-        if (dt < timePerFrame)
-            std::this_thread::sleep_for(timePerFrame - dt);
-    }
     return 0;
 }

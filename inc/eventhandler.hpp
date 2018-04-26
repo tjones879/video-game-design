@@ -9,6 +9,7 @@
 #include <iostream>
 #include <inc/vec2.hpp>
 #include <inc/physics/body.hpp>
+#include "inc/threadmanager.hpp"
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -62,7 +63,6 @@ class MoveCommand : public Command {
     }
 
     virtual void execute() const override {
-        std::cout << "MOVE EXECUTE" << std::endl;
         addPlayerVel();
     }
 };
@@ -84,6 +84,7 @@ class SpecialCommand : public Command {
 class EventHandler
 {
 private:
+    ThreadManager *threadManager;
     bool initialized;
     std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
     std::map<SDL_Keycode, Commands> keysToCommands;
@@ -96,11 +97,12 @@ private:
     void initKeyMapping();
     void initButtonMapping();
 public:
-    EventHandler();
+    EventHandler(ThreadManager *manager);
     ~EventHandler();
     bool isInitialized() const;
     int inputHandler(SDL_Event &event);
     void addEvent(Command &newCommand);
     void executeEvents();
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
+    std::weak_ptr<const phy::Body> getPlayer() const;
 };
