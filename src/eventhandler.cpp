@@ -31,11 +31,6 @@ EventHandler::EventHandler(){
     commandState.fill(false);
     initKeyMapping();
     initButtonMapping();
-    duckCommand = new DuckCommand;
-    specialCommand = new SpecialCommand;
-    actionCommand = new ActionCommand;
-    moveCommand = new MoveCommand(this);
-    jumpCommand = new JumpCommand;
 
     // Temporarily open the first joystick to the controller if it exists
     if (SDL_NumJoysticks() > 0) {
@@ -45,44 +40,42 @@ EventHandler::EventHandler(){
 }
 
 EventHandler::~EventHandler(){
-    delete jumpCommand;
-    delete moveCommand;
-    delete actionCommand;
-    delete specialCommand;
-    delete duckCommand;
 }
 
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
+    std::unique_ptr<Command> cmd;
     if (pressed && !commandState[static_cast<char>(command)]) {
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            moveCommand->addCommand({0,-3});
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, -3));
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            moveCommand->addCommand({0,3});
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, 3));
             break;
         case Commands::BACK:
             DEBUG("Back");
-            moveCommand->addCommand({-3,0});
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(-3, 0));
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            moveCommand->addCommand({3,0});
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(3, 0));
             break;
         case Commands::ACTION:
             DEBUG("Action");
-            eventStack.push(actionCommand);
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, -3));
             break;
         case Commands::SPECIAL:
             DEBUG("Special");
-            eventStack.push(specialCommand);
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, -3));
             break;
         default:
+            std::cout << "Invalid button" << std::endl;
             break;
         }
+        eventStack.push(std::move(cmd));
     }
     commandState[static_cast<char>(command)] = pressed;
 }
@@ -131,10 +124,6 @@ bool EventHandler::isInitialized() const
     return initialized;
 }
 
-void EventHandler::addEvent(Command &newCommand){
-    eventStack.push(&newCommand);
-}
-
 void EventHandler::executeEvents(){
     while (!eventStack.empty()) {
         DEBUG("Step2");
@@ -143,6 +132,7 @@ void EventHandler::executeEvents(){
     }
 }
 
+/*
 auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
     switch (cmd) {
         case Commands::JUMP:
@@ -161,13 +151,8 @@ auto EventHandler::getCommandPtr(Commands cmd) -> Command*{
             break;
     }
 }
+*/
 
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     body = bodyPtr;
-}
-
-void EventHandler::addPlayerVel(Vec2<int> addVelocity){
-    auto locked = body.lock();
-    auto currVel = locked->getLinearVelocity();
-    locked->setLinearVelocity(currVel + addVelocity);
 }

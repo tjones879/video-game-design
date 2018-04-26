@@ -1,14 +1,18 @@
 #pragma once
 
 #include "inc/physics/polygon.hpp"
+#include "inc/eventhandler.hpp"
 
 enum class MessageType : char {
     Render,
+    Input,
     INVALID
 };
 
-struct Message {
-    virtual MessageType getType() const = 0;
+struct Message { 
+    virtual MessageType getType() const {
+        return MessageType::INVALID;
+    }
 };
 
 struct RenderMessage : Message {
@@ -27,5 +31,20 @@ struct RenderMessage : Message {
 
     virtual MessageType getType() const override {
         return MessageType::Render;
+    }
+};
+
+/**
+ * An input message should be sent from the event handler to
+ * the physics engine to prompt any actions to be done.
+ */
+struct InputMessage : Message {
+    std::unique_ptr<Command> command;
+
+    InputMessage() {}
+    InputMessage(std::unique_ptr<Command>&& cmd) : command(std::move(cmd)) {}
+
+    virtual MessageType getType() const override {
+        return MessageType::Input;
     }
 };
