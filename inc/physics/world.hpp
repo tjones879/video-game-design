@@ -26,6 +26,7 @@ class Contact;
 class World {
 private:
     Vec2f gravity;
+    ThreadManager *threadManager;
     std::vector<std::shared_ptr<Body>> bodyList;
     uint8_t velocityIterations; ///< Number of iterations used to resolve velocity of bodies
     uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
@@ -33,7 +34,7 @@ private:
     BroadPhase broadPhase;
     std::pair<bool, uint32_t> lastPause;
 public:
-    World(const Vec2f &gravity_);
+    World(const Vec2f &gravity_, ThreadManager *manager);
     /**
      * All objects referenced by the world are ref counted, so
      * they should be automatically destroyed when any other

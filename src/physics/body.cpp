@@ -10,6 +10,8 @@ Body::Body(const BodySpec &spec)
 
     angle = spec.angle;
 
+    position = spec.position;
+
     linearVelocity = spec.linVelocity;
     angularVelocity = spec.angVelocity;
     gravityFactor = spec.gravityFactor;

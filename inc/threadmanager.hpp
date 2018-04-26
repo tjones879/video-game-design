@@ -1,5 +1,7 @@
 #pragma once
 
+class ThreadManager;
+
 #include <thread>
 #include <string>
 #include <array>
@@ -11,6 +13,13 @@
 #include <shared_mutex>
 #include <type_traits>
 #include "inc/messagetypes.hpp"
+
+namespace buffers {
+    const std::string render("render");
+    const std::string input("input");
+    const std::string bodies("body");
+    const std::string sound("sound");
+}
 
 class ThreadBuffer {
 private:
