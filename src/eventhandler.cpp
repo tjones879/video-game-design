@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdio>
 
-#define DEBUG(e) std::cerr << e << std::endl;
+#define DEBUG(e) ;
 
 void EventHandler::initButtonMapping()
 {
@@ -50,27 +50,25 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, -3));
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>( 0,-5));
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, 3));
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>( 0, 5));
             break;
         case Commands::BACK:
             DEBUG("Back");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(-3, 0));
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(-5, 0));
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(3, 0));
+            cmd = std::make_unique<MoveCommand>(body, Vec2<int>( 5, 0));
             break;
         case Commands::ACTION:
             DEBUG("Action");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, -3));
             break;
         case Commands::SPECIAL:
             DEBUG("Special");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(0, -3));
             break;
         default:
             std::cout << "Invalid button" << std::endl;
