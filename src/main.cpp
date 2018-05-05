@@ -74,12 +74,12 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 
 void audio(std::atomic<bool> *quit, ThreadManager *manager)
 {
-    Sound::init();
+    SoundManager soundManager;
+    auto effect = soundManager.addSound(WAV_PATH, SOUND_TYPE::EFFECT);
+    auto music = soundManager.addSound(WAV_PATH, SOUND_TYPE::MUSIC);
 
-    auto effect = std::make_shared<Sound>(WAV_PATH, SOUND_EFFECT);
-    auto music = std::make_shared<Sound>(WAV_PATH, SOUND_MUSIC);
-    music->playSound(127);
     manager->openBuffer(buffers::sound);
+    music->playSound(127);
 
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();

@@ -62,7 +62,6 @@ void EventHandler::setCamPosX(int camX) {
 
 void EventHandler::actionHandler(Commands command, bool pressed)
 {
-    Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
     std::unique_ptr<Command> cmd;
     if (pressed && !commandState[static_cast<char>(command)]) {
         switch (command) {
@@ -84,7 +83,6 @@ void EventHandler::actionHandler(Commands command, bool pressed)
             break;
         case Commands::ACTION:
             DEBUG("Action");
-            effect->playSound(getSoundOrigin());
             break;
         case Commands::SPECIAL:
             DEBUG("Special");
@@ -144,8 +142,8 @@ bool EventHandler::isInitialized() const
 
 void EventHandler::executeEvents(){
     while (!eventStack.empty()) {
-        // Check the message and see if there is anything that needs to be done.
-        threadManager->sendMessage(buffers::input, std::make_unique<InputMessage>(std::move(eventStack.front())));
+        threadManager->sendMessage(buffers::input,
+                                   std::make_unique<InputMessage>(std::move(eventStack.front())));
         eventStack.pop();
     }
 }
