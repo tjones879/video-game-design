@@ -64,8 +64,10 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
         std::weak_ptr<phy::PolygonShape> shape = shapes[i];
         auto offset = body.lock()->getPosition();
         auto vel = body.lock()->getLinearVelocity();
-        //std::cout << offset.x << ' ' << i << std::endl;
-        setCamera(bodies[0].lock()->getLinearVelocity(),bodies[0].lock()->getPosition(),bodies[1].lock()->getLinearVelocity(),bodies[1].lock()->getPosition());
+        setCamera(bodies[0].lock()->getLinearVelocity(),
+                  bodies[0].lock()->getPosition(),
+                  bodies[1].lock()->getLinearVelocity(),
+                  bodies[1].lock()->getPosition());
 
         std::vector<float> vertices;
         vertices.reserve(shape.lock()->vertices.size() * 2);
@@ -87,7 +89,6 @@ void DisplayManager::setCamera(const Vec2<float> playerVel,
                                const Vec2<float> enemyVel, 
                                const Vec2<float> enemyPos){
     //This tracks the camera to the player
-    std::cout << "Cam x,y: " << camera.x << "," << camera.y << " CamZoom: " << camera.zoom << " Plyr x,y: " << playerPos.x << "," << playerPos.y << std::endl;
     if(playerPos.x < (camera.x + (SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75)){
         camera.x = (playerPos.x - ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75));
     }
@@ -123,34 +124,26 @@ void DisplayManager::setCamera(const Vec2<float> playerVel,
                 camera.zoom += .005;
         }
     }
-    // if(playerPos.x > (camera.x + (SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.6) &&
-    //    playerPos.x < (camera.x + (SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.6)){
-    //     camera.x = ((playerPos.x + enemyPos.x)/2)-(SCREEN_WIDTH/2);
-    // }
-    // if(playerPos.y > (camera.y + (SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.6) &&
-    //    playerPos.y < (camera.y + (SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.6)){
-    //     camera.y = ((playerPos.y + enemyPos.y)/2)-(SCREEN_HEIGHT/2);
-    //}
     GPU_SetCamera(gpu, &camera);
 }
 
 void DisplayManager::setPlayerColor(){
-    if ( playerColor.r == 255 || playerColor.r == 0)
+    if (playerColor.r == 255 || playerColor.r == 0)
         r = !r;
-    if ( playerColor.g == 254 || playerColor.g == 0)
+    if (playerColor.g == 254 || playerColor.g == 0)
         g = !g;
-    if ( playerColor.b == 255 || playerColor.b == 0)
+    if (playerColor.b == 255 || playerColor.b == 0)
         b = !b;
-    if ( !r )
+    if (!r)
         playerColor.r += 1;
-    if ( !g )
+    if (!g)
         playerColor.g += 2;
-    if ( !b )
+    if (!b)
         playerColor.b += 3;
-    if ( r )
+    if (r)
         playerColor.r -= 1;
-    if ( g )
+    if (g)
         playerColor.g -= 2;
-    if ( b )
+    if (b)
         playerColor.b -= 3;
 }
