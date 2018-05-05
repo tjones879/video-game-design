@@ -29,13 +29,14 @@ enum class Commands : char {
 };
 
 class Command {
-  public:
+public:
+    Commands type;
     virtual ~Command() {};
     virtual void execute() const = 0;
 };
 
 class JumpCommand : public Command {
-  public:
+public:
     virtual void execute() const {
         DEBUG("Execute Jump");
         //jump();
@@ -44,14 +45,14 @@ class JumpCommand : public Command {
 };
 
 class DuckCommand : public Command {
-  public:
+public:
     virtual void execute() const {
         //duck();
     }
 };
 
 class MoveCommand : public Command {
-  private:
+private:
     Vec2<int> addVelocity;
     std::weak_ptr<phy::Body> body;
     void addPlayerVel() const {
@@ -60,7 +61,7 @@ class MoveCommand : public Command {
         locked->setLinearVelocity(currVel + addVelocity);
     }
 
-  public:
+public:
     MoveCommand(std::weak_ptr<phy::Body> body, Vec2<int> addVel){
         this->body = body;
         addVelocity = addVel;
@@ -72,7 +73,12 @@ class MoveCommand : public Command {
 };
 
 class ActionCommand : public Command {
-  public:
+    std::weak_ptr<phy::Body> body;
+public:
+    ActionCommand(std::weak_ptr<phy::Body> body) {
+        this->body = body;
+        type = Commands::ACTION;
+    }
     virtual void execute() const {
         //action();
     }

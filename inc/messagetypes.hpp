@@ -4,6 +4,7 @@ struct Message;
 struct RenderMessage;
 struct InputMessage;
 struct BodyMessage;
+struct AudioMessage;
 
 #include "inc/physics/polygon.hpp"
 #include "inc/eventhandler.hpp"
@@ -12,6 +13,7 @@ enum class MessageType : char {
     Render,
     Input,
     Body,
+    Audio,
     INVALID
 };
 
@@ -63,5 +65,15 @@ struct BodyMessage : Message {
 
     virtual MessageType getType() const override {
         return MessageType::Body;
+    }
+};
+
+struct AudioMessage : Message {
+    int posLeft;
+    AudioMessage() {}
+    AudioMessage(int left) : posLeft(left) {}
+
+    virtual MessageType getType() const override {
+        return MessageType::Audio;
     }
 };

@@ -83,6 +83,7 @@ void EventHandler::actionHandler(Commands command, bool pressed)
             break;
         case Commands::ACTION:
             DEBUG("Action");
+            cmd = std::make_unique<ActionCommand>(body);
             break;
         case Commands::SPECIAL:
             DEBUG("Special");
@@ -142,6 +143,9 @@ bool EventHandler::isInitialized() const
 
 void EventHandler::executeEvents(){
     while (!eventStack.empty()) {
+        if (eventStack.front()->type == Commands::ACTION)
+            threadManager->sendMessage(buffers::sound,
+                                       std::make_unique<AudioMessage>(getSoundOrigin()));
         threadManager->sendMessage(buffers::input,
                                    std::make_unique<InputMessage>(std::move(eventStack.front())));
         eventStack.pop();

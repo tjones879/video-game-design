@@ -75,8 +75,8 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 void audio(std::atomic<bool> *quit, ThreadManager *manager)
 {
     SoundManager soundManager;
-    auto effect = soundManager.addSound(WAV_PATH, SOUND_TYPE::EFFECT);
-    auto music = soundManager.addSound(WAV_PATH, SOUND_TYPE::MUSIC);
+    auto effect = soundManager.addSound("assets/high.wav", SOUND_TYPE::EFFECT);
+    auto music = soundManager.addSound("assets/minor_clam.wav", SOUND_TYPE::MUSIC);
 
     manager->openBuffer(buffers::sound);
     music->playSound(127);
@@ -85,8 +85,8 @@ void audio(std::atomic<bool> *quit, ThreadManager *manager)
         auto start = std::chrono::high_resolution_clock::now();
 
         while (manager->newMessages(buffers::sound)) {
-            // TODO: GET MESSAGE
-            // TODO: ACT ON MESSAGE
+            auto &&msg = manager->getMessage<AudioMessage>(buffers::sound);
+            effect->playSound(msg->posLeft);
         }
 
         sleepForTimeLeft(start);
