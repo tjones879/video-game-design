@@ -123,6 +123,14 @@ void DisplayManager::setCamera(const Vec2<float> playerVel,
                 camera.zoom += .005;
         }
     }
+    // if(playerPos.x > (camera.x + (SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.6) &&
+    //    playerPos.x < (camera.x + (SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.6)){
+    //     camera.x = ((playerPos.x + enemyPos.x)/2)-(SCREEN_WIDTH/2);
+    // }
+    // if(playerPos.y > (camera.y + (SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.6) &&
+    //    playerPos.y < (camera.y + (SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.6)){
+    //     camera.y = ((playerPos.y + enemyPos.y)/2)-(SCREEN_HEIGHT/2);
+    //}
     GPU_SetCamera(gpu, &camera);
 }
 
