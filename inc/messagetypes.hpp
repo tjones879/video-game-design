@@ -12,9 +12,18 @@ struct AudioMessage;
 enum class MessageType : char {
     Render,
     Input,
-    Body,
+    BodyCreated,
+    CreateBody,
     Audio,
     INVALID
+};
+
+enum class CharacterType : char {
+    Player,
+    Spawner,
+    Boundary,
+    Enemy,
+    Unknown
 };
 
 struct Message {
@@ -57,14 +66,28 @@ struct InputMessage : Message {
     }
 };
 
-struct BodyMessage : Message {
+struct BodyCreatedMessage : Message {
     std::weak_ptr<phy::Body> body;
+    CharacterType type;
 
-    BodyMessage() {}
-    BodyMessage(std::weak_ptr<phy::Body> bod) : body(bod) {}
+    BodyCreatedMessage() : type(CharacterType::Unknown) {}
+    BodyCreatedMessage(std::weak_ptr<phy::Body> bod) : body(bod), type(CharacterType::Unknown) {}
+    BodyCreatedMessage(std::weak_ptr<phy::Body> bod, CharacterType charType)
+        : body(bod), type(charType) {}
 
     virtual MessageType getType() const override {
-        return MessageType::Body;
+        return MessageType::BodyCreated;
+    }
+};
+
+struct CreateBodyMessage : Message {
+    CharacterType type;
+
+    CreateBodyMessage() : type(CharacterType::Uknown) {}
+    CreateBodyMessage(CharacterType charType) : type(charType) {}
+
+    virtual MessageType getType() const override {
+        return MessageType::CreateBody;
     }
 };
 
