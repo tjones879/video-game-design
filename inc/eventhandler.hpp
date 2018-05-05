@@ -13,6 +13,7 @@
 #include <inc/vec2.hpp>
 #include <inc/displaymanager.hpp>
 #include <inc/physics/body.hpp>
+#include "inc/threadmanager.hpp"
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -27,83 +28,87 @@ enum class Commands : char {
     NUM_OF_COMMANDS
 };
 
+class Command {
+  public:
+    virtual ~Command() {};
+    virtual void execute() const = 0;
+};
+
+class JumpCommand : public Command {
+  public:
+    virtual void execute() const {
+        DEBUG("Execute Jump");
+        //jump();
+        return;
+    }
+};
+
+class DuckCommand : public Command {
+  public:
+    virtual void execute() const {
+        //duck();
+    }
+};
+
+class MoveCommand : public Command {
+  private:
+    Vec2<int> addVelocity;
+    std::weak_ptr<phy::Body> body;
+    void addPlayerVel() const {
+        auto locked = body.lock();
+        auto currVel = locked->getLinearVelocity();
+        locked->setLinearVelocity(currVel + addVelocity);
+    }
+
+  public:
+    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<int> addVel){
+        this->body = body;
+        addVelocity = addVel;
+    }
+
+    virtual void execute() const override {
+        addPlayerVel();
+    }
+};
+
+class ActionCommand : public Command {
+  public:
+    virtual void execute() const {
+        //action();
+    }
+};
+
+class SpecialCommand : public Command {
+  public:
+    virtual void execute() const {
+        //special();
+    }
+};
+
 class EventHandler
 {
 private:
+    ThreadManager *threadManager;
     bool initialized;
     std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> body;
+    std::queue<std::unique_ptr<Command>> eventStack;
     Controller controller;
     int camPosX;
-
-    class Command {
-        public:
-          virtual ~Command() {};
-          virtual void execute() const = 0;
-    };
-    class JumpCommand : public Command {
-        public:
-          virtual void execute() const {
-              DEBUG("Execute Jump");
-              //jump();
-              return;
-          }
-    };
-    class DuckCommand : public Command {
-        public:
-          virtual void execute() const {
-              //duck();
-          }
-    };
-    class MoveCommand : public Command {
-      private:
-        Vec2<int> addVelocity;
-        EventHandler* eventHandler;
-      public:
-        MoveCommand(EventHandler* eventhandler){
-          eventHandler = eventhandler;
-        }
-        void addCommand(Vec2<int> addVel) {
-          addVelocity = addVel;
-          eventHandler->eventStack.push(eventHandler->moveCommand);
-        }
-        virtual void execute() const override {
-          eventHandler->addPlayerVel(addVelocity);
-        }
-    };
-    class ActionCommand : public Command {
-        public:
-          virtual void execute() const {
-              //action();
-          }
-    };
-    class SpecialCommand : public Command {
-        public:
-          virtual void execute() const {
-              //special();
-          }
-    };
     void actionHandler(Commands command, bool pressed);
     void initKeyMapping();
     void initButtonMapping();
-    std::queue<Command*> eventStack;
-    JumpCommand* jumpCommand;
-    MoveCommand* moveCommand;
-    ActionCommand* actionCommand;
-    SpecialCommand* specialCommand;
-    DuckCommand* duckCommand;
 public:
-    EventHandler();
+    EventHandler(ThreadManager *manager);
     ~EventHandler();
     bool isInitialized() const;
     int inputHandler(SDL_Event &event);
     void addEvent(Command &newCommand);
     void executeEvents();
-    Command *getCommandPtr(Commands cmd);
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
-    void addPlayerVel(Vec2<int> addVelocity);
+    std::weak_ptr<const phy::Body> getPlayer() const;
     int getSoundOrigin();
     void setCamPosX(int camX);
 };

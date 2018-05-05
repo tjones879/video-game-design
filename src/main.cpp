@@ -1,42 +1,52 @@
+#include <chrono>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
+#include "inc/threadmanager.hpp"
 #include <iostream>
 #include "inc/vec2.hpp"
+#include "inc/physics/world.hpp"
 #include "inc/eventhandler.hpp"
 #include "inc/displaymanager.hpp"
-#include "inc/physics/world.hpp"
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
-#include "sound.cpp"
+
 #define WAV_PATH "assets/minor_clam.wav"
 
+const std::chrono::milliseconds timePerFrame(16);
 
-#define DEBUG(e) std::cerr << e << std::endl;
+void sleepForTimeLeft(std::chrono::time_point<std::chrono::high_resolution_clock> startTime) {
+    auto end = std::chrono::high_resolution_clock::now();
+    if (end - startTime < timePerFrame)
+        std::this_thread::sleep_for(timePerFrame - (end - startTime));
+}
 
-
-const int MIN_MILLISECONDS_PER_FRAME = 16;
-
-int main(int argc, char **args)
+void display(std::atomic<bool> *quit, ThreadManager *manager)
 {
     DisplayManager displayManager("Test Window");
+
     if (!displayManager.isInitialized()) {
         std::cout << "Display Manager failed" << std::endl;
-        return 1;
+        return;
     }
-    Sound::init();
+    manager->openBuffer(buffers::render);
 
-    Sound* effect = new Sound(WAV_PATH, SOUND_EFFECT);
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+        while (manager->newMessages(buffers::render)) {
+            auto&& msg = manager->getMessage<RenderMessage>(buffers::render);
+            displayManager.addRenderable(std::move(msg));
+        }
 
-    EventHandler eventHandler;
-    if (!eventHandler.isInitialized()) {
-        std::cout << "EventHandler failed" << std::endl;
-        return 1;
+        displayManager.displayAll();
+        sleepForTimeLeft(start);
     }
+}
 
-
-    phy::World world(Vec2<float>(0, 0));
-
+void physics(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    phy::World world(Vec2<float>(5, 9.8), manager);
+    manager->openBuffer(buffers::input);
 
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
@@ -47,39 +57,82 @@ int main(int argc, char **args)
     auto body = world.createBody(spec);
     auto shape_ptr = body.lock()->addShape(shape);
 
-    spec.position = {150,150};
-    auto shape2 = phy::PolygonShape(0.5f);
-    shape2.setBox(Vec2<float>(50.0,50.0));
-    auto body2 = world.createBody(spec);
-    auto shape_ptr2 = body2.lock()->addShape(shape2);
-    eventHandler.setPlayer(body2);
-    std::vector<std::weak_ptr<phy::Body>> bodies;
-    bodies.push_back(body);
-    bodies.push_back(body2);
-    std::vector<std::weak_ptr<phy::PolygonShape>> shapes;
-    shapes.push_back(shape_ptr);
-    shapes.push_back(shape_ptr2);
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
 
-    Sound* music = new Sound(WAV_PATH, SOUND_MUSIC);
-    music->playSound(127);
-    bool quit = false;
-    SDL_Event e{};
-    while (!quit) {
-        const int start = SDL_GetTicks();
-        displayManager.displayPolygon(bodies, shapes);
-        int camX = displayManager.getCamPosX();
-        eventHandler.setCamPosX(camX);
-
-        if (eventHandler.inputHandler(e) == 1)
-            return 0;
-        eventHandler.executeEvents();
-        world.step();
-
-        const int millisecondsThisFrame = SDL_GetTicks() - start;
-        if (millisecondsThisFrame < MIN_MILLISECONDS_PER_FRAME) {
-            // If rendering faster than 60FPS, delay
-            SDL_Delay(MIN_MILLISECONDS_PER_FRAME - millisecondsThisFrame);
+        while (manager->newMessages(buffers::input)) {
+            auto &&msg = manager->getMessage<InputMessage>(buffers::input);
+            msg->command->execute();
         }
+
+        world.step();
+        manager->sendMessage(buffers::render, world.getObjects());
+
+        sleepForTimeLeft(start);
     }
+}
+
+void audio(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    Sound::init();
+
+    auto effect = std::make_shared<Sound>(WAV_PATH, SOUND_EFFECT);
+    auto music = std::make_shared<Sound>(WAV_PATH, SOUND_MUSIC);
+    music->playSound(127);
+    manager->openBuffer(buffers::sound);
+
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        while (manager->newMessages(buffers::sound)) {
+            // TODO: GET MESSAGE
+            // TODO: ACT ON MESSAGE
+        }
+
+        sleepForTimeLeft(start);
+    }
+}
+
+void events(std::atomic<bool> *quit, ThreadManager *manager)
+{
+    EventHandler eventHandler(manager);
+    if (!eventHandler.isInitialized()) {
+        std::cout << "EventHandler failed" << std::endl;
+        return;
+    }
+
+    manager->openBuffer(buffers::bodies);
+
+    SDL_Event e{};
+    while (!(*quit)) {
+        auto start = std::chrono::high_resolution_clock::now();
+        if (eventHandler.inputHandler(e) == 1) {
+            manager->waitAll();
+            return;
+        }
+
+        if (manager->newMessages(buffers::bodies)) {
+            auto&& body = manager->getMessage<BodyMessage>(buffers::bodies);
+            if (!eventHandler.getPlayer().lock())
+                eventHandler.setPlayer(body->body);
+        }
+
+        eventHandler.executeEvents();
+
+        sleepForTimeLeft(start);
+    }
+}
+
+int main(int argc, char **args)
+{
+    ThreadManager threadManager;
+
+    threadManager.spawnThread(display);
+    threadManager.spawnThread(physics);
+    threadManager.spawnThread(audio);
+    events(&threadManager.stopThreads, &threadManager);
+
+    threadManager.waitAll();
+
     return 0;
 }

@@ -142,6 +142,12 @@ bool operator== (const Vec2<T> &a, const Vec2<T> &b)
     return (a.x == b.x) && (a.y == b.y);
 }
 
+template <typename T>
+bool operator!= (const Vec2<T> &a, const Vec2<T> &b)
+{
+    return !(a == b);
+}
+
 /**
  * Calculate the minimum values for each direction in the Vec2.
  *
