@@ -2,6 +2,7 @@
 
 #include "inc/physics/common.hpp"
 #include "inc/physics/body.hpp"
+#include "inc/messagetypes.hpp"
 #include "inc/physics/broadphase.hpp"
 #include <memory>
 #include <vector>
@@ -25,13 +26,15 @@ class Contact;
 class World {
 private:
     Vec2f gravity;
+    ThreadManager *threadManager;
     std::vector<std::shared_ptr<Body>> bodyList;
     uint8_t velocityIterations; ///< Number of iterations used to resolve velocity of bodies
     uint8_t positionIterations; ///< Number of iterations used to resolve positions of bodies
     uint32_t lastTicks; ///< Number of SDL_GetTicks() for the last iteration
     BroadPhase broadPhase;
+    std::pair<bool, uint32_t> lastPause;
 public:
-    World(const Vec2f &gravity_);
+    World(const Vec2f &gravity_, ThreadManager *manager);
     /**
      * All objects referenced by the world are ref counted, so
      * they should be automatically destroyed when any other
@@ -90,6 +93,18 @@ public:
      * and prevent impossible conditions.
      */
     void setPositionIterations(uint8_t iterations);
+
+    /**
+     *
+     *
+     */
+    std::unique_ptr<RenderMessage> getObjects();
+
+    /**
+     * Pause the world so that no objects are moved.
+     */
+    void pause();
+    void unpause();
 private:
     float updateTime();
 };

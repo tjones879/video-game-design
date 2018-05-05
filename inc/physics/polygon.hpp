@@ -12,6 +12,7 @@ class PolygonShape : public Shape {
     float density;
 public:
     std::vector<Vec2f> vertices;
+    PolygonShape() {}
     PolygonShape(float dens);
     PolygonShape(const PolygonShape &shape, const Transform &transform);
     /**

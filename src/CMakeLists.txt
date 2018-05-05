@@ -11,5 +11,6 @@ add_library(engine
     ${SRC}/physics/broadphase.cpp
     ${SRC}/physics/collisions.cpp
     ${SRC}/displaymanager.cpp
+    ${SRC}/sound.cpp
     ${SRC}/eventhandler.cpp
     ${SRC}/controller.cpp)

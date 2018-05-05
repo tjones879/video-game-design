@@ -46,11 +46,12 @@ struct Transform {
     Rotation rotation;
     Transform(Vec2f p, Rotation r)
         : position(p), rotation(r) {}
+    Transform() {}
 
     /**
      * Rotate a point then apply a linear translation.
      */
-    Vec2f translate(const Vec2f &point) const
+    inline Vec2f translate(const Vec2f &point) const
     {
         auto translated = rotation.rotate(point);
         translated.x += position.x;

@@ -7,7 +7,7 @@
 DisplayManager::DisplayManager(const std::string &title)
     : initialized(false), window(nullptr), gpu(&window)
 {
-    if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0) {
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) < 0) {
         std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return;
     }
@@ -25,8 +25,6 @@ DisplayManager::DisplayManager(const std::string &title)
     playerColor.a = 255;
     camera = GPU_GetCamera(gpu);
     GPU_EnableCamera(gpu, true);
-    // camera.x = 150 - (SCREEN_HEIGHT/2);
-    // camera.y = 150 - (SCREEN_HEIGHT/2);
     camera.x = 0;
     camera.y = 0;
     camera.zoom = .5;
@@ -49,8 +47,27 @@ bool DisplayManager::isInitialized() const
     return initialized;
 }
 
-void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> &bodies,
-                                    const std::vector<std::weak_ptr<phy::PolygonShape>> &shapes)
+void DisplayManager::addRenderable(std::unique_ptr<RenderMessage>&& msg)
+{
+    shapes.resize(msg->shapes->size());
+    shapes = std::move(*msg->shapes.get());
+}
+
+inline std::vector<float> DisplayManager::toFloatVector(const phy::PolygonShape &shape,
+                                                        const phy::Transform &offset)
+{
+    std::vector<float> vertices;
+    vertices.reserve(shape.vertices.size() * 2);
+    for (auto v : shape.vertices) {
+        auto point = std::move(offset.translate(v));
+        vertices.push_back(point.x);
+        vertices.push_back(point.y);
+    }
+
+    return vertices;
+}
+
+void DisplayManager::displayAll()
 {
     GPU_Clear(gpu);
     color.r = 0;
@@ -58,7 +75,11 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
     color.b = 125;
     color.a = 255;
 
+    for (const auto &s : shapes) {
+        auto shape = s.first;
+        auto transform = s.second;
 
+    /*
     for (int i = 0; i < bodies.size(); i++) {
         std::weak_ptr<phy::Body> body = bodies[i];
         std::weak_ptr<phy::PolygonShape> shape = shapes[i];
@@ -80,8 +101,16 @@ void DisplayManager::displayPolygon(const std::vector<std::weak_ptr<phy::Body>> 
             GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], playerColor);
         }else
             GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
+        */
+        auto vertices = std::move(toFloatVector(shape, transform));
+        GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], color);
     }
+
     GPU_Flip(gpu);
+}
+
+int DisplayManager::getCamPosX() {
+    return camera.x;
 }
 
 void DisplayManager::setCamera(const Vec2<float> playerVel, 
