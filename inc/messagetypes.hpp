@@ -28,6 +28,7 @@ enum class CharacterType : char {
     Spawner,
     Boundary,
     Enemy,
+    Spawner,
     Unknown
 };
 

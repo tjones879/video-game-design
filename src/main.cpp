@@ -127,7 +127,8 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     spec.position = {300, 300};
     spec.gravityFactor = 0;
     manager->sendMessage(buffers::createBody,
-                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Unknown));
+                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Spawner));
+
 
     SDL_Event e{};
     while (!(*quit)) {
