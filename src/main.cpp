@@ -113,6 +113,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
         return;
     }
 
+    // Create Player
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
     spec.position = {180, 180};
@@ -124,10 +125,19 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
 
-    spec.position = {300, 300};
+    // Create Spawner
+    spec.position = {400, 400};
     spec.gravityFactor = 0;
+    shape.setBox(Vec2<float>(40, 40));
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Spawner));
+
+    // Create Enemies
+    auto enemies = eventHandler.defineEnemies(20);
+    for (auto spec : enemies)
+        manager->sendMessage(buffers::createBody,
+                             std::make_unique<CreateBodyMessage>(spec, CharacterType::Enemy));
 
 
     SDL_Event e{};
@@ -139,15 +149,29 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
         }
 
         if (manager->newMessages(buffers::bodyCreated)) {
-            auto&& body = manager->getMessage<BodyCreatedMessage>(buffers::bodyCreated);
-            if (!eventHandler.getPlayer().lock())
-                eventHandler.setPlayer(body->body);
+            auto&& msg = manager->getMessage<BodyCreatedMessage>(buffers::bodyCreated);
+            switch(msg->type) {
+            case CharacterType::Player:
+                eventHandler.setPlayer(msg->body);
+                break;
+            case CharacterType::Enemy:
+                eventHandler.addEnemy(msg->body.lock());
+                break;
+            case CharacterType::Spawner:
+                break;
+            case CharacterType::Boundary:
+                break;
+            case CharacterType::Unknown:
+                break;
+            }
         }
 
         if (manager->newMessages(buffers::collisions)) {
             auto&& msg = manager->getMessage<CollisionMessage>(buffers::collisions);
+            /* Unnecessary logging
             for (auto p : msg->bodies)
                 std::cout << *p.first.lock() << ", " << *p.second.lock() << std::endl;
+            */
         }
 
         eventHandler.executeEvents();
@@ -158,6 +182,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
 
 int main(int argc, char **args)
 {
+    std::srand(std::time(0));
     ThreadManager threadManager;
 
     threadManager.spawnThread(display);

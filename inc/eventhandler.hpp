@@ -14,6 +14,7 @@
 #include <inc/displaymanager.hpp>
 #include <inc/physics/body.hpp>
 #include "inc/threadmanager.hpp"
+#include <unordered_set>
 
 #define DEBUG(e) std::cerr << e << std::endl;
 
@@ -99,9 +100,11 @@ private:
     std::array<bool, static_cast<char>(Commands::NUM_OF_COMMANDS)> commandState{};
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
-    std::weak_ptr<phy::Body> body;
+    std::weak_ptr<phy::Body> player;
     std::queue<std::unique_ptr<Command>> eventStack;
+    std::unordered_set<std::shared_ptr<phy::Body>> enemies;
     Controller controller;
+
     int camPosX;
     void actionHandler(Commands command, bool pressed);
     void initKeyMapping();
@@ -117,4 +120,16 @@ public:
     std::weak_ptr<const phy::Body> getPlayer() const;
     int getSoundOrigin();
     void setCamPosX(int camX);
+    /**
+     * Create a random amount of enemies and return them.
+     */
+    std::vector<phy::BodySpec> defineEnemies(uint32_t numEnemies) const;
+    /**
+     *
+     */
+    std::unordered_set<std::shared_ptr<phy::Body>> getEnemies() const;
+    /**
+     * Add a created body to the enemy list for tracking.
+     */
+    void addEnemy(std::shared_ptr<phy::Body> enemy);
 };

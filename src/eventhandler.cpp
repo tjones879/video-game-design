@@ -3,6 +3,7 @@
 #include <inc/sound.hpp>
 #include <iostream>
 #include <cstdio>
+#include <random>
 #define WAV_PATH "assets/high.wav"
 
 #define DEBUG(e) ;
@@ -48,9 +49,9 @@ EventHandler::~EventHandler(){
 }
 
 int EventHandler::getSoundOrigin() {
-    auto player = body.lock()->getPosition();
+    auto playerPos = player.lock()->getPosition();
     DEBUG(camPosX);
-    double soundRatio = double(abs(camPosX - player.x))/640; //640 is Screen width
+    double soundRatio = double(abs(camPosX - playerPos.x))/640; //640 is Screen width
     int soundOrigin = soundRatio*255;// 255 is max volume per channel
     DEBUG(soundOrigin);
     return soundOrigin*-1; // return inverse since this is used for left channel -- see Mix_SetPanning in sound.cpp
@@ -67,23 +68,23 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>( 0,-5));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 0,-5));
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>( 0, 5));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 0, 5));
             break;
         case Commands::BACK:
             DEBUG("Back");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>(-5, 0));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<int>(-5, 0));
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            cmd = std::make_unique<MoveCommand>(body, Vec2<int>( 5, 0));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 5, 0));
             break;
         case Commands::ACTION:
             DEBUG("Action");
-            cmd = std::make_unique<ActionCommand>(body);
+            cmd = std::make_unique<ActionCommand>(player);
             break;
         case Commands::SPECIAL:
             DEBUG("Special");
@@ -153,10 +154,45 @@ void EventHandler::executeEvents(){
 }
 
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
-    body = bodyPtr;
+    player = bodyPtr;
 }
 
 std::weak_ptr<const phy::Body> EventHandler::getPlayer() const
 {
-    return body;
+    return player;
+}
+
+std::vector<phy::BodySpec> EventHandler::defineEnemies(uint32_t numEnemies) const
+{
+    // Initialize randomness
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> vel(-50, 50);
+    std::uniform_real_distribution<float> pos(200, 300);
+
+    std::vector<phy::BodySpec> specs;
+    for (int i = 0; i < numEnemies; i++) {
+        phy::BodySpec spec;
+        spec.bodyType = phy::BodyType::dynamicBody;
+        spec.position = {pos(gen), pos(gen)};
+        spec.gravityFactor = 0;
+        auto shape = phy::PolygonShape(1.0f);
+        shape.setBox(Vec2<float>(5, 5));
+        spec.shapes.push_back(std::make_shared<phy::PolygonShape>(shape));
+
+        spec.linVelocity = {vel(gen), vel(gen)};
+        // TODO: Give enemy random color
+        specs.push_back(spec);
+    }
+    return specs;
+}
+
+std::unordered_set<std::shared_ptr<phy::Body>> EventHandler::getEnemies() const
+{
+    return enemies;
+}
+
+void EventHandler::addEnemy(std::shared_ptr<phy::Body> enemy)
+{
+    enemies.insert(enemy);
 }
