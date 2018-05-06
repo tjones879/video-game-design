@@ -99,6 +99,7 @@ private:
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> player;
+    std::weak_ptr<phy::Body> spawner;
     std::queue<std::unique_ptr<Command>> eventStack;
     std::unordered_set<std::shared_ptr<phy::Body>> enemies;
     Controller controller;
@@ -115,7 +116,9 @@ public:
     void addEvent(Command &newCommand);
     void executeEvents();
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
+    void setSpawner(std::weak_ptr<phy::Body> bodyPtr);
     std::weak_ptr<const phy::Body> getPlayer() const;
+    std::weak_ptr<const phy::Body> getSpawner() const;
     int getSoundOrigin();
     void setCamPosX(int camX);
     /**
