@@ -2,6 +2,7 @@
 
 #include "inc/controller.hpp"
 #include "inc/sound.hpp"
+#include "inc/common.hpp"
 #include <SDL2/SDL_mixer.h>
 
 #include <SDL2/SDL.h>

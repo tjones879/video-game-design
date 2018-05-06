@@ -1,4 +1,5 @@
 #include <chrono>
+#include "inc/common.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include "inc/threadmanager.hpp"
@@ -11,7 +12,6 @@
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
 
-#define DEBUG(e) std::cerr << e << std::endl;
 
 const std::chrono::milliseconds timePerFrame(16);
 
