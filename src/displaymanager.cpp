@@ -47,8 +47,10 @@ bool DisplayManager::isInitialized() const
 
 void DisplayManager::addRenderable(std::unique_ptr<RenderMessage>&& msg)
 {
-    shapes.resize(msg->shapes->size());
-    shapes = std::move(*msg->shapes.get());
+    polygons.resize(msg->polygons->size());
+    polygons = std::move(*msg->polygons.get());
+    circles.resize(msg->circles->size());
+    circles = std::move(*msg->circles.get());
 }
 
 inline std::vector<float> DisplayManager::toFloatVector(const phy::PolygonShape &shape,
@@ -68,12 +70,8 @@ inline std::vector<float> DisplayManager::toFloatVector(const phy::PolygonShape 
 void DisplayManager::displayAll()
 {
     GPU_Clear(gpu);
-    color.r = 0;
-    color.g = 125;
-    color.b = 125;
-    color.a = 255;
 
-    for (const auto &s : shapes) {
+    for (const auto &s : polygons) {
         auto shape = std::get<0>(s);
         auto transform = std::get<1>(s);
 
@@ -96,6 +94,14 @@ void DisplayManager::displayAll()
         */
         auto vertices = toFloatVector(shape, transform);
         GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], std::get<2>(s));
+    }
+
+    for (const auto &s : circles) {
+        auto shape = std::get<0>(s);
+        auto transform = std::get<1>(s);
+
+        auto center = transform.translate(shape.pos);
+        GPU_CircleFilled(gpu, center.x, center.y, shape.radius, std::get<2>(s));
     }
 
     GPU_Flip(gpu);

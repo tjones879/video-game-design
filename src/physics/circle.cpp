@@ -7,10 +7,18 @@ CircleShape::CircleShape()
     shapeType = ShapeType::circle;
 }
 
-CircleShape::CircleShape(float dens, float rad)
-    : density(dens), radius(rad)
+CircleShape::CircleShape(float dens, float rad, Vec2f position)
+    : density(dens), radius(rad), pos(position)
 {
     shapeType = ShapeType::circle;
+}
+
+CircleShape::CircleShape(const CircleShape &other)
+{
+    shapeType = ShapeType::circle;
+    density = other.density;
+    radius = other.radius;
+    pos = other.pos;
 }
 
 bool CircleShape::testPoint(const Transform &transform, const Vec2f &pos) const

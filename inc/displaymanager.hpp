@@ -13,7 +13,8 @@
 class DisplayManager
 {
 private:
-    std::vector<std::tuple<phy::PolygonShape, phy::Transform, SDL_Color>> shapes;
+    std::vector<std::tuple<phy::PolygonShape, phy::Transform, SDL_Color>> polygons;
+    std::vector<std::tuple<phy::CircleShape, phy::Transform, SDL_Color>> circles;
     bool initialized;
     SDL_Window *window;
     GPUTarget gpu;

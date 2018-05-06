@@ -111,16 +111,29 @@ void World::setPositionIterations(uint8_t iterations)
 
 std::unique_ptr<RenderMessage> World::getObjects()
 {
-    RenderMessage::ShapeList shapes;
+    using Polygons = RenderMessage::ShapeList<PolygonShape>;
+    using Circles = RenderMessage::ShapeList<CircleShape>;
+    Polygons polygons;
+    Circles circles;
 
     for (auto&& b : bodyList) {
         for (auto&& s : b->shapeList) {
-            auto polygon = std::dynamic_pointer_cast<phy::PolygonShape>(s);
-            shapes.push_back(std::make_tuple(*polygon.get(), b->getTransform(), b->getExtraData()->color));
+            if (s->getShapeType() == ShapeType::polygon) {
+                auto polygon = std::dynamic_pointer_cast<phy::PolygonShape>(s);
+                polygons.push_back(std::make_tuple(*polygon.get(),
+                                                   b->getTransform(),
+                                                   b->getExtraData()->color));
+            } else {
+                auto circle = std::dynamic_pointer_cast<phy::CircleShape>(s);
+                circles.push_back(std::make_tuple(*circle.get(),
+                                                  b->getTransform(),
+                                                  b->getExtraData()->color));
+            }
         }
     }
 
-    auto msg = RenderMessage(std::make_unique<RenderMessage::ShapeList>(shapes));
+    auto msg = RenderMessage(std::make_unique<Polygons>(polygons),
+                             std::make_unique<Circles>(circles));
     return std::make_unique<RenderMessage>(std::move(msg));
 }
 

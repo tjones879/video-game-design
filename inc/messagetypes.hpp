@@ -38,17 +38,22 @@ struct Message {
 };
 
 struct RenderMessage : Message {
-    using ShapeList = std::vector<std::tuple<phy::PolygonShape, phy::Transform, SDL_Color>>;
-    std::unique_ptr<ShapeList> shapes;
+    template <typename T>
+    using ShapeList = std::vector<std::tuple<T, phy::Transform, SDL_Color>>;
+    std::unique_ptr<ShapeList<phy::PolygonShape>> polygons;
+    std::unique_ptr<ShapeList<phy::CircleShape>> circles;
 
     RenderMessage() {}
 
-    RenderMessage(std::unique_ptr<ShapeList>&& shapesList) {
-        shapes = std::move(shapesList);
+    RenderMessage(std::unique_ptr<ShapeList<phy::PolygonShape>>&& polygonList,
+                  std::unique_ptr<ShapeList<phy::CircleShape>>&& circleList) {
+        polygons = std::move(polygonList);
+        circles = std::move(circleList);
     }
 
     RenderMessage(RenderMessage &&other) {
-        shapes = std::move(other.shapes);
+        polygons = std::move(other.polygons);
+        circles = std::move(other.circles);
     }
 
     virtual MessageType getType() const override {

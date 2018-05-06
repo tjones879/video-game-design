@@ -11,7 +11,8 @@ public:
     Vec2f pos;
 
     CircleShape();
-    CircleShape(float dens, float rad);
+    CircleShape(float dens, float rad, Vec2f position);
+    CircleShape(const CircleShape &other);
 
     virtual bool testPoint(const Transform &transform, const Vec2f &pos) const override;
     virtual AABB getAABB(const Transform &transform) const override;
