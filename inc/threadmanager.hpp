@@ -20,6 +20,7 @@ namespace buffers {
     const std::string bodyCreated("bodyCreated");
     const std::string createBody("createBody");
     const std::string sound("sound");
+    const std::string destroyBody("destroyBody");
 }
 
 class ThreadBuffer {

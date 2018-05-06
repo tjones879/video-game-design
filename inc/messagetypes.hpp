@@ -5,6 +5,8 @@ struct RenderMessage;
 struct InputMessage;
 struct BodyCreatedMessage;
 struct CreateBodyMessage;
+struct DestroyBodyMessage;
+struct CollisionMessage;
 struct AudioMessage;
 
 #include "inc/physics/polygon.hpp"
@@ -15,7 +17,9 @@ enum class MessageType : char {
     Input,
     BodyCreated,
     CreateBody,
+    DestroyBody,
     Audio,
+    Collision,
     INVALID
 };
 
@@ -91,6 +95,26 @@ struct CreateBodyMessage : Message {
 
     virtual MessageType getType() const override {
         return MessageType::CreateBody;
+    }
+};
+
+struct DestroyBodyMessage : Message {
+    std::weak_ptr<phy::Body> body;
+
+    DestroyBodyMessage() {}
+    DestroyBodyMessage(std::weak_ptr<phy::Body> bod) : body(bod) {}
+    virtual MessageType getType() const override {
+        return MessageType::DestroyBody;
+    }
+};
+
+struct CollisionMessage : Message {
+    std::pair<phy::Body, phy::Body> bodies;
+
+    CollisionMessage(std::pair<phy::Body, phy::Body> bodyPair) : bodies(bodyPair) {}
+
+    virtual MessageType getType() const override {
+        return MessageType::Collision;
     }
 };
 

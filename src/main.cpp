@@ -47,6 +47,7 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 {
     manager->openBuffer(buffers::input);
     manager->openBuffer(buffers::createBody);
+    manager->openBuffer(buffers::destroyBody);
 
     phy::World world(Vec2<float>(5, 9.8), manager);
 
@@ -59,6 +60,11 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 
             manager->sendMessage(buffers::bodyCreated,
                                  std::make_unique<BodyCreatedMessage>(bod, msg->type));
+        }
+
+        while (manager->newMessages(buffers::destroyBody)) {
+            auto &&msg = manager->getMessage<DestroyBodyMessage>(buffers::destroyBody);
+            world.destroyBody(msg->body);
         }
 
         while (manager->newMessages(buffers::input)) {
