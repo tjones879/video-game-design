@@ -11,6 +11,7 @@ public:
     Vec2f pos;
 
     CircleShape();
+    CircleShape(float dens, float rad);
     CircleShape(float dens, float rad, Vec2f position);
     CircleShape(const CircleShape &other);
 

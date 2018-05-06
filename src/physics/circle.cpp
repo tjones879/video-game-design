@@ -7,6 +7,9 @@ CircleShape::CircleShape()
     shapeType = ShapeType::circle;
 }
 
+CircleShape::CircleShape(float dens, float rad)
+    : density(dens), radius(rad), pos({0, 0}) {}
+
 CircleShape::CircleShape(float dens, float rad, Vec2f position)
     : density(dens), radius(rad), pos(position)
 {
