@@ -21,6 +21,9 @@ enum class BodyType {
 };
 
 struct ExtraData {
+    ExtraData() {
+        color = {0, 125, 125, 255};
+    }
     SDL_Color color;
 };
 

@@ -116,7 +116,7 @@ std::unique_ptr<RenderMessage> World::getObjects()
     for (auto&& b : bodyList) {
         for (auto&& s : b->shapeList) {
             auto polygon = std::dynamic_pointer_cast<phy::PolygonShape>(s);
-            shapes.push_back(std::make_pair(*polygon.get(), b->getTransform()));
+            shapes.push_back(std::make_tuple(*polygon.get(), b->getTransform(), b->getExtraData()->color));
         }
     }
 

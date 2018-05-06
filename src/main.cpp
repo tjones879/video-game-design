@@ -169,8 +169,8 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
         if (manager->newMessages(buffers::collisions)) {
             auto&& msg = manager->getMessage<CollisionMessage>(buffers::collisions);
             /* Unnecessary logging
-            for (auto p : msg->bodies)
-                std::cout << *p.first.lock() << ", " << *p.second.lock() << std::endl;
+            for (auto bodyPair : msg->bodies)
+                std::cout << *bodyPair.first.lock() << ", " << *bodyPair.second.lock() << std::endl;
             */
         }
 

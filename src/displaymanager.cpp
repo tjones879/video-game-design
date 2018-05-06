@@ -76,8 +76,8 @@ void DisplayManager::displayAll()
     color.a = 255;
 
     for (const auto &s : shapes) {
-        auto shape = s.first;
-        auto transform = s.second;
+        auto shape = std::get<0>(s);
+        auto transform = std::get<1>(s);
 
     /*
     for (int i = 0; i < bodies.size(); i++) {
@@ -96,8 +96,8 @@ void DisplayManager::displayAll()
         }else
             GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
         */
-        auto vertices = std::move(toFloatVector(shape, transform));
-        GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], color);
+        auto vertices = toFloatVector(shape, transform);
+        GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], std::get<2>(s));
     }
 
     GPU_Flip(gpu);

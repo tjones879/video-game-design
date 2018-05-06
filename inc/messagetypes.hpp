@@ -38,7 +38,7 @@ struct Message {
 };
 
 struct RenderMessage : Message {
-    using ShapeList = std::vector<std::pair<phy::PolygonShape, phy::Transform>>;
+    using ShapeList = std::vector<std::tuple<phy::PolygonShape, phy::Transform, SDL_Color>>;
     std::unique_ptr<ShapeList> shapes;
 
     RenderMessage() {}
