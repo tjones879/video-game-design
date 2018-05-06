@@ -178,7 +178,7 @@ struct TestCallback : public AABBCallback {
     bool findAll;
     TestCallback(bool keepGoing)
         : findAll(keepGoing) {}
-    virtual bool registerCollision(const AABB &a, int32_t nodeid) override
+    virtual bool registerCollision(int32_t nodeA, int32_t nodeB) override
     {
         count++;
         return findAll;

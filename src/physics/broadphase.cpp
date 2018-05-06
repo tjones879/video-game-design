@@ -67,7 +67,7 @@ void BroadPhase::updatePairs()
     moved.clear();
 }
 
-bool BroadPhase::registerCollision(const AABB &a, int32_t nodeID)
+bool BroadPhase::registerCollision(int32_t nodeA, int32_t nodeB)
 {
     return true;
 }

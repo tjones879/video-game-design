@@ -420,7 +420,7 @@ void AABBTree::findCollisions(AABBCallback *callback, const AABB &aabb) const
         const AABBNode *node = &nodes[index];
         if (node->aabb.overlaps(aabb)) {
             if (node->isLeaf()) {
-                if (!callback->registerCollision(aabb, index))
+                if (!callback->registerCollision(-1, index))
                     return;
             } else {
                 stack.push(node->leftChild);
@@ -445,7 +445,7 @@ void AABBTree::findCollisions(AABBCallback *callback, int32_t index) const
         const AABBNode *node = &nodes[top];
         if (index != top && node->aabb.overlaps(aabb)) {
             if (node->isLeaf()) {
-                if (!callback->registerCollision(aabb, top))
+                if (!callback->registerCollision(index, top))
                     return;
             } else {
                 stack.push(node->leftChild);

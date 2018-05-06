@@ -80,7 +80,7 @@ public:
      * Callback for when the dynamic tree finds an overlap
      * in AABB.
      */
-    virtual bool registerCollision(const AABB &a, int32_t nodeID) = 0;
+    virtual bool registerCollision(int32_t nodeA, int32_t nodeB) = 0;
 };
 
 
@@ -105,8 +105,17 @@ public:
     /**
      * Find any any AABB in the tree that overlap with the
      * one that is given.
+     * @note This prototype should only be used for testing and will
+     *       always return -1 for the first index on callback.
      */
     void findCollisions(AABBCallback *callback, const AABB &aabb) const;
+    /**
+     * Find any any AABB in the tree that overlap with the
+     * one that is given.
+     * @note This is the only prototype that should be used for traversing
+     *       the tree of ingame objects and will use the correct index on
+     *       callback.
+     */
     void findCollisions(AABBCallback *callback, int32_t index) const;
     /**
      * Convert the tree to a string for debugging purposes.

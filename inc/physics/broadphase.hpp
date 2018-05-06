@@ -29,7 +29,7 @@ public:
      */
     void deleteBody(const std::shared_ptr<Body> deletedBody);
     void updatePairs();
-    virtual bool registerCollision(const AABB &a, int32_t nodeID) override;
+    virtual bool registerCollision(int32_t nodeA, int32_t nodeB) override;
     void printTree(std::ostream &out);
 private:
     /**
