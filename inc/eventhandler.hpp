@@ -118,6 +118,9 @@ public:
     std::weak_ptr<const phy::Body> getPlayer() const;
     int getSoundOrigin();
     void setCamPosX(int camX);
+
+    std::vector<phy::BodySpec>
+    defineBoundaries(Vec2<float> center, float thickness, float sideLength) const;
     /**
      * Create a random amount of enemies and return them.
      */

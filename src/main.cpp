@@ -139,6 +139,12 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
         manager->sendMessage(buffers::createBody,
                              std::make_unique<CreateBodyMessage>(spec, CharacterType::Enemy));
 
+    // Create Walls
+    auto boundaries = eventHandler.defineBoundaries(Vec2<float>(250, -100), 10, 400);
+    for (auto boundary : boundaries)
+        manager->sendMessage(buffers::createBody,
+                             std::make_unique<CreateBodyMessage>(boundary, CharacterType::Boundary));
+
 
     SDL_Event e{};
     while (!(*quit)) {

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdio>
 #include <random>
+#include <math.h>
 
 void EventHandler::initButtonMapping()
 {
@@ -147,6 +148,41 @@ void EventHandler::executeEvents(){
                                    std::make_unique<InputMessage>(std::move(eventStack.front())));
         eventStack.pop();
     }
+}
+
+std::vector<phy::BodySpec>
+EventHandler::defineBoundaries(Vec2<float> center, float thickness, float sideLength) const
+{
+    std::vector<phy::BodySpec> boundaries;
+
+    phy::BodySpec spec;
+    spec.bodyType = phy::BodyType::staticBody;
+    spec.position = {0, 0};
+    spec.gravityFactor = 0;
+
+    auto shape = phy::PolygonShape(1.0f);
+    shape.setBox({sideLength, thickness}, center, 0);
+    SDL_Color c{255, 255, 255, 255};
+    spec.extra.color = c;
+
+    spec.shapes.push_back(std::make_shared<phy::PolygonShape>(shape));
+    boundaries.push_back(spec);
+
+    shape.setBox({thickness, sideLength}, {center.x + sideLength, center.y + sideLength - thickness}, 0);
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
+    boundaries.push_back(spec);
+
+    shape.setBox({thickness, sideLength}, {center.x - sideLength, center.y + sideLength - thickness}, 0);
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
+    boundaries.push_back(spec);
+
+    shape.setBox({sideLength, thickness}, {center.x, center.y + 2 * (sideLength - thickness)}, 0);
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
+    boundaries.push_back(spec);
+
+    for (auto b : boundaries)
+        std::cout << b.position << std::endl;
+    return boundaries;
 }
 
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
