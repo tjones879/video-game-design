@@ -54,14 +54,11 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
         auto start = std::chrono::high_resolution_clock::now();
 
         while (manager->newMessages(buffers::createBody)) {
-            std::cout << "newMessage" << std::endl;
             auto &&msg = manager->getMessage<CreateBodyMessage>(buffers::createBody);
-            std::cout << "Got message" << std::endl;
             auto bod = world.createBody(msg->bodySpec);
-            std::cout << "createBody" << std::endl;
+
             manager->sendMessage(buffers::bodyCreated,
                                  std::make_unique<BodyCreatedMessage>(bod, msg->type));
-            std::cout << "All done" << std::endl;
         }
 
         while (manager->newMessages(buffers::input)) {
@@ -146,9 +143,7 @@ int main(int argc, char **args)
     threadManager.spawnThread(display);
     threadManager.spawnThread(physics);
     threadManager.spawnThread(audio);
-    std::cout << "Before sleep " << std::endl;
     std::this_thread::sleep_for(timePerFrame);
-    std::cout << "After sleep " << std::endl;
     events(&threadManager.stopThreads, &threadManager);
 
     threadManager.waitAll();
