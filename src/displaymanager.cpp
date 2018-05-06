@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cstdio>
 
-#define DEBUG(e) std::cerr << e << std::endl;
-
 DisplayManager::DisplayManager(const std::string &title)
     : initialized(false), window(nullptr), gpu(&window)
 {

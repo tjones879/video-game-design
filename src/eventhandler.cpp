@@ -4,10 +4,6 @@
 #include <iostream>
 #include <cstdio>
 #include <random>
-#define WAV_PATH "assets/high.wav"
-
-#define DEBUG(e) ;
-
 
 void EventHandler::initButtonMapping()
 {

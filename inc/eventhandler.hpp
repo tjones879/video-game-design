@@ -4,7 +4,6 @@
 #include "inc/sound.hpp"
 #include <SDL2/SDL_mixer.h>
 
-#define WAV_PATH "assets/scratch.wav"
 #include <SDL2/SDL.h>
 #include <array>
 #include <map>
@@ -15,8 +14,6 @@
 #include <inc/physics/body.hpp>
 #include "inc/threadmanager.hpp"
 #include <unordered_set>
-
-#define DEBUG(e) std::cerr << e << std::endl;
 
 enum class Commands : char {
     JUMP,

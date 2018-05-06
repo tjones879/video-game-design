@@ -1,6 +1,4 @@
 #include "inc/sound.hpp"
-#define WAV_PATH "assets/scratch.wav"
-#define DEBUG(e) std::cerr << e << std::endl;
 
 Sound::Sound(std::string inFilename, SOUND_TYPE type)
 {

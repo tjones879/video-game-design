@@ -11,7 +11,7 @@
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
 
-#define WAV_PATH "assets/minor_clam.wav"
+#define DEBUG(e) std::cerr << e << std::endl;
 
 const std::chrono::milliseconds timePerFrame(16);
 

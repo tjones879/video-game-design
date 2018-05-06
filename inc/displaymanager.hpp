@@ -10,8 +10,6 @@
 #include "inc/physics/polygon.hpp"
 #include "inc/messagetypes.hpp"
 
-#define DEBUG(e) std::cerr << e << std::endl;
-
 class DisplayManager
 {
 private:
