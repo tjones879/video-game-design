@@ -33,6 +33,7 @@ struct BodySpec {
     Vec2f linVelocity;
     float angVelocity;
     float gravityFactor; ///< Scalar factor for the world's gravity on this body
+    std::vector<std::shared_ptr<Shape>> shapes;
 };
 
 class Body {

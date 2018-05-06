@@ -10,6 +10,7 @@ namespace phy {
 enum class ShapeType {
     circle,
     polygon,
+    INVALID
 };
 
 struct MassProperties {
@@ -28,6 +29,8 @@ class Shape {
 protected:
     ShapeType shapeType;
 public:
+    Shape() : shapeType(ShapeType::INVALID) {}
+    Shape(ShapeType type) : shapeType(type) {}
     /**
      * Test a point to see if it is inside this shape.
      * @param point The location in world coordinates

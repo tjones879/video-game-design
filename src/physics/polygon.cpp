@@ -5,10 +5,10 @@
 
 namespace phy {
 PolygonShape::PolygonShape(float dens)
-    : density(dens) {}
+    : Shape(ShapeType::polygon), density(dens) {}
 
 PolygonShape::PolygonShape(const PolygonShape &shape, const Transform &transform)
-    : density(shape.density)
+    : Shape(ShapeType::polygon), density(shape.density)
 {
     vertices.reserve(shape.vertices.size());
     normals.reserve(shape.normals.size());

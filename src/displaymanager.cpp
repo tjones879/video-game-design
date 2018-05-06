@@ -90,13 +90,7 @@ void DisplayManager::displayAll()
                   bodies[1].lock()->getLinearVelocity(),
                   bodies[1].lock()->getPosition());
 
-        std::vector<float> vertices;
-        vertices.reserve(shape.lock()->vertices.size() * 2);
-        for (auto v : shape.lock()->vertices) {
-            vertices.push_back(v.x + offset.x);
-            vertices.push_back(v.y + offset.y);
-        }
-        if(i==0){
+        if(!i == 0){
             setPlayerColor();
             GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], playerColor);
         }else
@@ -113,9 +107,9 @@ int DisplayManager::getCamPosX() {
     return camera.x;
 }
 
-void DisplayManager::setCamera(const Vec2<float> playerVel, 
-                               const Vec2<float> playerPos, 
-                               const Vec2<float> enemyVel, 
+void DisplayManager::setCamera(const Vec2<float> playerVel,
+                               const Vec2<float> playerPos,
+                               const Vec2<float> enemyVel,
                                const Vec2<float> enemyPos){
     //This tracks the camera to the player
     if(playerPos.x < (camera.x + (SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75)){

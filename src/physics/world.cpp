@@ -20,7 +20,15 @@ std::weak_ptr<Body> World::createBody(const BodySpec &spec)
     auto bodyPtr = std::make_shared<Body>(spec);
     bodyList.push_back(bodyPtr);
     broadPhase.addNewBody(bodyPtr);
-    threadManager->sendMessage(buffers::bodies, std::make_unique<BodyMessage>(bodyPtr));
+    for (auto shape : spec.shapes) {
+        auto shapeType = shape->getShapeType();
+        if (shapeType == ShapeType::circle) {
+            bodyPtr->addShape(*std::move(std::dynamic_pointer_cast<CircleShape>(shape)));
+        } else if (shapeType == ShapeType::polygon) {
+            bodyPtr->addShape(*std::move(std::dynamic_pointer_cast<PolygonShape>(shape)));
+        }
+    }
+
     return bodyPtr;
 }
 
@@ -57,8 +65,6 @@ void World::step()
         return;
 
     const float dt = updateTime();
-    // If new bodies or shapes were added, find them
-    // Lock the world
 
     // TODO: Update all contacts
     // Integrate velocities

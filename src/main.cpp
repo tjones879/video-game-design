@@ -45,20 +45,24 @@ void display(std::atomic<bool> *quit, ThreadManager *manager)
 
 void physics(std::atomic<bool> *quit, ThreadManager *manager)
 {
-    phy::World world(Vec2<float>(5, 9.8), manager);
     manager->openBuffer(buffers::input);
+    manager->openBuffer(buffers::createBody);
 
-    phy::BodySpec spec;
-    spec.bodyType = phy::BodyType::dynamicBody;
-    spec.position = {180, 180};
-    spec.gravityFactor = 1;
-    auto shape = phy::PolygonShape(1.0f);
-    shape.setBox(Vec2<float>(25, 25));
-    auto body = world.createBody(spec);
-    auto shape_ptr = body.lock()->addShape(shape);
+    phy::World world(Vec2<float>(5, 9.8), manager);
 
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
+
+        while (manager->newMessages(buffers::createBody)) {
+            std::cout << "newMessage" << std::endl;
+            auto &&msg = manager->getMessage<CreateBodyMessage>(buffers::createBody);
+            std::cout << "Got message" << std::endl;
+            auto bod = world.createBody(msg->bodySpec);
+            std::cout << "createBody" << std::endl;
+            manager->sendMessage(buffers::bodyCreated,
+                                 std::make_unique<BodyCreatedMessage>(bod, msg->type));
+            std::cout << "All done" << std::endl;
+        }
 
         while (manager->newMessages(buffers::input)) {
             auto &&msg = manager->getMessage<InputMessage>(buffers::input);
@@ -74,11 +78,12 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 
 void audio(std::atomic<bool> *quit, ThreadManager *manager)
 {
+    manager->openBuffer(buffers::sound);
+
     SoundManager soundManager;
     auto effect = soundManager.addSound("assets/high.wav", SOUND_TYPE::EFFECT);
     auto music = soundManager.addSound("assets/minor_clam.wav", SOUND_TYPE::MUSIC);
 
-    manager->openBuffer(buffers::sound);
     music->playSound(127);
 
     while (!(*quit)) {
@@ -95,13 +100,24 @@ void audio(std::atomic<bool> *quit, ThreadManager *manager)
 
 void events(std::atomic<bool> *quit, ThreadManager *manager)
 {
+    manager->openBuffer(buffers::bodyCreated);
+
     EventHandler eventHandler(manager);
     if (!eventHandler.isInitialized()) {
         std::cout << "EventHandler failed" << std::endl;
         return;
     }
 
-    manager->openBuffer(buffers::bodies);
+    phy::BodySpec spec;
+    spec.bodyType = phy::BodyType::dynamicBody;
+    spec.position = {180, 180};
+    spec.gravityFactor = 1;
+    auto shape = phy::PolygonShape(1.0f);
+    shape.setBox(Vec2<float>(25, 25));
+    spec.shapes.push_back(std::make_shared<phy::PolygonShape>(shape));
+
+    manager->sendMessage(buffers::createBody,
+                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
 
     SDL_Event e{};
     while (!(*quit)) {
@@ -111,8 +127,8 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
             return;
         }
 
-        if (manager->newMessages(buffers::bodies)) {
-            auto&& body = manager->getMessage<BodyMessage>(buffers::bodies);
+        if (manager->newMessages(buffers::bodyCreated)) {
+            auto&& body = manager->getMessage<BodyCreatedMessage>(buffers::bodyCreated);
             if (!eventHandler.getPlayer().lock())
                 eventHandler.setPlayer(body->body);
         }
@@ -130,6 +146,9 @@ int main(int argc, char **args)
     threadManager.spawnThread(display);
     threadManager.spawnThread(physics);
     threadManager.spawnThread(audio);
+    std::cout << "Before sleep " << std::endl;
+    std::this_thread::sleep_for(timePerFrame);
+    std::cout << "After sleep " << std::endl;
     events(&threadManager.stopThreads, &threadManager);
 
     threadManager.waitAll();

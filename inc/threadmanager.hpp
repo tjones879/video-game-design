@@ -17,7 +17,8 @@ class ThreadManager;
 namespace buffers {
     const std::string render("render");
     const std::string input("input");
-    const std::string bodies("body");
+    const std::string bodyCreated("bodyCreated");
+    const std::string createBody("createBody");
     const std::string sound("sound");
 }
 

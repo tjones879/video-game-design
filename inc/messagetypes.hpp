@@ -3,7 +3,8 @@
 struct Message;
 struct RenderMessage;
 struct InputMessage;
-struct BodyMessage;
+struct BodyCreatedMessage;
+struct CreateBodyMessage;
 struct AudioMessage;
 
 #include "inc/physics/polygon.hpp"
@@ -82,9 +83,11 @@ struct BodyCreatedMessage : Message {
 
 struct CreateBodyMessage : Message {
     CharacterType type;
+    phy::BodySpec bodySpec;
 
-    CreateBodyMessage() : type(CharacterType::Uknown) {}
-    CreateBodyMessage(CharacterType charType) : type(charType) {}
+    CreateBodyMessage() : type(CharacterType::Unknown) {}
+    CreateBodyMessage(phy::BodySpec spec, CharacterType charType)
+        : type(charType), bodySpec(spec) {}
 
     virtual MessageType getType() const override {
         return MessageType::CreateBody;
