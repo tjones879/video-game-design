@@ -74,6 +74,7 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
 
         world.step();
         manager->sendMessage(buffers::render, world.getObjects());
+        manager->sendMessage(buffers::collisions, world.getCollisions());
 
         sleepForTimeLeft(start);
     }
@@ -104,6 +105,7 @@ void audio(std::atomic<bool> *quit, ThreadManager *manager)
 void events(std::atomic<bool> *quit, ThreadManager *manager)
 {
     manager->openBuffer(buffers::bodyCreated);
+    manager->openBuffer(buffers::collisions);
 
     EventHandler eventHandler(manager);
     if (!eventHandler.isInitialized()) {
@@ -122,6 +124,11 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
 
+    spec.position = {300, 300};
+    spec.gravityFactor = 0;
+    manager->sendMessage(buffers::createBody,
+                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Unknown));
+
     SDL_Event e{};
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -134,6 +141,12 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
             auto&& body = manager->getMessage<BodyCreatedMessage>(buffers::bodyCreated);
             if (!eventHandler.getPlayer().lock())
                 eventHandler.setPlayer(body->body);
+        }
+
+        if (manager->newMessages(buffers::collisions)) {
+            auto&& msg = manager->getMessage<CollisionMessage>(buffers::collisions);
+            for (auto p : msg->bodies)
+                std::cout << *p.first.lock() << ", " << *p.second.lock() << std::endl;
         }
 
         eventHandler.executeEvents();

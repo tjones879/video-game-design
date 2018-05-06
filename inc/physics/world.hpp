@@ -67,9 +67,9 @@ public:
     std::vector<std::weak_ptr<const Body>> getBodies() const;
 
     /**
-     * Obtain all current contacts created by the world.
+     * Get the pairs of all colliding bodies.
      */
-    std::vector<std::weak_ptr<const Contact>> getContacts() const;
+    std::unique_ptr<CollisionMessage> getCollisions();
 
     void step();
 

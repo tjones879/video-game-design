@@ -46,9 +46,9 @@ std::vector<std::weak_ptr<const Body>> World::getBodies() const
     return std::vector<std::weak_ptr<const Body>>(bodyList.begin(), bodyList.end());
 }
 
-std::vector<std::weak_ptr<const Contact>> World::getContacts() const
+std::unique_ptr<CollisionMessage> World::getCollisions()
 {
-    return std::vector<std::weak_ptr<const Contact>>();
+    return std::make_unique<CollisionMessage>(broadPhase.getBodyCollisions());
 }
 
 float World::updateTime()

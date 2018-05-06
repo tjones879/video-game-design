@@ -109,9 +109,12 @@ struct DestroyBodyMessage : Message {
 };
 
 struct CollisionMessage : Message {
-    std::pair<phy::Body, phy::Body> bodies;
+    std::vector<std::pair<std::weak_ptr<const phy::Body>, std::weak_ptr<const phy::Body>>> bodies;
 
-    CollisionMessage(std::pair<phy::Body, phy::Body> bodyPair) : bodies(bodyPair) {}
+    CollisionMessage() {}
+    CollisionMessage(std::vector<std::pair<std::weak_ptr<const phy::Body>,
+                                           std::weak_ptr<const phy::Body>>> collisions)
+        : bodies(collisions) {}
 
     virtual MessageType getType() const override {
         return MessageType::Collision;
