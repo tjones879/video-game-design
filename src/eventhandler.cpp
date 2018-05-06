@@ -169,6 +169,7 @@ std::vector<phy::BodySpec> EventHandler::defineEnemies(uint32_t numEnemies) cons
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> vel(-50, 50);
     std::uniform_real_distribution<float> pos(200, 300);
+    std::uniform_int_distribution<uint8_t> color(0, 255);
 
     std::vector<phy::BodySpec> specs;
     for (int i = 0; i < numEnemies; i++) {
@@ -182,6 +183,8 @@ std::vector<phy::BodySpec> EventHandler::defineEnemies(uint32_t numEnemies) cons
 
         spec.linVelocity = {vel(gen), vel(gen)};
         // TODO: Give enemy random color
+        SDL_Color c{color(gen), color(gen), color(gen), color(gen)};
+        spec.extra.color = c;
         specs.push_back(spec);
     }
     return specs;

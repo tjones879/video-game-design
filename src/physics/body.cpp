@@ -4,7 +4,6 @@
 
 namespace phy {
 Body::Body(const BodySpec &spec)
-    : extraData(nullptr)
 {
     position = spec.position;
 
@@ -27,6 +26,7 @@ Body::Body(const BodySpec &spec)
     inertia = 0.0f;
     invInertia = 0.0f;
     torque = 0.0f;
+    extraData = spec.extra;
 }
 
 Body::~Body() = default;
@@ -192,12 +192,12 @@ void Body::updateMassProperties()
     // Update velocity
 }
 
-void *Body::getExtraData() const
+const ExtraData *Body::getExtraData() const
 {
-    return extraData;
+    return &extraData;
 }
 
-void Body::setExtraData(void *data)
+void Body::setExtraData(ExtraData data)
 {
     extraData = data;
 }

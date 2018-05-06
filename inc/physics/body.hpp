@@ -3,6 +3,7 @@
 #include "inc/physics/shape.hpp"
 #include "inc/physics/circle.hpp"
 #include "inc/physics/polygon.hpp"
+#include <SDL2/SDL.h>
 #include <memory>
 #include <vector>
 
@@ -12,10 +13,15 @@ class Shape;
 class ShapeSpec;
 class Contact;
 class World;
+class ExtraData;
 
 enum class BodyType {
     staticBody,
     dynamicBody,
+};
+
+struct ExtraData {
+    SDL_Color color;
 };
 
 struct BodySpec {
@@ -34,11 +40,12 @@ struct BodySpec {
     float angVelocity;
     float gravityFactor; ///< Scalar factor for the world's gravity on this body
     std::vector<std::shared_ptr<Shape>> shapes;
+    ExtraData extra;
 };
 
 class Body {
 private:
-    void *extraData; ///< Any additional data that may be used in other components of the game
+    ExtraData extraData;
     std::shared_ptr<World> parentWorld;
     float mass, invMass;
     float inertia, invInertia;
@@ -143,14 +150,14 @@ public:
      *
      * @return A void pointer that must be casted into the correct type.
      */
-    void *getExtraData() const;
+    const ExtraData *getExtraData() const;
 
     /**
      * Set the pointer to this body's extra data.
      *
      * This data will never be used by the physics engine.
      */
-    void setExtraData(void *data);
+    void setExtraData(ExtraData data);
 
     /**
      * Get the transformation needed to convert local shapes to global coords.
