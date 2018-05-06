@@ -11,7 +11,8 @@ namespace phy {
 class BroadPhase : public AABBCallback {
 private:
     AABBTree tree;
-    std::vector<std::pair<std::weak_ptr<const Shape>, int32_t>> mapping;
+    std::vector<std::pair<std::weak_ptr<const Shape>, int32_t>> shapeMapping;
+    std::vector<std::pair<std::weak_ptr<const Body>, int32_t>> bodyMapping;
     std::vector<int32_t> moved;
 public:
     BroadPhase();
