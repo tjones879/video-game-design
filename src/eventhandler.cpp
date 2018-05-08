@@ -49,10 +49,8 @@ EventHandler::~EventHandler(){
 
 int EventHandler::getSoundOrigin() {
     auto playerPos = player.lock()->getPosition();
-    DEBUG(camPosX);
     double soundRatio = double(abs(camPosX - playerPos.x))/640; //640 is Screen width
     int soundOrigin = soundRatio*255;// 255 is max volume per channel
-    DEBUG(soundOrigin);
     return soundOrigin*-1; // return inverse since this is used for left channel -- see Mix_SetPanning in sound.cpp
 }
 
@@ -83,7 +81,7 @@ void EventHandler::actionHandler(Commands command, bool pressed)
             break;
         case Commands::ACTION:
             DEBUG("Action");
-            cmd = std::make_unique<ActionCommand>(player);
+            cmd = std::make_unique<ActionCommand>(projectile);
             break;
         case Commands::SPECIAL:
             DEBUG("Special");
@@ -182,8 +180,6 @@ EventHandler::defineBoundaries(Vec2<float> center, float thickness, float sideLe
     spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
     boundaries.push_back(spec);
 
-    for (auto b : boundaries)
-        std::cout << b.position << std::endl;
     return boundaries;
 }
 
@@ -274,4 +270,33 @@ void EventHandler::addEnemy(std::shared_ptr<phy::Body> enemy)
 std::weak_ptr<phy::Body> EventHandler::getProjectile()
 {
     return projectile;
+}
+
+void EventHandler::setProjectile(std::weak_ptr<phy::Body> proj)
+{
+    projectile = proj;
+}
+
+
+SDL_Color EventHandler::setPlayerColor()
+{
+    auto data = player.lock()->getExtraData();
+    SDL_Color tmpColor;
+
+    if (colorAngle == 255 || colorAngle == 0)
+        angleIncrement = !angleIncrement;
+
+    if (angleIncrement)
+        colorAngle += 1;
+    else
+        colorAngle -= 1;
+
+    tmpColor.r = (sin(colorAngle*M_PI/180)+1)*127.5;
+    tmpColor.g = (sin(2*colorAngle*M_PI/180+3)+1)*127.5;
+    tmpColor.b = (sin(1.5*colorAngle*M_PI/180+2)+1)*127.5;
+    tmpColor.a = 255;
+    if (data)
+        data->color = tmpColor;
+
+    return tmpColor;
 }

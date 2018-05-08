@@ -24,10 +24,13 @@ struct ExtraData {
     ExtraData() {
         color = {0, 125, 125, 255};
         colliding = false;
+        expanding = 0;
     }
     bool colliding;
     SDL_Color color;
     int colorAngle;
+    // Projectile only
+    int expanding;
 };
 
 struct BodySpec {
@@ -145,6 +148,7 @@ public:
      * @param dt The amount of time in seconds since the last update
      */
     void updatePosition(float dt);
+    void setPosition(Vec2f pos);
 
     /**
      * Remove all forces that are currently effecting the body.

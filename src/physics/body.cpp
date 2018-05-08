@@ -203,6 +203,11 @@ void Body::updateMassProperties()
     // Update velocity
 }
 
+void Body::setPosition(Vec2f pos)
+{
+    position = pos;
+}
+
 ExtraData *Body::getExtraData()
 {
     return &extraData;

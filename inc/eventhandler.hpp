@@ -81,12 +81,19 @@ public:
 class ActionCommand : public Command {
     std::weak_ptr<phy::Body> body;
 public:
-    ActionCommand(std::weak_ptr<phy::Body> body) {
-        this->body = body;
-        type = Commands::ACTION;
+    ActionCommand(std::weak_ptr<phy::Body> bod)
+        : body(bod) {
+            type = Commands::ACTION;
     }
+
     virtual void execute() const {
-        //action();
+        auto expand = &body.lock()->getExtraData()->expanding;
+        std::cout << "Old expand: " << *expand << std::endl;
+        if (!(*expand))
+            *expand = 1;
+        else
+            *expand *= -1;
+        std::cout << "New expand: " << *expand << std::endl;
     }
 };
 
@@ -165,24 +172,7 @@ public:
      *         2 if the second body is the projectile
      */
     int projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
+    void setProjectile(std::weak_ptr<phy::Body> proj);
     std::weak_ptr<phy::Body> getProjectile();
-    void setPlayerColor()
-    {
-        auto data = player.lock()->getExtraData();
-        SDL_Color tmpColor;
-
-        if (colorAngle == 255 || colorAngle == 0)
-            angleIncrement = !angleIncrement;
-
-        if (angleIncrement)
-            colorAngle += 1;
-        else
-            colorAngle -= 1;
-
-        tmpColor.r = (sin(colorAngle*M_PI/180)+1)*127.5;
-        tmpColor.g = (sin(2*colorAngle*M_PI/180+3)+1)*127.5;
-        tmpColor.b = (sin(1.5*colorAngle*M_PI/180+2)+1)*127.5;
-        if (data)
-            data->color = tmpColor;
-    }
+    SDL_Color setPlayerColor();
 };

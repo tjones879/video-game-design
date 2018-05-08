@@ -113,16 +113,16 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
         return;
     }
 
-    // Create Player
+    // Create Projectlie & Player
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
     spec.position = {80, 80};
     spec.gravityFactor = 1;
     auto shape = phy::CircleShape(1.0f, 15, {0, 0});
-    auto shape2 = phy::CircleShape(1.0f, 25, {0, 0});
     spec.shapes.push_back(std::make_shared<phy::CircleShape>(shape));
-    spec.shapes.push_back(std::make_shared<phy::CircleShape>(shape2));
 
+    manager->sendMessage(buffers::createBody,
+                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Projectile));
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
 
@@ -152,7 +152,6 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     SDL_Event e{};
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
-        eventHandler.setPlayerColor();
         if (eventHandler.inputHandler(e) == 1) {
             manager->waitAll();
             return;
@@ -173,6 +172,8 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
             case CharacterType::Boundary:
                 eventHandler.addBoundary(msg->body);
                 break;
+            case CharacterType::Projectile:
+                eventHandler.setProjectile(msg->body);
             case CharacterType::Unknown:
                 break;
             }
@@ -213,13 +214,17 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                     // TODO: Color Logic
                 }
             }
-            /* Unnecessary logging
-            for (auto bodyPair : msg->bodies)
-                std::cout << *bodyPair.first.lock() << ", " << *bodyPair.second.lock() << std::endl;
-            */
         }
 
         eventHandler.executeEvents();
+
+        auto color = eventHandler.setPlayerColor();
+        auto projectile = eventHandler.getProjectile().lock();
+        if (projectile->getExtraData())
+            projectile->getExtraData()->color = color;
+
+        if (projectile && eventHandler.getPlayer().lock())
+            projectile->setPosition(eventHandler.getPlayer().lock()->getPosition());
 
         sleepForTimeLeft(start);
     }
