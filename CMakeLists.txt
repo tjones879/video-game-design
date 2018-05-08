@@ -62,9 +62,9 @@ add_executable(VGD src/main.cpp)
 
 target_link_libraries(VGD
     ${CMAKE_THREAD_LIBS_INIT}
-    ${SDL2_LIBRARIES}
     engine
     ${CMAKE_SOURCE_DIR}/build/lib/libSDL2_gpu.so
+    ${SDL2_LIBRARIES}
     ${SDL2_MIXER_LIBRARIES})
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
