@@ -25,7 +25,7 @@ DisplayManager::DisplayManager(const std::string &title)
     GPU_EnableCamera(gpu, true);
     camera.x = 0;
     camera.y = 0;
-    camera.zoom = 1;
+    camera.zoom = .9;
     GPU_SetCamera(gpu, &camera);
 }
 
@@ -127,28 +127,28 @@ void DisplayManager::setCamera(const int playerPosX, const int playerPosY){
         camera.y = (playerPosY - ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75));
     }
     //This zooms the camera based on the enemy
-    if(camera.zoom <= 1.5 && camera.zoom >= 0.5){
-        if(380 <= (camera.x + ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else if(420 >= (camera.x + ((SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else if(380 <= (camera.y + ((SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else if(420 >= (camera.y + ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else{
-            if(camera.zoom <= 1.49)
-                camera.zoom += .005;
-        }
-    }
+    // if(camera.zoom <= 1.5 && camera.zoom >= 0.5){
+    //     if(380 <= (camera.x + ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else if(420 >= (camera.x + ((SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else if(380 <= (camera.y + ((SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else if(420 >= (camera.y + ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else{
+    //         if(camera.zoom <= 1.49)
+    //             camera.zoom += .005;
+    //     }
+    // }
     GPU_SetCamera(gpu, &camera);
 }
 
@@ -165,7 +165,7 @@ SDL_Color DisplayManager::setPlayerColor()
     } else colorAngle -= 1;
     
     tmpColor.r = (sin(colorAngle*M_PI/180)+1)*127.5;
-    tmpColor.g = (sin(2*colorAngle*M_PI/180+1)+1)*127.5;
+    tmpColor.g = (sin(2*colorAngle*M_PI/180+3)+1)*127.5;
     tmpColor.b = (sin(1.5*colorAngle*M_PI/180+2)+1)*127.5;
     return tmpColor;
 }

@@ -116,20 +116,23 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     // Create Player
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
-    spec.position = {180, 180};
+    spec.position = {80, 80};
     spec.gravityFactor = 1;
     auto shape = phy::CircleShape(1.0f, 15, {0, 0});
+    auto shape2 = phy::CircleShape(1.0f, 25, {0, 0});
     spec.shapes.push_back(std::make_shared<phy::CircleShape>(shape));
+    spec.shapes.push_back(std::make_shared<phy::CircleShape>(shape2));
 
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
 
     // Create Spawner
-    spec.position = {400, 400};
+    spec.position = {250, 250};
     spec.gravityFactor = 0;
-    auto shape2 = phy::PolygonShape(1.0f);
-    shape2.setBox(Vec2<float>(40, 40));
-    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape2);
+    auto shape3 = phy::PolygonShape(1.0f);
+    shape3.setBox(Vec2<float>(40, 40));
+    spec.shapes.clear();
+    spec.shapes.push_back(std::make_shared<phy::PolygonShape>(shape3));
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Spawner));
 
