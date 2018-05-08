@@ -32,7 +32,6 @@ public:
     ~DisplayManager();
     bool isInitialized() const;
     operator SDL_Window*() const;
-    SDL_Color setPlayerColor();
     void displayAll();
     inline std::vector<float> toFloatVector(const phy::PolygonShape &shape, const phy::Transform &offset);
     void addRenderable(std::unique_ptr<RenderMessage>&& msg);

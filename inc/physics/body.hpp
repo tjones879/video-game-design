@@ -27,6 +27,7 @@ struct ExtraData {
     }
     bool colliding;
     SDL_Color color;
+    int colorAngle;
 };
 
 struct BodySpec {

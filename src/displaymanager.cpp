@@ -101,7 +101,7 @@ void DisplayManager::displayAll()
         auto shape = std::get<0>(s);
         auto transform = std::get<1>(s);
         auto center = transform.translate(shape.pos);
-        GPU_CircleFilled(gpu, center.x, center.y, shape.radius, setPlayerColor());
+        GPU_CircleFilled(gpu, center.x, center.y, shape.radius, std::get<2>(s));
         setCamera(center.x, center.y);
     }
 
@@ -150,22 +150,4 @@ void DisplayManager::setCamera(const int playerPosX, const int playerPosY){
     //     }
     // }
     GPU_SetCamera(gpu, &camera);
-}
-
-SDL_Color DisplayManager::setPlayerColor()
-{
-
-    SDL_Color tmpColor;
-
-    if(colorAngle == 255 || colorAngle == 0)
-        angleIncrement = !angleIncrement;
-
-    if(angleIncrement){
-        colorAngle += 1;
-    } else colorAngle -= 1;
-    
-    tmpColor.r = (sin(colorAngle*M_PI/180)+1)*127.5;
-    tmpColor.g = (sin(2*colorAngle*M_PI/180+3)+1)*127.5;
-    tmpColor.b = (sin(1.5*colorAngle*M_PI/180+2)+1)*127.5;
-    return tmpColor;
 }

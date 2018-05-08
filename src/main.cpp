@@ -49,7 +49,7 @@ void physics(std::atomic<bool> *quit, ThreadManager *manager)
     manager->openBuffer(buffers::createBody);
     manager->openBuffer(buffers::destroyBody);
 
-    phy::World world(Vec2<float>(5, 9.8), manager);
+    phy::World world(Vec2<float>(0, 0), manager);
 
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -152,6 +152,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     SDL_Event e{};
     while (!(*quit)) {
         auto start = std::chrono::high_resolution_clock::now();
+        eventHandler.setPlayerColor();
         if (eventHandler.inputHandler(e) == 1) {
             manager->waitAll();
             return;
