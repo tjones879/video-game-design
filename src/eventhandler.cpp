@@ -46,11 +46,16 @@ EventHandler::~EventHandler(){
 
 int EventHandler::getSoundOrigin() {
     auto playerPos = player.lock()->getPosition();
-    DEBUG(camPosX);
     double soundRatio = double(abs(camPosX - playerPos.x))/640; //640 is Screen width
     int soundOrigin = soundRatio*255;// 255 is max volume per channel
-    DEBUG(soundOrigin);
     return soundOrigin*-1; // return inverse since this is used for left channel -- see Mix_SetPanning in sound.cpp
+}
+
+int EventHandler::getEnemySound(enemy) {
+    auto enemyPos = enemy->getPosition();
+    double soundRatio = double(abs(camPosX - enemyPos.x))/640;
+    int soundOrigin = soundRatio*255;
+    return soundOrigin*-1;
 }
 
 void EventHandler::setCamPosX(int camX) {
@@ -213,7 +218,7 @@ void EventHandler::enemyMovement() {
         if (dirx < 0 && diry < 0) {
             enemy->setLinearVelocity(Vec2<float>(-30,-30));
         }
-        
+
 
     }
 }
