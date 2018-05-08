@@ -160,4 +160,5 @@ public:
      *         2 if the second body is the projectile
      */
     int projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
+    std::weak_ptr<phy::Body> getProjectile();
 };
