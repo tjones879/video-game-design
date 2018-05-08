@@ -23,7 +23,9 @@ enum class BodyType {
 struct ExtraData {
     ExtraData() {
         color = {0, 125, 125, 255};
+        colliding = false;
     }
+    bool colliding;
     SDL_Color color;
 };
 
@@ -150,10 +152,8 @@ public:
 
     /**
      * Get any extra data about this body that other components may need to use.
-     *
-     * @return A void pointer that must be casted into the correct type.
      */
-    const ExtraData *getExtraData() const;
+    ExtraData *getExtraData();
 
     /**
      * Set the pointer to this body's extra data.
