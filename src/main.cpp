@@ -220,8 +220,8 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                     auto enemies = eventHandler.getEnemies();
                     auto search = enemies.find(enemy.lock());
                     if(search != enemies.end()){
-                        std::cout<<"Enemy: "<<enemy.lock()->getExtraData()->color.a<<std::endl;
-                        std::cout<<"Attack: "<<playerAttack.lock()->getExtraData()->color.a<<std::endl;
+                        std::cout<<"Enemy: "<<static_cast< int >( enemy.lock()->getExtraData()->color.a )<<std::endl;
+                        std::cout<<"Attack: "<<static_cast< int >( playerAttack.lock()->getExtraData()->color.a )<<std::endl;
                     } 
                     // TODO: Color Logic
                 }
