@@ -205,25 +205,32 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                                              std::make_unique<InputMessage>(std::move(cmd)));
                     }
                 } // Check if one of the bodies is the projectile
-
-                else if ((index = eventHandler.projectileCollision(bodyPair)) && index) {
-                    std::weak_ptr<phy::Body> enemy;
-                    std::weak_ptr<phy::Body> playerAttack;
-                    if (index == 1){
-                        enemy = bodyPair.second;
-                        playerAttack = bodyPair.first;
-                    }
-                    else{
-                        enemy = bodyPair.first;
-                        playerAttack = bodyPair.second;
-                    }
-                    auto enemies = eventHandler.getEnemies();
-                    auto search = enemies.find(enemy.lock());
-                    if(search != enemies.end()){
-                        std::cout<<"Enemy: "<<enemy.lock()->getExtraData()->color.a<<std::endl;
-                        std::cout<<"Attack: "<<playerAttack.lock()->getExtraData()->color.a<<std::endl;
-                    } 
+                else {
+                    index = eventHandler.projectileCollision(bodyPair);
+                    if (index) {
+                        std::weak_ptr<phy::Body> enemy;
+                        std::weak_ptr<phy::Body> playerAttack;
+                        if (index == 1){
+                            playerAttack = bodyPair.first;
+                            enemy = bodyPair.second;
+                        } else {
+                            enemy = bodyPair.first;
+                            playerAttack = bodyPair.second;
+                        }
+                        auto enemies = eventHandler.getEnemies();
+                        auto search = enemies.find(enemy.lock());
+                        if (search != enemies.end()){
+                            printf("{%d, %d, %d, %d}\n", enemy.lock()->getExtraData()->color.r,
+                                                         enemy.lock()->getExtraData()->color.g,
+                                                         enemy.lock()->getExtraData()->color.b,
+                                                         enemy.lock()->getExtraData()->color.a);
+                            printf("{%d, %d, %d, %d}\n", playerAttack.lock()->getExtraData()->color.r,
+                                                         playerAttack.lock()->getExtraData()->color.g,
+                                                         playerAttack.lock()->getExtraData()->color.b,
+                                                         playerAttack.lock()->getExtraData()->color.a);
+                        }
                     // TODO: Color Logic
+                    }
                 }
             }
         }
