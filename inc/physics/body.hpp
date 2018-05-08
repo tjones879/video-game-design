@@ -153,7 +153,7 @@ public:
      *
      * @return A void pointer that must be casted into the correct type.
      */
-    const ExtraData *getExtraData() const;
+    ExtraData *getExtraData();
 
     /**
      * Set the pointer to this body's extra data.

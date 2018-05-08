@@ -105,6 +105,8 @@ private:
     Controller controller;
 
     int camPosX;
+    int colorAngle;
+    bool angleIncrement = true;
     void actionHandler(Commands command, bool pressed);
     void initKeyMapping();
     void initButtonMapping();

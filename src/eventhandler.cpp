@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdio>
 #include <random>
+#include <math.h>
 
 void EventHandler::initButtonMapping()
 {
@@ -32,6 +33,7 @@ EventHandler::EventHandler(ThreadManager *manager) : threadManager(manager) {
     commandState.fill(false);
     initKeyMapping();
     initButtonMapping();
+    colorAngle = 1;
 
 
     // Temporarily open the first joystick to the controller if it exists
@@ -153,9 +155,18 @@ void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     player = bodyPtr;
 }
 
+void EventHandler::setSpawner(std::weak_ptr<phy::Body> bodyPtr){
+    spawner = bodyPtr;
+}
+
 std::weak_ptr<const phy::Body> EventHandler::getPlayer() const
 {
     return player;
+}
+
+std::weak_ptr<const phy::Body> EventHandler::getSpawner() const
+{
+    return spawner;
 }
 
 std::vector<phy::BodySpec> EventHandler::defineEnemies(uint32_t numEnemies) const
@@ -195,3 +206,4 @@ void EventHandler::addEnemy(std::shared_ptr<phy::Body> enemy)
 {
     enemies.insert(enemy);
 }
+

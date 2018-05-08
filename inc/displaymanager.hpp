@@ -24,13 +24,15 @@ private:
     SDL_Color color{};
     SDL_Color playerColor{};
     bool r = false, g = false, b = false;
-    void setCamera(Vec2<float> playerVel, Vec2<float> playerPos, Vec2<float> enemyVel, Vec2<float> enemyPos);
+    void setCamera(int playerPosX, int playerPosY);
+    int colorAngle;
+    bool angleIncrement = true;
 public:
     DisplayManager(const std::string &title);
     ~DisplayManager();
     bool isInitialized() const;
     operator SDL_Window*() const;
-    void setPlayerColor();
+    SDL_Color setPlayerColor();
     void displayAll();
     inline std::vector<float> toFloatVector(const phy::PolygonShape &shape, const phy::Transform &offset);
     void addRenderable(std::unique_ptr<RenderMessage>&& msg);

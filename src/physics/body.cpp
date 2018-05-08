@@ -192,7 +192,7 @@ void Body::updateMassProperties()
     // Update velocity
 }
 
-const ExtraData *Body::getExtraData() const
+ExtraData *Body::getExtraData()
 {
     return &extraData;
 }

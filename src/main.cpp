@@ -158,6 +158,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                 eventHandler.addEnemy(msg->body.lock());
                 break;
             case CharacterType::Spawner:
+                eventHandler.setSpawner(msg->body);
                 break;
             case CharacterType::Boundary:
                 break;
