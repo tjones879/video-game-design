@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <random>
 #include <math.h>
+#include <algorithm>
 
 void EventHandler::initButtonMapping()
 {
@@ -185,11 +186,29 @@ EventHandler::defineBoundaries(Vec2<float> center, float thickness, float sideLe
     return boundaries;
 }
 
+void EventHandler::addBoundary(std::weak_ptr<phy::Body> boundary)
+{
+    boundaries.push_back(boundary);
+}
+
+int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodies)
+{
+    int ret = 0;
+    for (auto b : boundaries) {
+        if (bodies.first.lock() == b.lock())
+            ret += 1;
+        else if (bodies.second.lock() == b.lock())
+            ret += 2;
+    }
+
+    return ret;
+}
+
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     player = bodyPtr;
 }
 
-std::weak_ptr<const phy::Body> EventHandler::getPlayer() const
+std::weak_ptr<phy::Body> EventHandler::getPlayer()
 {
     return player;
 }

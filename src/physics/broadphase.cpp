@@ -67,10 +67,10 @@ void BroadPhase::updatePairs()
     moved.clear();
 }
 
-std::vector<std::pair<std::weak_ptr<const Body>, std::weak_ptr<const Body>>>
+std::vector<std::pair<std::weak_ptr<Body>, std::weak_ptr<Body>>>
 BroadPhase::getBodyCollisions()
 {
-    std::vector<std::pair<std::weak_ptr<const Body>, std::weak_ptr<const Body>>> ret;
+    std::vector<std::pair<std::weak_ptr<Body>, std::weak_ptr<Body>>> ret;
     for (const auto &p : collisions) {
         auto body1 = std::find_if(std::begin(bodyMapping), std::end(bodyMapping),
                 [p](auto item) {

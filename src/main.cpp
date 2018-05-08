@@ -166,6 +166,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
             case CharacterType::Spawner:
                 break;
             case CharacterType::Boundary:
+                eventHandler.addBoundary(msg->body);
                 break;
             case CharacterType::Unknown:
                 break;
@@ -174,6 +175,22 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
 
         if (manager->newMessages(buffers::collisions)) {
             auto&& msg = manager->getMessage<CollisionMessage>(buffers::collisions);
+            for (auto bodyPair : msg->bodies) {
+                // Check if one of the bodies is a boundary
+                if (auto index = eventHandler.boundaryCollision(bodyPair)) {
+                    std::weak_ptr<phy::Body> body;
+                    if (index == 1)
+                        body = bodyPair.second;
+                    else if (index == 2)
+                        body = bodyPair.first;
+
+                    auto vel = body.lock()->getLinearVelocity();
+                    auto cmd = std::make_unique<MoveCommand>(body, Vec2<int>(-1.5 * vel.x, -1.5 * vel.y));
+                    manager->sendMessage(buffers::input,
+                                         std::make_unique<InputMessage>(std::move(cmd)));
+                } // Check if one of the bodies is the projectile
+
+            }
             /* Unnecessary logging
             for (auto bodyPair : msg->bodies)
                 std::cout << *bodyPair.first.lock() << ", " << *bodyPair.second.lock() << std::endl;

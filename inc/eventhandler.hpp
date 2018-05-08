@@ -99,6 +99,7 @@ private:
     std::map<SDL_Keycode, Commands> keysToCommands;
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> player;
+    std::vector<std::weak_ptr<phy::Body>> boundaries;
     std::queue<std::unique_ptr<Command>> eventStack;
     std::unordered_set<std::shared_ptr<phy::Body>> enemies;
     Controller controller;
@@ -115,12 +116,22 @@ public:
     void addEvent(Command &newCommand);
     void executeEvents();
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
-    std::weak_ptr<const phy::Body> getPlayer() const;
+    std::weak_ptr<phy::Body> getPlayer();
     int getSoundOrigin();
     void setCamPosX(int camX);
 
     std::vector<phy::BodySpec>
     defineBoundaries(Vec2<float> center, float thickness, float sideLength) const;
+    void addBoundary(std::weak_ptr<phy::Body> boundary);
+    /**
+     * Determine if the given collision involves a body.
+     *
+     * @return 0 if not involved with a boundary
+     *         1 if the first body is a boundary
+     *         2 if the second body is a boundary
+     *         3 if both bodies are boundaries (this is an invalid state)
+     */
+    int boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodies);
     /**
      * Create a random amount of enemies and return them.
      */
