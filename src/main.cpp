@@ -220,7 +220,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
 
         auto color = eventHandler.setPlayerColor();
         auto projectile = eventHandler.getProjectile().lock();
-        if (projectile->getExtraData())
+        if (projectile->getExtraData() && !projectile->getExtraData()->expanding)
             projectile->getExtraData()->color = color;
 
         if (projectile && eventHandler.getPlayer().lock())
