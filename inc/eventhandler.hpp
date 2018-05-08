@@ -52,22 +52,28 @@ public:
 
 class MoveCommand : public Command {
 private:
-    Vec2<int> addVelocity;
+    Vec2<float> addVelocity;
+    float dt; ///< The length of time the body should move at its new velocity
     std::weak_ptr<phy::Body> body;
     void addPlayerVel() const {
         auto locked = body.lock();
         auto currVel = locked->getLinearVelocity();
         locked->setLinearVelocity(currVel + addVelocity);
     }
+    void updatePlayerPos() const {
+        auto locked = body.lock();
+        locked->updatePosition(dt);
+    }
 
 public:
-    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<int> addVel){
+    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<float> addVel, float dt=0){
         this->body = body;
         addVelocity = addVel;
     }
 
     virtual void execute() const override {
         addPlayerVel();
+        updatePlayerPos();
     }
 };
 
@@ -100,6 +106,8 @@ private:
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> player;
     std::weak_ptr<phy::Body> spawner;
+    std::vector<std::weak_ptr<phy::Body>> boundaries;
+    std::weak_ptr<phy::Body> projectile;
     std::queue<std::unique_ptr<Command>> eventStack;
     std::unordered_set<std::shared_ptr<phy::Body>> enemies;
     Controller controller;
@@ -119,10 +127,23 @@ public:
     void executeEvents();
     void setPlayer(std::weak_ptr<phy::Body> bodyPtr);
     void setSpawner(std::weak_ptr<phy::Body> bodyPtr);
-    std::weak_ptr<const phy::Body> getPlayer() const;
     std::weak_ptr<const phy::Body> getSpawner() const;
+    std::weak_ptr<phy::Body> getPlayer();
     int getSoundOrigin();
     void setCamPosX(int camX);
+
+    std::vector<phy::BodySpec>
+    defineBoundaries(Vec2<float> center, float thickness, float sideLength) const;
+    void addBoundary(std::weak_ptr<phy::Body> boundary);
+    /**
+     * Determine if the given collision involves a body.
+     *
+     * @return 0 if not involved with a boundary
+     *         1 if the first body is a boundary
+     *         2 if the second body is a boundary
+     *         3 if both bodies are boundaries (this is an invalid state)
+     */
+    int boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodies);
     /**
      * Create a random amount of enemies and return them.
      */
@@ -135,4 +156,12 @@ public:
      * Add a created body to the enemy list for tracking.
      */
     void addEnemy(std::shared_ptr<phy::Body> enemy);
+    /**
+     * Determine if the given collision involves a projectile.
+     *
+     * @return 0 if not involved with the projectile
+     *         1 if the first body is the projectile
+     *         2 if the second body is the projectile
+     */
+    int projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
 };

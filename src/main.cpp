@@ -134,10 +134,16 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Spawner));
 
     // Create Enemies
-    auto enemies = eventHandler.defineEnemies(20);
+    auto enemies = eventHandler.defineEnemies(50);
     for (auto spec : enemies)
         manager->sendMessage(buffers::createBody,
                              std::make_unique<CreateBodyMessage>(spec, CharacterType::Enemy));
+
+    // Create Walls
+    auto boundaries = eventHandler.defineBoundaries(Vec2<float>(250, -100), 25, 400);
+    for (auto boundary : boundaries)
+        manager->sendMessage(buffers::createBody,
+                             std::make_unique<CreateBodyMessage>(boundary, CharacterType::Boundary));
 
 
     SDL_Event e{};
@@ -161,6 +167,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                 eventHandler.setSpawner(msg->body);
                 break;
             case CharacterType::Boundary:
+                eventHandler.addBoundary(msg->body);
                 break;
             case CharacterType::Unknown:
                 break;
@@ -169,6 +176,26 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
 
         if (manager->newMessages(buffers::collisions)) {
             auto&& msg = manager->getMessage<CollisionMessage>(buffers::collisions);
+            for (auto bodyPair : msg->bodies) {
+                // Check if one of the bodies is a boundary
+                auto index = eventHandler.boundaryCollision(bodyPair);
+                if (index == 1 || index == 2) {
+                    std::weak_ptr<phy::Body> body;
+                    if (index == 1)
+                        body = bodyPair.second;
+                    else if (index == 2)
+                        body = bodyPair.first;
+
+                    auto vel = body.lock()->getLinearVelocity();
+                    body.lock()->setLinearVelocity(vel - 2 * vel);
+                    body.lock()->updatePosition(1.f / 60.f);
+                    /*
+                    auto cmd = std::make_unique<MoveCommand>(body, Vec2<float>(-2 * vel.x, -2 * vel.y), 1.f / 30.f);
+                    manager->sendMessage(buffers::input,
+                                         std::make_unique<InputMessage>(std::move(cmd)));
+                     */
+                } // Check if one of the bodies is the projectile
+            }
             /* Unnecessary logging
             for (auto bodyPair : msg->bodies)
                 std::cout << *bodyPair.first.lock() << ", " << *bodyPair.second.lock() << std::endl;

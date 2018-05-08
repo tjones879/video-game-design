@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <random>
 #include <math.h>
+#include <algorithm>
 
 void EventHandler::initButtonMapping()
 {
@@ -66,19 +67,19 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 0,-5));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>( 0,-5));
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 0, 5));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>( 0, 5));
             break;
         case Commands::BACK:
             DEBUG("Back");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>(-5, 0));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>(-5, 0));
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 5, 0));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>( 5, 0));
             break;
         case Commands::ACTION:
             DEBUG("Action");
@@ -151,6 +152,66 @@ void EventHandler::executeEvents(){
     }
 }
 
+std::vector<phy::BodySpec>
+EventHandler::defineBoundaries(Vec2<float> center, float thickness, float sideLength) const
+{
+    std::vector<phy::BodySpec> boundaries;
+
+    phy::BodySpec spec;
+    spec.bodyType = phy::BodyType::staticBody;
+    spec.position = {0, 0};
+    spec.gravityFactor = 0;
+
+    auto shape = phy::PolygonShape(1.0f);
+    shape.setBox({sideLength, thickness}, center, 0);
+    SDL_Color c{255, 255, 255, 255};
+    spec.extra.color = c;
+
+    spec.shapes.push_back(std::make_shared<phy::PolygonShape>(shape));
+    boundaries.push_back(spec);
+
+    shape.setBox({thickness, sideLength}, {center.x + sideLength, center.y + sideLength - thickness}, 0);
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
+    boundaries.push_back(spec);
+
+    shape.setBox({thickness, sideLength}, {center.x - sideLength, center.y + sideLength - thickness}, 0);
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
+    boundaries.push_back(spec);
+
+    shape.setBox({sideLength, thickness}, {center.x, center.y + 2 * (sideLength - thickness)}, 0);
+    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape);
+    boundaries.push_back(spec);
+
+    for (auto b : boundaries)
+        std::cout << b.position << std::endl;
+    return boundaries;
+}
+
+void EventHandler::addBoundary(std::weak_ptr<phy::Body> boundary)
+{
+    boundaries.push_back(boundary);
+}
+
+int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodies)
+{
+    int ret = 0;
+
+    for (auto b : boundaries) {
+        if (bodies.first.lock() == b.lock())
+            ret += 1;
+        else if (bodies.second.lock() == b.lock())
+            ret += 2;
+    }
+
+    return ret;
+}
+
+int EventHandler::projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair)
+{
+    int ret = 0;
+    return ret;
+}
+
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     player = bodyPtr;
 }
@@ -159,7 +220,7 @@ void EventHandler::setSpawner(std::weak_ptr<phy::Body> bodyPtr){
     spawner = bodyPtr;
 }
 
-std::weak_ptr<const phy::Body> EventHandler::getPlayer() const
+std::weak_ptr<phy::Body> EventHandler::getPlayer()
 {
     return player;
 }

@@ -92,6 +92,7 @@ void DisplayManager::displayAll()
         }else
             GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
         */
+        //std::cout << shape << std::endl;
         auto vertices = toFloatVector(shape, transform);
         GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], std::get<2>(s));
     }
