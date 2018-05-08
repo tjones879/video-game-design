@@ -204,6 +204,12 @@ int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::wea
     return ret;
 }
 
+int EventHandler::projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair)
+{
+    int ret = 0;
+
+}
+
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     player = bodyPtr;
 }

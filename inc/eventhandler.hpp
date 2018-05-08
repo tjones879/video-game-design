@@ -100,6 +100,7 @@ private:
     std::map<uint8_t, Commands> buttonsToCommands;
     std::weak_ptr<phy::Body> player;
     std::vector<std::weak_ptr<phy::Body>> boundaries;
+    std::weak_ptr<phy::Body> projectile;
     std::queue<std::unique_ptr<Command>> eventStack;
     std::unordered_set<std::shared_ptr<phy::Body>> enemies;
     Controller controller;
@@ -144,4 +145,12 @@ public:
      * Add a created body to the enemy list for tracking.
      */
     void addEnemy(std::shared_ptr<phy::Body> enemy);
+    /**
+     * Determine if the given collision involves a projectile.
+     *
+     * @return 0 if not involved with the projectile
+     *         1 if the first body is the projectile
+     *         2 if the second body is the projectile
+     */
+    int projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
 };

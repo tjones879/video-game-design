@@ -189,6 +189,9 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                     manager->sendMessage(buffers::input,
                                          std::make_unique<InputMessage>(std::move(cmd)));
                 } // Check if one of the bodies is the projectile
+                if (auto index = eventHandler.projectileCollision(bodyPair)) {
+                
+                }
 
             }
             /* Unnecessary logging
