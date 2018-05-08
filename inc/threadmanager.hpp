@@ -76,7 +76,7 @@ public:
 };
 
 class ThreadManager {
-    std::map<std::thread::id, std::shared_ptr<std::thread>> threads;
+    std::map<std::thread::id, std::thread *> threads;
     std::map<std::string, std::pair<std::thread::id, ThreadBuffer>> buffers;
     /**
      * This mutex allows multiple threads to read and write to buffers,
