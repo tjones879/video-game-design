@@ -74,8 +74,10 @@ void World::step()
     // TODO: Resolve velocity constraints
     // Integrate positions
     for (const auto body : bodyList) {
-       body->updatePosition(dt);
-       broadPhase.updateBody(body);
+        if (!body->getExtraData()->colliding) {
+            body->updatePosition(dt);
+            broadPhase.updateBody(body);
+        }
     }
 
     // TODO: Resolve position constraints

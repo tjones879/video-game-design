@@ -190,14 +190,27 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                         body = bodyPair.first;
 
                     auto vel = body.lock()->getLinearVelocity();
-                    body.lock()->setLinearVelocity(vel - 2 * vel);
-                    body.lock()->updatePosition(1.f / 60.f);
-                    /*
-                    auto cmd = std::make_unique<MoveCommand>(body, Vec2<float>(-2 * vel.x, -2 * vel.y), 1.f / 30.f);
-                    manager->sendMessage(buffers::input,
-                                         std::make_unique<InputMessage>(std::move(cmd)));
-                     */
+                    auto extra = body.lock()->getExtraData();
+                    if (!extra->colliding && body.lock() != eventHandler.getProjectile().lock()) {
+                        extra->colliding = true;
+                        auto cmd = std::make_unique<MoveCommand>(body, Vec2<float>(-2.5 * vel.x, -2.5 * vel.y),
+                                [](std::weak_ptr<phy::Body> body) {
+                                    body.lock()->getExtraData()->colliding = false;
+                                });
+                        manager->sendMessage(buffers::input,
+                                             std::make_unique<InputMessage>(std::move(cmd)));
+                    }
                 } // Check if one of the bodies is the projectile
+                else if ((index = eventHandler.projectileCollision(bodyPair))) {
+                    std::weak_ptr<phy::Body> body;
+                    if (index == 1)
+                        body = bodyPair.second;
+                    else
+                        body = bodyPair.first;
+
+
+                    // TODO: Color Logic
+                }
             }
             /* Unnecessary logging
             for (auto bodyPair : msg->bodies)

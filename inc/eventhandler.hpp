@@ -15,6 +15,7 @@
 #include <inc/physics/body.hpp>
 #include "inc/threadmanager.hpp"
 #include <unordered_set>
+#include <functional>
 
 enum class Commands : char {
     JUMP,
@@ -55,25 +56,25 @@ private:
     Vec2<float> addVelocity;
     float dt; ///< The length of time the body should move at its new velocity
     std::weak_ptr<phy::Body> body;
+    std::function<void (std::weak_ptr<phy::Body>)> runAfter;
     void addPlayerVel() const {
         auto locked = body.lock();
         auto currVel = locked->getLinearVelocity();
         locked->setLinearVelocity(currVel + addVelocity);
     }
-    void updatePlayerPos() const {
-        auto locked = body.lock();
-        locked->updatePosition(dt);
-    }
 
 public:
-    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<float> addVel, float dt=0){
+    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<float> addVel, std::function<void (std::weak_ptr<phy::Body>)> lambda=0){
         this->body = body;
         addVelocity = addVel;
+        runAfter = lambda;
     }
 
     virtual void execute() const override {
         addPlayerVel();
-        updatePlayerPos();
+        if (runAfter)
+            runAfter(body);
+        body.lock()->updatePosition(1.f / 30.f);
     }
 };
 
@@ -164,4 +165,5 @@ public:
      *         2 if the second body is the projectile
      */
     int projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
+    std::weak_ptr<phy::Body> getProjectile();
 };

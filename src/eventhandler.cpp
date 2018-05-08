@@ -208,8 +208,11 @@ int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::wea
 
 int EventHandler::projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair)
 {
-    int ret = 0;
-    return ret;
+    if (bodyPair.first.lock() == projectile.lock())
+        return 1;
+    if (bodyPair.second.lock() == projectile.lock())
+        return 2;
+    return 0;
 }
 
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
@@ -237,7 +240,7 @@ std::vector<phy::BodySpec> EventHandler::defineEnemies(uint32_t numEnemies) cons
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> vel(-50, 50);
     std::uniform_real_distribution<float> pos(200, 300);
-    std::uniform_int_distribution<uint8_t> color(0, 255);
+    std::uniform_int_distribution<uint8_t> color(40, 200);
 
     std::vector<phy::BodySpec> specs;
     for (int i = 0; i < numEnemies; i++) {
@@ -268,3 +271,7 @@ void EventHandler::addEnemy(std::shared_ptr<phy::Body> enemy)
     enemies.insert(enemy);
 }
 
+std::weak_ptr<phy::Body> EventHandler::getProjectile()
+{
+    return projectile;
+}
