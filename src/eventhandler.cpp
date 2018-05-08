@@ -191,6 +191,33 @@ std::unordered_set<std::shared_ptr<phy::Body>> EventHandler::getEnemies() const
     return enemies;
 }
 
+void EventHandler::enemyMovement() {
+    int dirx, diry;
+    auto playerPos = player.lock()->getPosition();
+
+    for (auto enemy:enemies) {
+        auto enemyPos = enemy->getPosition();
+
+        dirx = playerPos.x - enemyPos.x;
+        diry = playerPos.y - enemyPos.y;
+
+        if (dirx > 0 && diry > 0) {
+            enemy->setLinearVelocity(Vec2<float>(30,30));
+        }
+        if (dirx > 0 && diry < 0) {
+            enemy->setLinearVelocity(Vec2<float>(30,-30));
+        }
+        if (dirx < 0 && diry > 0) {
+            enemy->setLinearVelocity(Vec2<float>(-30,30));
+        }
+        if (dirx < 0 && diry < 0) {
+            enemy->setLinearVelocity(Vec2<float>(-30,-30));
+        }
+        
+
+    }
+}
+
 void EventHandler::addEnemy(std::shared_ptr<phy::Body> enemy)
 {
     enemies.insert(enemy);

@@ -118,6 +118,7 @@ public:
     std::weak_ptr<const phy::Body> getPlayer() const;
     int getSoundOrigin();
     void setCamPosX(int camX);
+    void enemyMovement();
     /**
      * Create a random amount of enemies and return them.
      */
