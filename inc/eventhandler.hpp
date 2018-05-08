@@ -52,22 +52,28 @@ public:
 
 class MoveCommand : public Command {
 private:
-    Vec2<int> addVelocity;
+    Vec2<float> addVelocity;
+    float dt; ///< The length of time the body should move at its new velocity
     std::weak_ptr<phy::Body> body;
     void addPlayerVel() const {
         auto locked = body.lock();
         auto currVel = locked->getLinearVelocity();
         locked->setLinearVelocity(currVel + addVelocity);
     }
+    void updatePlayerPos() const {
+        auto locked = body.lock();
+        locked->updatePosition(dt);
+    }
 
 public:
-    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<int> addVel){
+    MoveCommand(std::weak_ptr<phy::Body> body, Vec2<float> addVel, float dt=0){
         this->body = body;
         addVelocity = addVel;
     }
 
     virtual void execute() const override {
         addPlayerVel();
+        updatePlayerPos();
     }
 };
 

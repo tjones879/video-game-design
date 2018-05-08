@@ -66,19 +66,19 @@ void EventHandler::actionHandler(Commands command, bool pressed)
         switch (command) {
         case Commands::JUMP:
             DEBUG("Jump");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 0,-5));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>( 0,-5));
             break;
         case Commands::DUCK:
             DEBUG("Duck");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 0, 5));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>( 0, 5));
             break;
         case Commands::BACK:
             DEBUG("Back");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>(-5, 0));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>(-5, 0));
             break;
         case Commands::FORWARD:
             DEBUG("Forward");
-            cmd = std::make_unique<MoveCommand>(player, Vec2<int>( 5, 0));
+            cmd = std::make_unique<MoveCommand>(player, Vec2<float>( 5, 0));
             break;
         case Commands::ACTION:
             DEBUG("Action");
@@ -194,6 +194,7 @@ void EventHandler::addBoundary(std::weak_ptr<phy::Body> boundary)
 int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodies)
 {
     int ret = 0;
+
     for (auto b : boundaries) {
         if (bodies.first.lock() == b.lock())
             ret += 1;
@@ -207,7 +208,7 @@ int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::wea
 int EventHandler::projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair)
 {
     int ret = 0;
-
+    return ret;
 }
 
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){

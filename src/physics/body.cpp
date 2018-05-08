@@ -66,7 +66,18 @@ float Body::getRotation() const
 
 void Body::setLinearVelocity(const Vec2f &velocity)
 {
-    linearVelocity = velocity;
+    Vec2f newVelocity;
+    if (abs(velocity.x) > 25)
+        newVelocity.x = velocity.x < 0 ? -25 : 25;
+    else
+        newVelocity.x = velocity.x;
+
+    if (abs(velocity.y) > 25)
+        newVelocity.y = velocity.y < 0 ? -25 : 25;
+    else
+        newVelocity.y = velocity.y;
+
+    linearVelocity = newVelocity;
 }
 
 const Vec2f &Body::getLinearVelocity() const
@@ -155,6 +166,7 @@ std::weak_ptr<const World> Body::getParentWorld() const
 
 void Body::updateVelocity(float dt, Vec2f gravity)
 {
+    const auto maxVelocity = 1000;
     if (bodyType == BodyType::dynamicBody) {
         linearVelocity += (gravity * gravityFactor + force * invMass) * dt;
         angularVelocity = invInertia * torque * dt;
