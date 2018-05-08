@@ -11,6 +11,7 @@
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
+#include <unordered_set>
 
 
 const std::chrono::milliseconds timePerFrame(16);
@@ -121,10 +122,11 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
     auto shape = phy::CircleShape(1.0f, 15, {0, 0});
     spec.shapes.push_back(std::make_shared<phy::CircleShape>(shape));
 
-    manager->sendMessage(buffers::createBody,
-                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Projectile));
+
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
+    manager->sendMessage(buffers::createBody,
+                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Projectile));
 
     // Create Spawner
     spec.position = {250, 250};
@@ -203,14 +205,24 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                                              std::make_unique<InputMessage>(std::move(cmd)));
                     }
                 } // Check if one of the bodies is the projectile
-                else if ((index = eventHandler.projectileCollision(bodyPair))) {
-                    std::weak_ptr<phy::Body> body;
-                    if (index == 1)
-                        body = bodyPair.second;
-                    else
-                        body = bodyPair.first;
 
-
+                else if ((index = eventHandler.projectileCollision(bodyPair)) && index) {
+                    std::weak_ptr<phy::Body> enemy;
+                    std::weak_ptr<phy::Body> playerAttack;
+                    if (index == 1){
+                        enemy = bodyPair.second;
+                        playerAttack = bodyPair.first;
+                    }
+                    else{
+                        enemy = bodyPair.first;
+                        playerAttack = bodyPair.second;
+                    }
+                    auto enemies = eventHandler.getEnemies();
+                    auto search = enemies.find(enemy.lock());
+                    if(search != enemies.end()){
+                        std::cout<<"Enemy: "<<enemy.lock()->getExtraData()->color.a<<std::endl;
+                        std::cout<<"Attack: "<<playerAttack.lock()->getExtraData()->color.a<<std::endl;
+                    } 
                     // TODO: Color Logic
                 }
             }

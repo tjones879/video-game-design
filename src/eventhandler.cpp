@@ -204,10 +204,16 @@ int EventHandler::boundaryCollision(std::pair<std::weak_ptr<phy::Body>, std::wea
 
 int EventHandler::projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair)
 {
-    if (bodyPair.first.lock() == projectile.lock())
+    if (bodyPair.first.lock() == projectile.lock()){
+        std::cout<<"Test: "<<(bodyPair.first.lock() == player.lock())<<std::endl;
+        std::cout<<"Test1: "<<(bodyPair.second.lock() == player.lock())<<std::endl;
         return 1;
-    if (bodyPair.second.lock() == projectile.lock())
+    }
+    if (bodyPair.second.lock() == projectile.lock()){
+        std::cout<<"Test2: "<<(bodyPair.first.lock() == player.lock())<<std::endl;
+        std::cout<<"Test3: "<<(bodyPair.second.lock() == player.lock())<<std::endl;
         return 2;
+    }
     return 0;
 }
 
