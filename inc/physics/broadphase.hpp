@@ -21,7 +21,7 @@ class BroadPhase : public AABBCallback {
 private:
     AABBTree tree;
     std::vector<std::pair<std::weak_ptr<const Shape>, int32_t>> shapeMapping;
-    std::vector<std::pair<std::weak_ptr<const Body>, int32_t>> bodyMapping;
+    std::vector<std::pair<std::weak_ptr<Body>, int32_t>> bodyMapping;
     std::unordered_set<std::pair<int32_t, int32_t>, pair_hash> collisions;
     std::vector<int32_t> moved;
 public:
@@ -41,7 +41,7 @@ public:
     void updatePairs();
     virtual bool registerCollision(int32_t nodeA, int32_t nodeB) override;
     void printTree(std::ostream &out);
-    std::vector<std::pair<std::weak_ptr<const Body>, std::weak_ptr<const Body>>>
+    std::vector<std::pair<std::weak_ptr<Body>, std::weak_ptr<Body>>>
     getBodyCollisions();
 private:
     /**

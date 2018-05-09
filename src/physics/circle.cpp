@@ -24,6 +24,19 @@ CircleShape::CircleShape(const CircleShape &other)
     pos = other.pos;
 }
 
+int CircleShape::updateRadius(int minR, int maxR, int expand)
+{
+    radius += expand;
+    if (radius >= maxR) {
+        radius = maxR;
+        return -1;
+    } else if (radius <= minR) {
+        radius = minR;
+        return 0;
+    }
+    return expand;
+}
+
 bool CircleShape::testPoint(const Transform &transform, const Vec2f &pos) const
 {
     Vec2f center = transform.position + transform.rotation.rotate(pos);

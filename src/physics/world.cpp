@@ -74,15 +74,18 @@ void World::step()
     // TODO: Resolve velocity constraints
     // Integrate positions
     for (const auto body : bodyList) {
-       body->updatePosition(dt);
-       broadPhase.updateBody(body);
+        if (!body->getExtraData()->colliding) {
+            body->updatePosition(dt);
+            broadPhase.updateBody(body);
+        }
+        auto expand = &body->getExtraData()->expanding;
+        if (*expand) {
+            auto circle = std::dynamic_pointer_cast<CircleShape>(body->shapeList[0]);
+            *expand = circle->updateRadius(10, 100, *expand);
+        }
     }
 
-    // TODO: Resolve position constraints
     broadPhase.updatePairs();
-
-    // TODO: Synchronize shapes for broad-phase
-    // TODO: Handle TOI
 
     // Clear forces
     for (const auto &body : bodyList)

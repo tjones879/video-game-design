@@ -15,6 +15,8 @@ public:
     CircleShape(float dens, float rad, Vec2f position);
     CircleShape(const CircleShape &other);
 
+    int updateRadius(int minR, int maxR, int expand);
+
     virtual bool testPoint(const Transform &transform, const Vec2f &pos) const override;
     virtual AABB getAABB(const Transform &transform) const override;
     virtual MassProperties getMassProps() const override;

@@ -11,6 +11,7 @@
 #include "inc/physics/common.hpp"
 #include "inc/physics/polygon.hpp"
 #include "inc/sound.hpp"
+#include <unordered_set>
 
 
 const std::chrono::milliseconds timePerFrame(16);
@@ -113,31 +114,41 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
         return;
     }
 
-    // Create Player
+    // Create Projectlie & Player
     phy::BodySpec spec;
     spec.bodyType = phy::BodyType::dynamicBody;
-    spec.position = {180, 180};
+    spec.position = {80, 80};
     spec.gravityFactor = 1;
     auto shape = phy::CircleShape(1.0f, 15, {0, 0});
     spec.shapes.push_back(std::make_shared<phy::CircleShape>(shape));
 
+
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Player));
+    manager->sendMessage(buffers::createBody,
+                         std::make_unique<CreateBodyMessage>(spec, CharacterType::Projectile));
 
     // Create Spawner
-    spec.position = {400, 400};
+    spec.position = {250, 250};
     spec.gravityFactor = 0;
-    auto shape2 = phy::PolygonShape(1.0f);
-    shape2.setBox(Vec2<float>(40, 40));
-    spec.shapes[0] = std::make_shared<phy::PolygonShape>(shape2);
+    auto shape3 = phy::PolygonShape(1.0f);
+    shape3.setBox(Vec2<float>(40, 40));
+    spec.shapes.clear();
+    spec.shapes.push_back(std::make_shared<phy::PolygonShape>(shape3));
     manager->sendMessage(buffers::createBody,
                          std::make_unique<CreateBodyMessage>(spec, CharacterType::Spawner));
 
     // Create Enemies
-    auto enemies = eventHandler.defineEnemies(20);
+    auto enemies = eventHandler.defineEnemies(50);
     for (auto spec : enemies)
         manager->sendMessage(buffers::createBody,
                              std::make_unique<CreateBodyMessage>(spec, CharacterType::Enemy));
+
+    // Create Walls
+    auto boundaries = eventHandler.defineBoundaries(Vec2<float>(250, -100), 25, 400);
+    for (auto boundary : boundaries)
+        manager->sendMessage(buffers::createBody,
+                             std::make_unique<CreateBodyMessage>(boundary, CharacterType::Boundary));
 
 
     SDL_Event e{};
@@ -158,9 +169,13 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                 eventHandler.addEnemy(msg->body.lock());
                 break;
             case CharacterType::Spawner:
+                eventHandler.setSpawner(msg->body);
                 break;
             case CharacterType::Boundary:
+                eventHandler.addBoundary(msg->body);
                 break;
+            case CharacterType::Projectile:
+                eventHandler.setProjectile(msg->body);
             case CharacterType::Unknown:
                 break;
             }
@@ -170,13 +185,110 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
 
         if (manager->newMessages(buffers::collisions)) {
             auto&& msg = manager->getMessage<CollisionMessage>(buffers::collisions);
-            /* Unnecessary logging
-            for (auto bodyPair : msg->bodies)
-                std::cout << *bodyPair.first.lock() << ", " << *bodyPair.second.lock() << std::endl;
-            */
+            for (auto bodyPair : msg->bodies) {
+                // Check if one of the bodies is a boundary
+                auto index = eventHandler.boundaryCollision(bodyPair);
+                if (index == 1 || index == 2) {
+                    std::weak_ptr<phy::Body> body;
+                    if (index == 1)
+                        body = bodyPair.second;
+                    else if (index == 2)
+                        body = bodyPair.first;
+
+                    auto vel = body.lock()->getLinearVelocity();
+                    auto extra = body.lock()->getExtraData();
+                    if (!extra->colliding && body.lock() != eventHandler.getProjectile().lock()) {
+                        extra->colliding = true;
+                        auto cmd = std::make_unique<MoveCommand>(body, Vec2<float>(-2.5 * vel.x, -2.5 * vel.y),
+                                [](std::weak_ptr<phy::Body> body) {
+                                    body.lock()->getExtraData()->colliding = false;
+                                });
+                        manager->sendMessage(buffers::input,
+                                             std::make_unique<InputMessage>(std::move(cmd)));
+                    }
+                } // Check if one of the bodies is the projectile
+                else if (1){
+                    index = eventHandler.projectileCollision(bodyPair);
+                    if (index) {
+                        std::weak_ptr<phy::Body> enemy;
+                        std::weak_ptr<phy::Body> playerAttack;
+                        if (index == 1){
+                            playerAttack = bodyPair.first;
+                            enemy = bodyPair.second;
+                        } else {
+                            enemy = bodyPair.first;
+                            playerAttack = bodyPair.second;
+                        }
+                        auto enemies = eventHandler.getEnemies();
+                        auto search = enemies.find(enemy.lock());
+                        if (search != enemies.end()){
+                            if ( abs(enemy.lock()->getExtraData()->color.r - playerAttack.lock()->getExtraData()->color.r) <= 250 &&
+                                 abs(enemy.lock()->getExtraData()->color.g - playerAttack.lock()->getExtraData()->color.g) <= 250 &&
+                                 abs(enemy.lock()->getExtraData()->color.b - playerAttack.lock()->getExtraData()->color.b) <= 250){
+                                if(enemy.lock()->getExtraData()->color.a > 10){
+                                    std::cout<<"1alphaBefore: "<<static_cast< int >( enemy.lock()->getExtraData()->color.a )<<std::endl;
+                                    enemy.lock()->getExtraData()->color.a = 0;
+                                    std::cout<<"1alphaAfter: "<<static_cast< int >( enemy.lock()->getExtraData()->color.a )<<std::endl;
+                                }
+
+                            }
+
+                            // printf("{%d, %d, %d, %d}\n", enemy.lock()->getExtraData()->color.r,
+                            //                              enemy.lock()->getExtraData()->color.g,
+                            //                              enemy.lock()->getExtraData()->color.b,
+                            //                              enemy.lock()->getExtraData()->color.a);
+                            // printf("{%d, %d, %d, %d}\n", playerAttack.lock()->getExtraData()->color.r,
+                            //                              playerAttack.lock()->getExtraData()->color.g,
+                            //                              playerAttack.lock()->getExtraData()->color.b,
+                            //                              playerAttack.lock()->getExtraData()->color.a);
+                        }
+                    // TODO: Color Logic
+                    }
+                }
+                else {
+                    index = eventHandler.playerCollision(bodyPair);
+                    if (index) {
+                        std::weak_ptr<phy::Body> enemy;
+                        std::weak_ptr<phy::Body> player;
+                        if (index == 1){
+                            player = bodyPair.first;
+                            enemy = bodyPair.second;
+                        } else {
+                            enemy = bodyPair.first;
+                            player = bodyPair.second;
+                        }
+                        auto enemies = eventHandler.getEnemies();
+                        auto search = enemies.find(enemy.lock());
+                        if (search != enemies.end()){
+                            if(player.lock()->getExtraData()->color.a > 10){
+                                std::cout<<"alphaBefore: "<<static_cast< int >( player.lock()->getExtraData()->color.a )<<std::endl;
+                                player.lock()->getExtraData()->color.a -= 5;
+                                std::cout<<"alphaAfter: "<<static_cast< int >( player.lock()->getExtraData()->color.a )<<std::endl;
+                            }
+                        }
+                            // printf("{%d, %d, %d, %d}\n", enemy.lock()->getExtraData()->color.r,
+                            //                              enemy.lock()->getExtraData()->color.g,
+                            //                              enemy.lock()->getExtraData()->color.b,
+                            //                              enemy.lock()->getExtraData()->color.a);
+                            // printf("{%d, %d, %d, %d}\n", player.lock()->getExtraData()->color.r,
+                            //                              player.lock()->getExtraData()->color.g,
+                            //                              player.lock()->getExtraData()->color.b,
+                            //                              player.lock()->getExtraData()->color.a);
+                    // TODO: Color Logic
+                    }
+                }
+            }
         }
 
         eventHandler.executeEvents();
+
+        auto color = eventHandler.setPlayerColor();
+        auto projectile = eventHandler.getProjectile().lock();
+        if (projectile->getExtraData() && !projectile->getExtraData()->expanding)
+            projectile->getExtraData()->color = color;
+
+        if (projectile && eventHandler.getPlayer().lock())
+            projectile->setPosition(eventHandler.getPlayer().lock()->getPosition());
 
         sleepForTimeLeft(start);
     }

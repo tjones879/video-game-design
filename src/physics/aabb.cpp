@@ -121,10 +121,6 @@ void AABBTree::updateAABB(int32_t index, const AABB &newAABB)
     if (index < 0 || index > nodes.capacity())
         return;
 
-    if (nodes[index].aabb.contains(newAABB)) {
-        return;
-    }
-
     // Just remove, update, reinsert the node.
     // TODO: Find a more efficient way of updating nodes.
     remove(index);

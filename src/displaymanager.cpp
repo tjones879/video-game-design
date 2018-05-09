@@ -25,7 +25,7 @@ DisplayManager::DisplayManager(const std::string &title)
     GPU_EnableCamera(gpu, true);
     camera.x = 0;
     camera.y = 0;
-    camera.zoom = .5;
+    camera.zoom = .7;
     GPU_SetCamera(gpu, &camera);
 }
 
@@ -92,6 +92,7 @@ void DisplayManager::displayAll()
         }else
             GPU_PolygonFilled(gpu, shape.lock()->vertices.size(), &vertices[0], color);
         */
+        //std::cout << shape << std::endl;
         auto vertices = toFloatVector(shape, transform);
         GPU_PolygonFilled(gpu, shape.vertices.size(), &vertices[0], std::get<2>(s));
     }
@@ -99,9 +100,9 @@ void DisplayManager::displayAll()
     for (const auto &s : circles) {
         auto shape = std::get<0>(s);
         auto transform = std::get<1>(s);
-
         auto center = transform.translate(shape.pos);
         GPU_CircleFilled(gpu, center.x, center.y, shape.radius, std::get<2>(s));
+        setCamera(center.x, center.y);
     }
 
     GPU_Flip(gpu);
@@ -111,66 +112,42 @@ int DisplayManager::getCamPosX() {
     return camera.x;
 }
 
-void DisplayManager::setCamera(const Vec2<float> playerVel,
-                               const Vec2<float> playerPos,
-                               const Vec2<float> enemyVel,
-                               const Vec2<float> enemyPos){
+void DisplayManager::setCamera(const int playerPosX, const int playerPosY){
     //This tracks the camera to the player
-    if(playerPos.x < (camera.x + (SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75)){
-        camera.x = (playerPos.x - ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75));
+    if(playerPosX < (camera.x + (SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75)){
+        camera.x = (playerPosX - ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75));
     }
-    if(playerPos.x > (camera.x + (SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75)){
-        camera.x = (playerPos.x - ((SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75));
+    if(playerPosX > (camera.x + (SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75)){
+        camera.x = (playerPosX - ((SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75));
     }
-    if(playerPos.y < (camera.y + (SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75)){
-        camera.y = (playerPos.y - ((SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75));
+    if(playerPosY < (camera.y + (SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75)){
+        camera.y = (playerPosY - ((SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75));
     }
-    if(playerPos.y > (camera.y + (SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75)){
-        camera.y = (playerPos.y - ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75));
+    if(playerPosY > (camera.y + (SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75)){
+        camera.y = (playerPosY - ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75));
     }
     //This zooms the camera based on the enemy
-    if(camera.zoom <= 1.5 && camera.zoom >= 0.5){
-        if(enemyPos.x <= (camera.x + ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else if(enemyPos.x >= (camera.x + ((SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else if(enemyPos.y <= (camera.y + ((SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else if(enemyPos.y >= (camera.y + ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
-            if(camera.zoom >= 0.52)
-                camera.zoom -= .005;
-        }
-        else{
-            if(camera.zoom <= 1.49)
-                camera.zoom += .005;
-        }
-    }
+    // if(camera.zoom <= 1.5 && camera.zoom >= 0.5){
+    //     if(380 <= (camera.x + ((SCREEN_WIDTH/2)-((SCREEN_WIDTH/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else if(420 >= (camera.x + ((SCREEN_WIDTH/2)+((SCREEN_WIDTH/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else if(380 <= (camera.y + ((SCREEN_HEIGHT/2)-((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else if(420 >= (camera.y + ((SCREEN_HEIGHT/2)+((SCREEN_HEIGHT/2)/camera.zoom)*.75))){
+    //         if(camera.zoom >= 0.52)
+    //             camera.zoom -= .005;
+    //     }
+    //     else{
+    //         if(camera.zoom <= 1.49)
+    //             camera.zoom += .005;
+    //     }
+    // }
     GPU_SetCamera(gpu, &camera);
-}
-
-void DisplayManager::setPlayerColor(){
-    if (playerColor.r == 255 || playerColor.r == 0)
-        r = !r;
-    if (playerColor.g == 254 || playerColor.g == 0)
-        g = !g;
-    if (playerColor.b == 255 || playerColor.b == 0)
-        b = !b;
-    if (!r)
-        playerColor.r += 1;
-    if (!g)
-        playerColor.g += 2;
-    if (!b)
-        playerColor.b += 3;
-    if (r)
-        playerColor.r -= 1;
-    if (g)
-        playerColor.g -= 2;
-    if (b)
-        playerColor.b -= 3;
 }

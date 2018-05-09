@@ -66,7 +66,18 @@ float Body::getRotation() const
 
 void Body::setLinearVelocity(const Vec2f &velocity)
 {
-    linearVelocity = velocity;
+    Vec2f newVelocity;
+    if (abs(velocity.x) > 40)
+        newVelocity.x = velocity.x < 0 ? -40 : 40;
+    else
+        newVelocity.x = velocity.x;
+
+    if (abs(velocity.y) > 40)
+        newVelocity.y = velocity.y < 0 ? -40 : 40;
+    else
+        newVelocity.y = velocity.y;
+
+    linearVelocity = newVelocity;
 }
 
 const Vec2f &Body::getLinearVelocity() const
@@ -192,7 +203,12 @@ void Body::updateMassProperties()
     // Update velocity
 }
 
-const ExtraData *Body::getExtraData() const
+void Body::setPosition(Vec2f pos)
+{
+    position = pos;
+}
+
+ExtraData *Body::getExtraData()
 {
     return &extraData;
 }

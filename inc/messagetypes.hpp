@@ -28,6 +28,7 @@ enum class CharacterType : char {
     Spawner,
     Boundary,
     Enemy,
+    Projectile,
     Unknown
 };
 
@@ -114,11 +115,11 @@ struct DestroyBodyMessage : Message {
 };
 
 struct CollisionMessage : Message {
-    std::vector<std::pair<std::weak_ptr<const phy::Body>, std::weak_ptr<const phy::Body>>> bodies;
+    std::vector<std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>>> bodies;
 
     CollisionMessage() {}
-    CollisionMessage(std::vector<std::pair<std::weak_ptr<const phy::Body>,
-                                           std::weak_ptr<const phy::Body>>> collisions)
+    CollisionMessage(std::vector<std::pair<std::weak_ptr<phy::Body>,
+                                           std::weak_ptr<phy::Body>>> collisions)
         : bodies(collisions) {}
 
     virtual MessageType getType() const override {
