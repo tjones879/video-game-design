@@ -192,6 +192,8 @@ std::unordered_set<std::shared_ptr<phy::Body>> EventHandler::getEnemies() const
 
 void EventHandler::enemyMovement() {
     int dirx, diry;
+    if (!player.lock())
+        return;
     auto playerPos = player.lock()->getPosition();
 
     for (auto enemy:enemies) {
@@ -201,16 +203,16 @@ void EventHandler::enemyMovement() {
         diry = playerPos.y - enemyPos.y;
 
         if (dirx > 0 && diry > 0) {
-            enemy->setLinearVelocity(Vec2<float>(30,30));
+            enemy->setLinearVelocity(Vec2<float>(20,20));
         }
         if (dirx > 0 && diry < 0) {
-            enemy->setLinearVelocity(Vec2<float>(30,-30));
+            enemy->setLinearVelocity(Vec2<float>(20,-20));
         }
         if (dirx < 0 && diry > 0) {
-            enemy->setLinearVelocity(Vec2<float>(-30,30));
+            enemy->setLinearVelocity(Vec2<float>(-20,20));
         }
         if (dirx < 0 && diry < 0) {
-            enemy->setLinearVelocity(Vec2<float>(-30,-30));
+            enemy->setLinearVelocity(Vec2<float>(-20,-20));
         }
 
 
