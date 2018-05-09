@@ -172,6 +172,7 @@ public:
      *         2 if the second body is the projectile
      */
     int projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
+    int playerCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair);
     void setProjectile(std::weak_ptr<phy::Body> proj);
     std::weak_ptr<phy::Body> getProjectile();
     SDL_Color setPlayerColor();

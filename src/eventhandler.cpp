@@ -212,6 +212,16 @@ int EventHandler::projectileCollision(std::pair<std::weak_ptr<phy::Body>, std::w
     return 0;
 }
 
+int EventHandler::playerCollision(std::pair<std::weak_ptr<phy::Body>, std::weak_ptr<phy::Body>> bodyPair)
+{
+    if (bodyPair.first.lock() == player.lock() && bodyPair.second.lock() != projectile.lock())
+        return 1;
+    if (bodyPair.second.lock() == player.lock() && bodyPair.first.lock() != projectile.lock())
+        return 2;
+
+    return 0;
+}
+
 void EventHandler::setPlayer(std::weak_ptr<phy::Body> bodyPtr){
     player = bodyPtr;
 }
@@ -251,7 +261,7 @@ std::vector<phy::BodySpec> EventHandler::defineEnemies(uint32_t numEnemies) cons
 
         spec.linVelocity = {vel(gen), vel(gen)};
         // TODO: Give enemy random color
-        SDL_Color c{color(gen), color(gen), color(gen), color(gen)};
+        SDL_Color c{color(gen), color(gen), color(gen), 255};
         spec.extra.color = c;
         specs.push_back(spec);
     }

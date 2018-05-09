@@ -205,7 +205,7 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                                              std::make_unique<InputMessage>(std::move(cmd)));
                     }
                 } // Check if one of the bodies is the projectile
-                else {
+                else if (1){
                     index = eventHandler.projectileCollision(bodyPair);
                     if (index) {
                         std::weak_ptr<phy::Body> enemy;
@@ -220,15 +220,58 @@ void events(std::atomic<bool> *quit, ThreadManager *manager)
                         auto enemies = eventHandler.getEnemies();
                         auto search = enemies.find(enemy.lock());
                         if (search != enemies.end()){
-                            printf("{%d, %d, %d, %d}\n", enemy.lock()->getExtraData()->color.r,
-                                                         enemy.lock()->getExtraData()->color.g,
-                                                         enemy.lock()->getExtraData()->color.b,
-                                                         enemy.lock()->getExtraData()->color.a);
-                            printf("{%d, %d, %d, %d}\n", playerAttack.lock()->getExtraData()->color.r,
-                                                         playerAttack.lock()->getExtraData()->color.g,
-                                                         playerAttack.lock()->getExtraData()->color.b,
-                                                         playerAttack.lock()->getExtraData()->color.a);
+                            if ( abs(enemy.lock()->getExtraData()->color.r - playerAttack.lock()->getExtraData()->color.r) <= 250 &&
+                                 abs(enemy.lock()->getExtraData()->color.g - playerAttack.lock()->getExtraData()->color.g) <= 250 &&
+                                 abs(enemy.lock()->getExtraData()->color.b - playerAttack.lock()->getExtraData()->color.b) <= 250){
+                                if(enemy.lock()->getExtraData()->color.a > 10){
+                                    std::cout<<"1alphaBefore: "<<static_cast< int >( enemy.lock()->getExtraData()->color.a )<<std::endl;
+                                    enemy.lock()->getExtraData()->color.a = 0;
+                                    std::cout<<"1alphaAfter: "<<static_cast< int >( enemy.lock()->getExtraData()->color.a )<<std::endl;
+                                }
+
+                            }
+
+                            // printf("{%d, %d, %d, %d}\n", enemy.lock()->getExtraData()->color.r,
+                            //                              enemy.lock()->getExtraData()->color.g,
+                            //                              enemy.lock()->getExtraData()->color.b,
+                            //                              enemy.lock()->getExtraData()->color.a);
+                            // printf("{%d, %d, %d, %d}\n", playerAttack.lock()->getExtraData()->color.r,
+                            //                              playerAttack.lock()->getExtraData()->color.g,
+                            //                              playerAttack.lock()->getExtraData()->color.b,
+                            //                              playerAttack.lock()->getExtraData()->color.a);
                         }
+                    // TODO: Color Logic
+                    }
+                }
+                else {
+                    index = eventHandler.playerCollision(bodyPair);
+                    if (index) {
+                        std::weak_ptr<phy::Body> enemy;
+                        std::weak_ptr<phy::Body> player;
+                        if (index == 1){
+                            player = bodyPair.first;
+                            enemy = bodyPair.second;
+                        } else {
+                            enemy = bodyPair.first;
+                            player = bodyPair.second;
+                        }
+                        auto enemies = eventHandler.getEnemies();
+                        auto search = enemies.find(enemy.lock());
+                        if (search != enemies.end()){
+                            if(player.lock()->getExtraData()->color.a > 10){
+                                std::cout<<"alphaBefore: "<<static_cast< int >( player.lock()->getExtraData()->color.a )<<std::endl;
+                                player.lock()->getExtraData()->color.a -= 5;
+                                std::cout<<"alphaAfter: "<<static_cast< int >( player.lock()->getExtraData()->color.a )<<std::endl;
+                            }
+                        }
+                            // printf("{%d, %d, %d, %d}\n", enemy.lock()->getExtraData()->color.r,
+                            //                              enemy.lock()->getExtraData()->color.g,
+                            //                              enemy.lock()->getExtraData()->color.b,
+                            //                              enemy.lock()->getExtraData()->color.a);
+                            // printf("{%d, %d, %d, %d}\n", player.lock()->getExtraData()->color.r,
+                            //                              player.lock()->getExtraData()->color.g,
+                            //                              player.lock()->getExtraData()->color.b,
+                            //                              player.lock()->getExtraData()->color.a);
                     // TODO: Color Logic
                     }
                 }

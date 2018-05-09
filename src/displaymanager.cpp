@@ -25,7 +25,7 @@ DisplayManager::DisplayManager(const std::string &title)
     GPU_EnableCamera(gpu, true);
     camera.x = 0;
     camera.y = 0;
-    camera.zoom = .9;
+    camera.zoom = .7;
     GPU_SetCamera(gpu, &camera);
 }
 
