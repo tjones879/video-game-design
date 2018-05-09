@@ -51,12 +51,6 @@ int EventHandler::getSoundOrigin() {
     return soundOrigin*-1; // return inverse since this is used for left channel -- see Mix_SetPanning in sound.cpp
 }
 
-int EventHandler::getEnemySound(enemy) {
-    auto enemyPos = enemy->getPosition();
-    double soundRatio = double(abs(camPosX - enemyPos.x))/640;
-    int soundOrigin = soundRatio*255;
-    return soundOrigin*-1;
-}
 
 void EventHandler::setCamPosX(int camX) {
     camPosX = camX;
